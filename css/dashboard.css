@@ -1,0 +1,178 @@
+/* ==========================================================================
+   NexusTech ERP • Dashboard & Career Hub
+   ========================================================================== */
+
+.dashboard-hero {
+  background: linear-gradient(135deg, var(--erp-navy-950) 0%, var(--erp-navy-850) 100%);
+  border-radius: 8px;
+  padding: 24px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: var(--erp-shadow-md);
+  border: 1px solid var(--erp-navy-700);
+}
+
+.dashboard-hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.hero-profile-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0265dc 0%, #10b981 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.hero-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* Indicadores Chave de Desempenho (KPI Cards) */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: var(--erp-shadow-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--erp-navy-600);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.kpi-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--erp-navy-900);
+  font-family: var(--font-mono);
+}
+
+.kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--erp-blue-primary);
+  background-color: var(--erp-blue-subtle);
+}
+
+/* Seção de Chamados e Cenários */
+.scenarios-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scenarios-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.scenario-card {
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: var(--erp-shadow-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.scenario-card:hover {
+  border-color: var(--erp-blue-primary);
+  box-shadow: var(--erp-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.scenario-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 70%;
+}
+
+.scenario-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scenario-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--erp-navy-900);
+}
+
+.scenario-desc {
+  font-size: 12.5px;
+  color: var(--erp-text-muted);
+  line-height: 1.4;
+}
+
+/* Histórico de Auditoria */
+.audit-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audit-item {
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border-subtle);
+  border-radius: 4px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+
+.audit-time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--erp-text-light);
+}

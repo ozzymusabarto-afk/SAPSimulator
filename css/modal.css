@@ -1,0 +1,174 @@
+/* ==========================================================================
+   NexusTech ERP • Modals (Diagnóstico com Impacto no Negócio & Nível)
+   ========================================================================== */
+
+.erp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.erp-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.erp-modal-window {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: var(--erp-shadow-xl);
+  width: 90%;
+  max-width: 620px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--erp-border);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.erp-modal-overlay.active .erp-modal-window {
+  transform: translateY(0) scale(1);
+}
+
+/* Header do Modal */
+.erp-modal-header {
+  padding: 16px 20px;
+  background-color: var(--erp-navy-900);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--erp-navy-800);
+}
+
+.erp-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.erp-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.erp-modal-close:hover {
+  color: #ffffff;
+}
+
+/* Corpo do Modal */
+.erp-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Bloco de Diagnóstico em 3 Partes (Raciocínio & Impacto no Negócio) */
+.diagnostic-box {
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diagnostic-success {
+  background-color: var(--erp-green-bg);
+  border: 1px solid var(--erp-green-border);
+}
+
+.diagnostic-error {
+  background-color: var(--erp-red-bg);
+  border: 1px solid var(--erp-red-border);
+}
+
+.diagnostic-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diagnostic-step-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagnostic-success .diagnostic-step-title { color: var(--erp-green-success); }
+.diagnostic-error .diagnostic-step-title { color: var(--erp-red-danger); }
+
+.diagnostic-step-content {
+  font-size: 13px;
+  color: var(--erp-navy-900);
+  line-height: 1.45;
+  background-color: #ffffff;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Seção de Impacto no Negócio Real */
+.business-impact-card {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid var(--erp-amber-warning);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.business-impact-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--erp-amber-warning);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.business-impact-text {
+  font-size: 12.5px;
+  color: var(--erp-navy-900);
+  line-height: 1.4;
+}
+
+/* Footer do Modal */
+.erp-modal-footer {
+  padding: 14px 20px;
+  background-color: #f8fafc;
+  border-top: 1px solid var(--erp-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}

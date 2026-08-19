@@ -1,0 +1,313 @@
+/* ==========================================================================
+   NexusTech ERP • Mentor Dock (Painel do Gestor Carlos Eduardo)
+   ========================================================================== */
+
+.mentor-dock {
+  width: var(--mentor-dock-width);
+  background-color: #ffffff;
+  border-left: 1px solid var(--erp-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
+  z-index: 60;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.mentor-dock.collapsed {
+  width: 48px;
+}
+
+/* Cabeçalho do Mentor */
+.mentor-dock-header {
+  padding: 12px 14px;
+  background-color: var(--erp-navy-900);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--erp-navy-800);
+}
+
+.mentor-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mentor-avatar {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0265dc 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.mentor-status-online {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #22c55e;
+  border: 2px solid var(--erp-navy-900);
+  border-radius: 50%;
+}
+
+.mentor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mentor-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.mentor-role {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.mentor-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.mentor-toggle-btn:hover {
+  background-color: var(--erp-navy-800);
+  color: #ffffff;
+}
+
+/* Corpo e Abas do Mentor */
+.mentor-dock-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--erp-bg);
+}
+
+.mentor-tabs {
+  display: flex;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--erp-border-subtle);
+  padding: 0 8px;
+}
+
+.mentor-tab-btn {
+  flex: 1;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--erp-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.mentor-tab-btn:hover {
+  color: var(--erp-text-main);
+}
+
+.mentor-tab-btn.active {
+  color: var(--erp-blue-primary);
+  border-bottom-color: var(--erp-blue-primary);
+  font-weight: 600;
+}
+
+.mentor-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Cartão do Chamado Atual / Briefing */
+.ticket-card {
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: var(--erp-shadow-xs);
+}
+
+.ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--erp-border-subtle);
+}
+
+.ticket-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--erp-navy-800);
+}
+
+.ticket-sla-timer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.sla-normal {
+  background-color: var(--erp-blue-subtle);
+  color: var(--erp-blue-primary);
+}
+
+.sla-warning {
+  background-color: var(--erp-amber-bg);
+  color: var(--erp-amber-warning);
+  animation: pulse-border 1.5s infinite;
+}
+
+.sla-critical {
+  background-color: var(--erp-red-bg);
+  color: var(--erp-red-danger);
+  animation: pulse-border 0.8s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.ticket-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--erp-navy-900);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.ticket-desc {
+  font-size: 12px;
+  color: var(--erp-text-muted);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+/* Mensagem / Fala do Carlos */
+.mentor-speech-bubble {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid var(--erp-blue-primary);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--erp-navy-900);
+  line-height: 1.45;
+  box-shadow: var(--erp-shadow-xs);
+}
+
+.mentor-speech-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--erp-blue-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Lista de Objetivos / Checklist */
+.objectives-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border-subtle);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.checklist-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--erp-navy-700);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--erp-text-muted);
+  line-height: 1.3;
+}
+
+.checklist-icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.checklist-item.done {
+  color: var(--erp-green-success);
+  text-decoration: line-through;
+}
+
+/* Pílula SAP Bridge no Mentor */
+.sap-bridge-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.sap-bridge-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--erp-purple-sap);
+  margin-bottom: 4px;
+}
+
+.sap-bridge-text {
+  font-size: 11px;
+  color: var(--erp-navy-700);
+  line-height: 1.4;
+}

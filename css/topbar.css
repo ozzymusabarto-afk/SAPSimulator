@@ -1,0 +1,280 @@
+/* ==========================================================================
+   NexusTech ERP • Topbar Corporativa & Command Bar
+   ========================================================================== */
+
+.erp-topbar {
+  height: var(--topbar-height);
+  background-color: var(--erp-navy-900);
+  border-bottom: 1px solid var(--erp-navy-800);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: var(--erp-text-inverse);
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Marca / Logo da Empresa Fictícia */
+.erp-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.erp-brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #0265dc 0%, #1d4ed8 100%);
+  border-radius: 6px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  box-shadow: 0 2px 4px rgba(2, 101, 220, 0.4);
+}
+
+.erp-brand-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-brand-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.erp-brand-subtitle {
+  font-size: 10.5px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Barra de Comandos / T-Codes (OK-Code) */
+.erp-command-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--erp-navy-850);
+  border: 1px solid var(--erp-navy-700);
+  border-radius: 6px;
+  padding: 3px 8px;
+  transition: all 0.2s ease;
+  width: 380px;
+  max-width: 420px;
+}
+
+.erp-command-bar:focus-within {
+  border-color: var(--erp-blue-primary);
+  background-color: #0b1120;
+  box-shadow: 0 0 0 2px rgba(2, 101, 220, 0.25);
+}
+
+.erp-tcode-prefix {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: #38bdf8;
+  user-select: none;
+}
+
+.erp-tcode-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.erp-tcode-input::placeholder {
+  color: #64748b;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  text-transform: none;
+  font-size: 12px;
+}
+
+.erp-tcode-btn {
+  background-color: var(--erp-navy-700);
+  border: none;
+  color: #e2e8f0;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.erp-tcode-btn:hover {
+  background-color: var(--erp-blue-primary);
+  color: #ffffff;
+}
+
+/* Atalhos Rápidos no Topbar */
+.erp-quick-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.erp-nav-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbd5e1;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.erp-nav-btn:hover {
+  background-color: var(--erp-navy-800);
+  color: #ffffff;
+}
+
+.erp-nav-btn.active {
+  background-color: var(--erp-navy-800);
+  border-color: var(--erp-navy-700);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* Trainee HUD (Nível, XP, Status) */
+.erp-trainee-hud {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.erp-trainee-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--erp-navy-700);
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.erp-trainee-level-badge:hover {
+  background-color: var(--erp-navy-800);
+  border-color: #475569;
+}
+
+.erp-trainee-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.erp-trainee-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-trainee-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.erp-trainee-role {
+  font-size: 10px;
+  color: #38bdf8;
+  font-weight: 500;
+}
+
+.erp-xp-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 90px;
+}
+
+.erp-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: #94a3b8;
+  font-family: var(--font-mono);
+}
+
+.erp-xp-track {
+  width: 100%;
+  height: 4px;
+  background-color: var(--erp-navy-700);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.erp-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #10b981);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Statusbar do Rodapé */
+.erp-statusbar {
+  height: var(--statusbar-height);
+  background-color: var(--erp-navy-950);
+  border-top: 1px solid var(--erp-navy-800);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 11.5px;
+  color: #94a3b8;
+  z-index: 90;
+}
+
+.erp-status-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.erp-status-icon-ok { color: #22c55e; }
+.erp-status-icon-warn { color: #f59e0b; }
+.erp-status-icon-err { color: #ef4444; }
+
+.erp-status-system-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}

@@ -1,0 +1,392 @@
+/* ==========================================================================
+   NexusTech ERP • Design System & Base CSS
+   Simulador Educacional inspirado em conceitos SAP® SD
+   ========================================================================== */
+
+:root {
+  /* Paleta Corporativa Principal */
+  --erp-navy-950: #090d16;
+  --erp-navy-900: #0f172a;
+  --erp-navy-850: #141f36;
+  --erp-navy-800: #1e293b;
+  --erp-navy-700: #334155;
+  --erp-navy-600: #475569;
+
+  /* Superfícies e Tons Neutros */
+  --erp-bg: #f8fafc;
+  --erp-surface: #ffffff;
+  --erp-surface-subtle: #f1f5f9;
+  --erp-surface-hover: #e2e8f0;
+  --erp-border: #cbd5e1;
+  --erp-border-subtle: #e2e8f0;
+
+  /* Tipografia & Contrastes */
+  --erp-text-main: #0f172a;
+  --erp-text-muted: #475569;
+  --erp-text-light: #64748b;
+  --erp-text-inverse: #f8fafc;
+
+  /* Status e Semântica ERP (Inspirado no SAP Fiori Horizon) */
+  --erp-blue-primary: #0265dc;
+  --erp-blue-hover: #0052b4;
+  --erp-blue-subtle: #eff6ff;
+  --erp-blue-border: #bfdbfe;
+
+  --erp-green-success: #15803d;
+  --erp-green-bg: #f0fdf4;
+  --erp-green-border: #bbf7d0;
+
+  --erp-amber-warning: #b45309;
+  --erp-amber-bg: #fffbeb;
+  --erp-amber-border: #fde68a;
+
+  --erp-red-danger: #b91c1c;
+  --erp-red-bg: #fef2f2;
+  --erp-red-border: #fecaca;
+
+  --erp-purple-sap: #6366f1;
+  --erp-purple-bg: #eef2ff;
+
+  /* Sombras e Elevação */
+  --erp-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --erp-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --erp-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -2px rgba(15, 23, 42, 0.08);
+  --erp-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.12), 0 4px 6px -4px rgba(15, 23, 42, 0.08);
+  --erp-shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+
+  /* Dimensões do Layout */
+  --topbar-height: 54px;
+  --process-stepper-height: 48px;
+  --statusbar-height: 32px;
+  --mentor-dock-width: 380px;
+
+  /* Fontes */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+/* Reset Global e Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--erp-text-main);
+  background-color: var(--erp-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars Corporativas Estilizadas */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--erp-surface-subtle);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Contêiner Geral da Aplicação */
+#app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--erp-bg);
+}
+
+/* Layout Principal de Trabalho */
+.app-workspace-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Área de Trabalho Central */
+.app-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: var(--erp-bg);
+  padding: 16px 20px 48px 20px;
+}
+
+/* Tipografia e Utilitários */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.text-xs { font-size: 11px; }
+.text-sm { font-size: 12.5px; }
+.text-base { font-size: 14px; }
+.text-lg { font-size: 16px; font-weight: 600; }
+.text-xl { font-size: 18px; font-weight: 700; }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-muted { color: var(--erp-text-muted); }
+.text-light { color: var(--erp-text-light); }
+.text-primary { color: var(--erp-blue-primary); }
+.text-success { color: var(--erp-green-success); }
+.text-warning { color: var(--erp-amber-warning); }
+.text-danger { color: var(--erp-red-danger); }
+
+/* Badges e Tags de Código ERP */
+.erp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.erp-badge-code {
+  font-family: var(--font-mono);
+  background-color: var(--erp-surface-subtle);
+  color: var(--erp-navy-800);
+  border: 1px solid var(--erp-border);
+  letter-spacing: -0.2px;
+}
+
+.erp-badge-primary {
+  background-color: var(--erp-blue-subtle);
+  color: var(--erp-blue-primary);
+  border: 1px solid var(--erp-blue-border);
+}
+
+.erp-badge-success {
+  background-color: var(--erp-green-bg);
+  color: var(--erp-green-success);
+  border: 1px solid var(--erp-green-border);
+}
+
+.erp-badge-warning {
+  background-color: var(--erp-amber-bg);
+  color: var(--erp-amber-warning);
+  border: 1px solid var(--erp-amber-border);
+}
+
+.erp-badge-danger {
+  background-color: var(--erp-red-bg);
+  color: var(--erp-red-danger);
+  border: 1px solid var(--erp-red-border);
+}
+
+.erp-badge-sap {
+  background-color: var(--erp-purple-bg);
+  color: var(--erp-purple-sap);
+  border: 1px solid #c7d2fe;
+}
+
+/* Botões Corporativos */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--erp-blue-primary);
+  color: #ffffff;
+  border-color: var(--erp-blue-primary);
+}
+.btn-primary:hover {
+  background-color: var(--erp-blue-hover);
+  border-color: var(--erp-blue-hover);
+}
+
+.btn-secondary {
+  background-color: var(--erp-surface);
+  color: var(--erp-navy-800);
+  border-color: var(--erp-border);
+}
+.btn-secondary:hover {
+  background-color: var(--erp-surface-subtle);
+  border-color: #94a3b8;
+}
+
+.btn-success {
+  background-color: var(--erp-green-success);
+  color: #ffffff;
+}
+.btn-success:hover {
+  background-color: #166534;
+}
+
+.btn-danger {
+  background-color: var(--erp-red-danger);
+  color: #ffffff;
+}
+.btn-danger:hover {
+  background-color: #991b1b;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--erp-text-muted);
+}
+.btn-ghost:hover {
+  background-color: var(--erp-surface-subtle);
+  color: var(--erp-text-main);
+}
+
+/* Painéis / Cards Corporativos */
+.erp-card {
+  background-color: var(--erp-surface);
+  border: 1px solid var(--erp-border-subtle);
+  border-radius: 6px;
+  box-shadow: var(--erp-shadow-xs);
+  transition: box-shadow 0.2s ease;
+}
+
+.erp-card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--erp-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.erp-card-body {
+  padding: 16px;
+}
+
+/* Inputs Corporativos de Formulários */
+.erp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.erp-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--erp-navy-700);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.erp-input, .erp-select, .erp-textarea {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 6px 10px;
+  color: var(--erp-text-main);
+  background-color: #ffffff;
+  border: 1px solid var(--erp-border);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.erp-input:focus, .erp-select:focus, .erp-textarea:focus {
+  border-color: var(--erp-blue-primary);
+  box-shadow: 0 0 0 2px rgba(2, 101, 220, 0.15);
+}
+
+.erp-input.font-mono, .erp-select.font-mono {
+  font-family: var(--font-mono);
+}
+
+.erp-input[readonly], .erp-input:disabled {
+  background-color: var(--erp-surface-subtle);
+  color: var(--erp-text-muted);
+  cursor: not-allowed;
+}
+
+/* Grids de Dados Corporativas */
+.erp-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--erp-border-subtle);
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.erp-table th {
+  background-color: #f8fafc;
+  color: var(--erp-navy-700);
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--erp-border);
+  border-right: 1px solid var(--erp-border-subtle);
+  white-space: nowrap;
+}
+
+.erp-table th:last-child {
+  border-right: none;
+}
+
+.erp-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--erp-border-subtle);
+  border-right: 1px solid var(--erp-border-subtle);
+  color: var(--erp-text-main);
+  vertical-align: middle;
+}
+
+.erp-table td:last-child {
+  border-right: none;
+}
+
+.erp-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+.erp-table tr.selected {
+  background-color: var(--erp-blue-subtle);
+}

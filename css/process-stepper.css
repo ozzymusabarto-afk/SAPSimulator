@@ -1,0 +1,125 @@
+/* ==========================================================================
+   NexusTech ERP • Process Stepper (Fluxo de Processo Ponta a Ponta SD)
+   ========================================================================== */
+
+.process-stepper-bar {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--erp-border);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  z-index: 50;
+}
+
+.process-stepper-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.process-stepper-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--erp-navy-700);
+}
+
+.process-steps-track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  max-width: 960px;
+  margin: 0 16px;
+  overflow-x: auto;
+}
+
+.process-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--erp-text-light);
+  background-color: var(--erp-surface-subtle);
+  border: 1px solid var(--erp-border-subtle);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.process-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  color: var(--erp-navy-800);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.process-step-name {
+  font-weight: 600;
+}
+
+.process-step-tcode {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--erp-navy-600);
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* Estados do Step */
+.process-step.completed {
+  background-color: var(--erp-green-bg);
+  border-color: var(--erp-green-border);
+  color: var(--erp-green-success);
+}
+.process-step.completed .process-step-number {
+  background-color: var(--erp-green-success);
+  color: #ffffff;
+}
+
+.process-step.active {
+  background-color: var(--erp-blue-subtle);
+  border-color: var(--erp-blue-primary);
+  color: var(--erp-blue-primary);
+  box-shadow: 0 0 0 2px rgba(2, 101, 220, 0.15);
+  font-weight: 700;
+}
+.process-step.active .process-step-number {
+  background-color: var(--erp-blue-primary);
+  color: #ffffff;
+}
+
+.process-step.blocked {
+  background-color: var(--erp-red-bg);
+  border-color: var(--erp-red-border);
+  color: var(--erp-red-danger);
+}
+.process-step.blocked .process-step-number {
+  background-color: var(--erp-red-danger);
+  color: #ffffff;
+}
+
+.process-step-arrow {
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.process-mode-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
