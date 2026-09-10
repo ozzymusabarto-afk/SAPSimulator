@@ -9,6 +9,7 @@ import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
 import { diagnosticModal } from '../diagnosticModal.js';
+import { MentorDockComponent } from '../mentorDock.js';
 
 export class Xd03ViewComponent {
   constructor(onNavigate) {
@@ -35,7 +36,8 @@ export class Xd03ViewComponent {
         <div class="transaction-actions">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span class="text-xs font-semibold">Selecionar Cliente:</span>
-            <select class="erp-select font-mono text-xs" id="customer-selector" style="padding: 3px 8px;">
+            <button type="button" class="erp-field-help-btn" data-help-id="customerId" title="F1 - Ajuda do Campo">?</button>
+            <select class="erp-select font-mono text-xs" id="customer-selector" data-help-id="customerId" style="padding: 3px 8px;">
               ${customers.map(c => `
                 <option value="${c.id}" ${c.id === customer.id ? 'selected' : ''}>
                   ${c.id} - ${c.name}
@@ -254,6 +256,10 @@ export class Xd03ViewComponent {
       confirmBtn.addEventListener('click', () => {
         const result = scenarioEngine.validateCustomerAnalysis(this.selectedCustomerId);
         
+        if (result.isValid) {
+          MentorDockComponent.speak(`Dados cadastrais do cliente ${this.selectedCustomerId} validados. Utilize a Área de Vendas identificada na emissão da ordem na VA01.`, 'SUCCESS');
+        }
+
         diagnosticModal.show({
           isValid: result.isValid,
           mentorSpeech: result.feedback.mentorSpeech,

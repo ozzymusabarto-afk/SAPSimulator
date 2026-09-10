@@ -6,6 +6,7 @@
 import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
+import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
 
 export class Va03ViewComponent {
   constructor(onNavigate, initialParams = {}) {
@@ -23,8 +24,28 @@ export class Va03ViewComponent {
   }
 
   render() {
+    const scenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = scenario ? scenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.currentScenarioId = activeScenarioId;
+      if (scenario?.targetCriteria?.targetDocNumber) {
+        this.selectedDocNumber = scenario.targetCriteria.targetDocNumber;
+      }
+    }
+
+    if (scenario) {
+      scenarioEngine.completeObjective('check_order_va03');
+      scenarioEngine.completeObjective('analyze_order');
+      scenarioEngine.completeObjective('diagnose_situation');
+      scenarioEngine.completeObjective('verify_document_flow');
+    }
+
     const orders = db.getAllSalesOrders();
     const currentOrder = db.getSalesOrder(this.selectedDocNumber) || orders[orders.length - 1] || null;
+
+    const deliveryFlow = currentOrder?.documentFlow?.find(f => f.type === 'DELIVERY');
+    const matDocFlow = currentOrder?.documentFlow?.find(f => f.type === 'MATERIAL_DOC');
+    const invoiceFlow = currentOrder?.documentFlow?.find(f => f.type === 'INVOICE');
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
@@ -32,10 +53,15 @@ export class Va03ViewComponent {
           <span class="transaction-tcode-badge">VA03</span>
           <div>
             <div class="transaction-title">Exibir Ordem do Cliente: Fluxo de Documentos & Status</div>
-            <div class="text-xs text-muted">Acompanhamento do Processo de Ponta a Ponta</div>
+            <div class="text-xs text-muted">Acompanhamento do Processo de Ponta a Ponta (Document Flow • Tabela VBFA)</div>
           </div>
         </div>
         <div class="transaction-actions">
+          ${currentOrder && !deliveryFlow && currentOrder.overallStatus !== 'CREDIT_BLOCKED' && currentOrder.overallStatus !== 'CANCELLED' ? `
+            <button class="btn btn-primary btn-sm" id="btn-goto-vl01n-top">
+              ${Icons.package} Criar Remessa (VL01N)
+            </button>
+          ` : ''}
           <button class="btn btn-secondary btn-sm" id="btn-goto-va01">
             ${Icons.fileText} Criar Nova Ordem (VA01)
           </button>
@@ -86,6 +112,10 @@ export class Va03ViewComponent {
               <div>
                 ${currentOrder.overallStatus === 'CREDIT_BLOCKED' 
                   ? `<span class="erp-badge erp-badge-danger">${Icons.lock} Bloqueado por Crédito (VKM1)</span>` 
+                  : currentOrder.overallStatus === 'CANCELLED'
+                  ? `<span class="erp-badge erp-badge-danger">${Icons.alertTriangle} Cancelado</span>`
+                  : currentOrder.deliveryStatus === 'COMPLETED'
+                  ? `<span class="erp-badge erp-badge-success">${Icons.check} Fornecimento Concluído</span>`
                   : `<span class="erp-badge erp-badge-success">${Icons.check} Aberto para Fornecimento</span>`}
               </div>
             </div>
@@ -114,30 +144,62 @@ export class Va03ViewComponent {
             </div>
 
             <!-- Etapa 2: Fornecimento / Remessa -->
-            <div class="doc-flow-node ${currentOrder.overallStatus === 'CREDIT_BLOCKED' ? '' : 'active'}">
+            <div class="doc-flow-node ${deliveryFlow ? 'active' : (currentOrder.overallStatus === 'CREDIT_BLOCKED' ? '' : 'active')}">
               <div class="doc-flow-info">
-                <span class="erp-badge ${currentOrder.overallStatus === 'CREDIT_BLOCKED' ? 'erp-badge-code' : 'erp-badge-primary'}">
+                <span class="erp-badge ${deliveryFlow ? 'erp-badge-primary' : (currentOrder.overallStatus === 'CREDIT_BLOCKED' ? 'erp-badge-code' : 'erp-badge-primary')}">
                   2. Remessa / Fornecimento (VL01N)
                 </span>
                 <span class="doc-flow-number font-mono">
-                  ${currentOrder.overallStatus === 'CREDIT_BLOCKED' ? 'Bloqueado no Picking' : 'Doc: 80000104'}
+                  ${deliveryFlow
+                    ? `Doc: ${deliveryFlow.number}`
+                    : (currentOrder.overallStatus === 'CREDIT_BLOCKED' ? 'Bloqueado no Picking' : 'Pendente de Criação (VL01N)')}
                 </span>
               </div>
-              <div>
-                ${currentOrder.overallStatus === 'CREDIT_BLOCKED' 
-                  ? `<span class="erp-badge erp-badge-danger">${Icons.lock} Aguardando Liberação VKM1</span>` 
-                  : `<span class="erp-badge erp-badge-primary">${Icons.clock} Pronto para Expedição</span>`}
+              <div style="display: flex; gap: 8px; align-items: center;">
+                ${deliveryFlow ? `
+                  <span class="erp-badge ${deliveryFlow.status === 'COMPLETED' ? 'erp-badge-success' : 'erp-badge-warning'}">
+                    ${deliveryFlow.status === 'COMPLETED' ? `${Icons.check} PGI Concluído` : `${Icons.clock} Em Aberto / Picking`}
+                  </span>
+                  <button class="btn btn-secondary btn-xs btn-open-delivery" data-del="${deliveryFlow.number}">
+                    ${Icons.search} Ver VL03N
+                  </button>
+                ` : currentOrder.overallStatus === 'CREDIT_BLOCKED' ? `
+                  <span class="erp-badge erp-badge-danger">${Icons.lock} Aguardando Liberação VKM1</span>
+                ` : `
+                  <span class="erp-badge erp-badge-primary">${Icons.clock} Pronto para Expedição</span>
+                  <button class="btn btn-primary btn-xs" id="btn-flow-create-delivery">
+                    ${Icons.package} Criar VL01N
+                  </button>
+                `}
               </div>
             </div>
 
-            <!-- Etapa 3: Fatura Comercial -->
-            <div class="doc-flow-node">
+            <!-- Etapa 3: Documento de Material MM (se PGI executado) -->
+            ${matDocFlow ? `
+              <div class="doc-flow-node active">
+                <div class="doc-flow-info">
+                  <span class="erp-badge erp-badge-success">3. Documento de Material MM (Mov. 601)</span>
+                  <span class="doc-flow-number font-mono">Doc: ${matDocFlow.number}</span>
+                  <span class="text-xs text-muted">Baixa de Estoque Realizada</span>
+                </div>
+                <div>
+                  <span class="erp-badge erp-badge-success">${Icons.check} Contabilizado</span>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Etapa 4: Fatura Comercial -->
+            <div class="doc-flow-node ${invoiceFlow ? 'active' : ''}">
               <div class="doc-flow-info">
-                <span class="erp-badge erp-badge-code">3. Fatura / Nota Fiscal (VF01)</span>
-                <span class="doc-flow-number font-mono">-</span>
+                <span class="erp-badge ${invoiceFlow ? 'erp-badge-primary' : 'erp-badge-code'}">
+                  ${matDocFlow ? '4. Fatura / Nota Fiscal (VF01)' : '3. Fatura / Nota Fiscal (VF01)'}
+                </span>
+                <span class="doc-flow-number font-mono">${invoiceFlow ? `Doc: ${invoiceFlow.number}` : '-'}</span>
               </div>
               <div>
-                <span class="erp-badge erp-badge-code">Não Faturado</span>
+                <span class="erp-badge ${invoiceFlow ? 'erp-badge-success' : 'erp-badge-code'}">
+                  ${invoiceFlow ? `${Icons.check} Faturado` : 'Não Faturado'}
+                </span>
               </div>
             </div>
 
@@ -171,6 +233,24 @@ export class Va03ViewComponent {
 
     const btn2 = this.container.querySelector('#btn-goto-va01-empty');
     if (btn2) btn2.addEventListener('click', () => this.onNavigate('VA01'));
+
+    const btnTopVl01n = this.container.querySelector('#btn-goto-vl01n-top');
+    if (btnTopVl01n) {
+      btnTopVl01n.addEventListener('click', () => this.onNavigate('VL01N', { salesOrderNumber: this.selectedDocNumber }));
+    }
+
+    const btnFlowVl01n = this.container.querySelector('#btn-flow-create-delivery');
+    if (btnFlowVl01n) {
+      btnFlowVl01n.addEventListener('click', () => this.onNavigate('VL01N', { salesOrderNumber: this.selectedDocNumber }));
+    }
+
+    const btnOpenDel = this.container.querySelector('.btn-open-delivery');
+    if (btnOpenDel) {
+      btnOpenDel.addEventListener('click', () => {
+        const delNum = btnOpenDel.getAttribute('data-del');
+        this.onNavigate('VL03N', { deliveryNumber: delNum });
+      });
+    }
   }
 
   getElement() {

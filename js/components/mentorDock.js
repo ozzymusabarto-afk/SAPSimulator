@@ -1,22 +1,99 @@
 /**
  * NexusTech ERP • Mentor Dock Component
  * Painel Interativo do Gestor Sr. Wilson (Coordenador Comercial | Mentor SD)
- * Exibição de Briefings, Documentos de Compra Anexos e Dicas de Aprendizagem
+ * Exibição de Briefings, Documentos de Compra Anexos, Dicas e Orientação do Mentor
  */
 
 import { Icons } from '../utils/icons.js';
 import { Formatters } from '../utils/formatters.js';
 import { scenarioEngine } from '../core/engine/scenarioEngine.js';
+import { trainee } from '../core/engine/traineeEngine.js';
+import { ScenarioCatalog } from '../core/scenarios/catalog.js';
 
 export class MentorDockComponent {
+  static instance = null;
+
   constructor(onNavigate) {
+    MentorDockComponent.instance = this;
     this.onNavigate = onNavigate;
     this.container = document.createElement('aside');
     this.container.className = 'mentor-dock';
-    this.isCollapsed = false;
-    this.activeTab = 'BRIEFING'; // BRIEFING, OBJECTIVES, SAP_BRIDGE
 
-    scenarioEngine.subscribe(() => this.render());
+    // Inicia recolhido em telas compactas (notebooks <= 1280px) para preservar a área operacional
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth <= 1280;
+    this.isCollapsed = isSmallScreen;
+    if (isSmallScreen) {
+      this.container.classList.add('collapsed');
+    }
+
+    this.activeTab = 'BRIEFING'; // BRIEFING, OBJECTIVES, SAP_BRIDGE
+    this.currentSpeech = null;
+    this.speechType = 'DEFAULT'; // DEFAULT, HELP, SUCCESS, WARN
+    this.lastScenarioId = null;
+
+    scenarioEngine.subscribe(() => {
+      const scenario = scenarioEngine.getActiveScenario();
+      if (scenario && scenario.id !== this.lastScenarioId) {
+        this.lastScenarioId = scenario.id;
+        this.currentSpeech = scenario.mentorInitialTip;
+        this.speechType = 'DEFAULT';
+      }
+      this.render();
+    });
+  }
+
+  /**
+   * Dispara uma fala estática do Sr. Wilson no dock ativo
+   * @param {string} speechText - Texto da fala do supervisor
+   * @param {string} type - 'DEFAULT' | 'HELP' | 'SUCCESS' | 'WARN'
+   */
+  static speak(speechText, type = 'NORMAL') {
+    if (MentorDockComponent.instance) {
+      MentorDockComponent.instance.setMentorSpeech(speechText, type);
+    }
+  }
+
+  /**
+   * Restaura a mensagem original do cenário no dock ativo
+   */
+  static reset() {
+    if (MentorDockComponent.instance) {
+      MentorDockComponent.instance.resetSpeech();
+    }
+  }
+
+  /**
+   * Atualiza a mensagem falada pelo Sr. Wilson no Dock
+   * @param {string} speechText - Texto da fala do supervisor
+   * @param {string} type - 'DEFAULT' | 'HELP' | 'SUCCESS' | 'WARN'
+   */
+  setMentorSpeech(speechText, type = 'NORMAL') {
+    const scenario = scenarioEngine.getActiveScenario();
+    if (scenario) {
+      this.lastScenarioId = scenario.id;
+    }
+    this.currentSpeech = speechText;
+    this.speechType = type;
+    this.render();
+  }
+
+  /**
+   * Restaura a mensagem original do cenário ou de encerramento
+   */
+  resetSpeech() {
+    const profile = trainee.getProfile();
+    const completedScenarios = profile.completedScenarios || [];
+    const allCompleted = ScenarioCatalog.length > 0 && ScenarioCatalog.every(s => completedScenarios.includes(s.id));
+
+    if (allCompleted) {
+      this.currentSpeech = 'Parabéns pela conclusão da formação prática em SAP SD! Você percorreu com excelência toda a cadeia Order-to-Cash. Continue praticando no Histórico de Atividades para consolidar sua segurança operacional.';
+      this.speechType = 'SUCCESS';
+    } else {
+      const scenario = scenarioEngine.getActiveScenario();
+      this.currentSpeech = scenario ? scenario.mentorInitialTip : null;
+      this.speechType = 'DEFAULT';
+    }
+    this.render();
   }
 
   toggleCollapse() {
@@ -29,6 +106,22 @@ export class MentorDockComponent {
     const scenario = scenarioEngine.getActiveScenario();
     const isChallenge = scenario && scenario.mode === 'CHALLENGE';
     const remainingSeconds = scenarioEngine.slaRemainingSeconds;
+    const profile = trainee.getProfile();
+    const completedScenarios = profile.completedScenarios || [];
+    const allCompleted = ScenarioCatalog.length > 0 && ScenarioCatalog.every(s => completedScenarios.includes(s.id));
+
+    // Sincroniza fala inicial do cenário ou encerramento
+    if (allCompleted && (!scenario || completedScenarios.includes(scenario.id))) {
+      if (!this.currentSpeech || this.speechType === 'DEFAULT' || this.speechType === 'SUCCESS') {
+        this.currentSpeech = 'Parabéns pela conclusão da formação prática em SAP SD! Você percorreu com excelência toda a cadeia Order-to-Cash. Continue praticando no Histórico de Atividades para consolidar sua segurança operacional.';
+        this.speechType = 'SUCCESS';
+        this.lastScenarioId = scenario ? scenario.id : 'COMPLETED';
+      }
+    } else if (scenario && (this.lastScenarioId !== scenario.id || !this.currentSpeech)) {
+      this.lastScenarioId = scenario.id;
+      this.currentSpeech = scenario.mentorInitialTip;
+      this.speechType = 'DEFAULT';
+    }
 
     if (this.isCollapsed) {
       this.container.innerHTML = `
@@ -145,12 +238,43 @@ export class MentorDockComponent {
           </div>
         ` : ''}
 
-        <!-- Orientação Pedagógica do Sr. Wilson -->
-        <div class="mentor-speech-bubble">
-          <div class="mentor-speech-title">
-            ${Icons.lightbulb} Orientação do Sr. Wilson
+        <!-- Orientação e Fala do Supervisor Sr. Wilson -->
+        <div class="mentor-speech-bubble ${
+          this.speechType === 'HELP' ? 'speech-help' :
+          this.speechType === 'SUCCESS' ? 'speech-success' :
+          this.speechType === 'WARN' ? 'speech-warn' :
+          'speech-default'
+        }">
+          <div class="mentor-speech-title" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="display: flex; align-items: center; gap: 6px;">
+              ${
+                this.speechType === 'SUCCESS' ? Icons.check :
+                this.speechType === 'WARN' ? Icons.alertTriangle :
+                this.speechType === 'HELP' ? Icons.info :
+                Icons.lightbulb
+              } Fala do Sr. Wilson (Supervisor):
+            </span>
+            ${
+              this.speechType === 'HELP' ? `<span class="erp-badge erp-badge-primary text-xs font-mono">AJUDA ATIVA</span>` :
+              this.speechType === 'SUCCESS' ? `<span class="erp-badge erp-badge-success text-xs font-mono">AVANÇO</span>` :
+              this.speechType === 'WARN' ? `<span class="erp-badge erp-badge-warning text-xs font-mono">ATENÇÃO</span>` :
+              ''
+            }
           </div>
-          <p>${scenario.mentorInitialTip}</p>
+          <p style="font-size: 12px; line-height: 1.5; color: var(--erp-navy-900); margin: 0 0 10px 0; white-space: pre-line; word-break: break-word;">
+            ${this.currentSpeech || scenario.mentorInitialTip}
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--erp-border-subtle); padding-top: 8px; margin-top: 6px;">
+            <button id="btn-request-mentor-help" class="btn btn-secondary btn-xs" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600;" title="Consultar orientação do supervisor sem penalidade de XP">
+              ${Icons.lightbulb} Pedir Ajuda ao Sr. Wilson
+            </button>
+            ${this.speechType !== 'DEFAULT' ? `
+              <button id="btn-reset-mentor-speech" class="btn btn-secondary btn-xs" style="width: 100%; font-size: 11px; color: var(--erp-text-muted); background: transparent; border: none;" title="Retornar à dica inicial da atividade">
+                ${Icons.refresh} Voltar à orientação inicial
+              </button>
+            ` : ''}
+          </div>
         </div>
       `;
     }
@@ -237,8 +361,29 @@ export class MentorDockComponent {
     const startBtn = this.container.querySelector('#start-first-scenario-btn');
     if (startBtn) {
       startBtn.addEventListener('click', () => {
-        scenarioEngine.startScenario('SCN-01');
-        this.onNavigate('VA01');
+        const firstScenario = ScenarioCatalog[0];
+        if (firstScenario) {
+          scenarioEngine.startScenario(firstScenario.id);
+          this.onNavigate(firstScenario.initialTcode || 'VA01');
+        }
+      });
+    }
+
+    const helpBtn = this.container.querySelector('#btn-request-mentor-help');
+    if (helpBtn) {
+      helpBtn.addEventListener('click', () => {
+        const scenario = scenarioEngine.getActiveScenario();
+        if (scenario) {
+          const helpText = `Olá, trainee! Estou acompanhando sua atividade.\n\n${scenario.mentorInitialTip}\n\n💡 Dica do Supervisor: Você também pode consultar a aba "Guia SAP" no topo deste painel para entender os conceitos de negócio e tabelas envolvidas nesta transação.`;
+          this.setMentorSpeech(helpText, 'HELP');
+        }
+      });
+    }
+
+    const resetSpeechBtn = this.container.querySelector('#btn-reset-mentor-speech');
+    if (resetSpeechBtn) {
+      resetSpeechBtn.addEventListener('click', () => {
+        this.resetSpeech();
       });
     }
   }

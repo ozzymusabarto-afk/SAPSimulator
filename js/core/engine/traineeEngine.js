@@ -103,6 +103,7 @@ class TraineeEngine {
       slaTotalChallenges: 0,
 
       // Missões Concluídas no Ciclo Atual
+      activeScenarioId: 'SCN-01',
       completedScenarios: [],
       completedTasksLog: [],
       badges: [],
@@ -131,6 +132,7 @@ class TraineeEngine {
       failedActions: old.failedActions || 0,
       slaSuccessCount: old.slaSuccessCount || 0,
       slaTotalChallenges: old.slaTotalChallenges || 0,
+      activeScenarioId: old.activeScenarioId || 'SCN-01',
       completedScenarios: old.completedScenarios || [],
       completedTasksLog: old.completedTasksLog || [],
       badges: old.badges || [],
@@ -158,6 +160,25 @@ class TraineeEngine {
     this.listeners.forEach(fn => fn(this.profile));
   }
 
+  setActiveScenarioId(scenarioId) {
+    if (scenarioId && this.profile.activeScenarioId !== scenarioId) {
+      this.profile.activeScenarioId = scenarioId;
+      this.saveProfile();
+    }
+  }
+
+  getActiveScenarioId() {
+    return this.profile.activeScenarioId || null;
+  }
+
+  getCompletedScenarios() {
+    return this.profile.completedScenarios || [];
+  }
+
+  isScenarioCompleted(scenarioId) {
+    return (this.profile.completedScenarios || []).includes(scenarioId);
+  }
+
   startScenarioSession() {
     this.currentScenarioStartTime = Date.now();
     this.currentScenarioAttempts = 0;
@@ -168,21 +189,30 @@ class TraineeEngine {
   }
 
   /**
-   * Adiciona XP à carreira e ao ciclo atual SOMENTE em acerto.
+   * Adiciona XP à carreira e ao ciclo atual SOMENTE em acerto oficial.
+   * Não duplica XP quando a missão já foi concluída anteriormente (sessão de refazer / prática).
    * O XP não altera o nível de carreira sozinho (promoção é por formação + consolidação).
    * @param {number} amount
    * @param {string} reason
+   * @param {string|null} targetScenarioId
    */
-  addXp(amount, reason = '') {
+  addXp(amount, reason = '', targetScenarioId = null) {
     if (!amount || amount <= 0) return false;
     
+    // Proteção contra duplicação de XP em missões já concluídas (Refazer / Prática)
+    const scenarioId = targetScenarioId || this.profile.activeScenarioId;
+    if (scenarioId && this.isScenarioCompleted(scenarioId)) {
+      this.logAction('Treino / Prática', `Missão já homologada anteriormente (+0 XP): ${reason}`, 'INFO');
+      return false;
+    }
+
     this.profile.xp += amount;
     this.profile.totalCareerXp += amount;
     this.profile.currentCycleXp += amount;
 
     this.logAction('Conquista de XP', `+${amount} XP: ${reason}`, 'SUCCESS');
     this.saveProfile();
-    return false;
+    return true;
   }
 
   /**
@@ -226,7 +256,8 @@ class TraineeEngine {
    * Registra tarefa/cenário concluído no ciclo atual
    */
   completeScenario(scenarioId, scenarioTitle, correctAnswerSummary, xpEarned) {
-    if (!this.profile.completedScenarios.includes(scenarioId)) {
+    const isRedo = this.isScenarioCompleted(scenarioId);
+    if (!isRedo) {
       this.profile.completedScenarios.push(scenarioId);
       this.profile.currentCycle.completedMissionsCount = this.profile.completedScenarios.length;
     }
@@ -238,13 +269,13 @@ class TraineeEngine {
       scenarioId,
       scenarioTitle,
       correctAnswerSummary,
-      xpEarned,
+      xpEarned: isRedo ? 0 : xpEarned,
       timeSpentSeconds,
       attempts,
       completedAt: new Date().toLocaleTimeString('pt-BR')
     });
 
-    if (this.profile.completedTasksLog.length > 25) {
+    if (this.profile.completedTasksLog.length > 100) {
       this.profile.completedTasksLog.pop();
     }
 

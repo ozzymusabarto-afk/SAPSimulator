@@ -12,8 +12,8 @@ export const ProcessSteps = [
   { id: 'ATP', number: 3, name: 'Verificação ATP / Estoque', tcode: 'MM03', route: 'MM03' },
   { id: 'PRICING', number: 4, name: 'Preço & Impostos', tcode: 'VK11', route: 'VK11' },
   { id: 'CREDIT', number: 5, name: 'Análise de Crédito', tcode: 'VKM1', route: 'VKM1' },
-  { id: 'DELIVERY', number: 6, name: 'Fornecimento / Remessa', tcode: 'VL01N', route: 'VA03' },
-  { id: 'BILLING', number: 7, name: 'Fatura / Financeiro', tcode: 'VF01', route: 'VA03' }
+  { id: 'DELIVERY', number: 6, name: 'Fornecimento / Remessa', tcode: 'VL01N', route: 'VL01N' },
+  { id: 'BILLING', number: 7, name: 'Fatura / Financeiro', tcode: 'VF01', route: 'VF01' }
 ];
 
 export class ProcessStepperComponent {

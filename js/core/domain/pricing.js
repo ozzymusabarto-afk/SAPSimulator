@@ -50,6 +50,22 @@ export const ConditionTypes = [
 export const InitialPricingRecords = [
   { materialId: 'MAT-1001', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 8500.00, validTo: '31.12.2028' },
   { materialId: 'MAT-2004', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 1250.00, validTo: '31.12.2028' },
-  { materialId: 'MAT-3050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 980.00, validTo: '31.12.2028' }
-  // Nota: MAT-4099 intencionalmente não possui registro de PR00 para simular erro de precificação
+  { materialId: 'MAT-3050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 980.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-1010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 4200.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-1050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 16500.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-1090', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 7800.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-2010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 2400.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-2020', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 890.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-2050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 5400.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-2080', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 2850.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-3010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 1450.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-3020', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 1150.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-3080', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 620.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-3090', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 480.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-4010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 390.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-4020', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 110.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-4050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 95.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-5010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 3200.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-5050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 1180.00, validTo: '31.12.2028' }
+  // Nota: MAT-4099 intencionalmente não possui registro de PR00 para simular erro de precificação (VK11)
 ];

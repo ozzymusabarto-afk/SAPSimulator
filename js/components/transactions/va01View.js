@@ -11,6 +11,7 @@ import { db } from '../../core/engine/erpDatabase.js';
 import { PricingEngine } from '../../core/engine/pricingEngine.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
 import { diagnosticModal } from '../diagnosticModal.js';
+import { MentorDockComponent } from '../mentorDock.js';
 
 export class Va01ViewComponent {
   constructor(onNavigate) {
@@ -36,9 +37,34 @@ export class Va01ViewComponent {
 
     this.activeTab = 'HEADER'; // HEADER, ITEMS, PARTNERS, CONDITIONS
     this.fieldErrors = {}; // Mapeia campos com inconsistência
+    this.currentScenarioId = null;
+  }
+
+  resetForm() {
+    this.orderType = '';
+    this.salesOrg = '';
+    this.distChannel = '';
+    this.division = '';
+    this.customerId = '';
+    this.customerPoNumber = '';
+    this.paymentTerms = '';
+    this.incoterms = '';
+    this.incotermsLocation = '';
+    this.items = [
+      { materialId: '', quantity: 0, manualDiscountPercent: 0, manualFreight: 0 }
+    ];
+    this.activeTab = 'HEADER';
+    this.fieldErrors = {};
   }
 
   render() {
+    const activeScenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = activeScenario ? activeScenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
+    }
+
     const customers = db.getAllCustomers();
     const materials = db.getAllMaterials();
     const orderCalculation = PricingEngine.calculateOrderTotals(this.items, this.salesOrg || '1000', this.distChannel || '10');
@@ -90,9 +116,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Tipo de Ordem (Doc. Type) *</span>
-              <span class="text-xs text-primary font-medium">Decisão</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="orderType" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Decisão</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.orderType ? 'border-danger' : ''}" id="input-order-type" style="${this.fieldErrors.orderType ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.orderType ? 'border-danger' : ''}" id="input-order-type" data-help-id="orderType" style="${this.fieldErrors.orderType ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione o Tipo de Ordem --</option>
               ${CompanyStructure.orderTypes.map(t => `
                 <option value="${t.id}" ${this.orderType === t.id ? 'selected' : ''}>${t.name}</option>
@@ -103,9 +130,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Organização de Vendas *</span>
-              <span class="text-xs text-primary font-medium">Decisão</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="salesOrg" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Decisão</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.salesOrg ? 'border-danger' : ''}" id="input-sales-org" style="${this.fieldErrors.salesOrg ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.salesOrg ? 'border-danger' : ''}" id="input-sales-org" data-help-id="salesOrg" style="${this.fieldErrors.salesOrg ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione a Org. de Vendas --</option>
               ${CompanyStructure.salesOrganizations.map(o => `
                 <option value="${o.id}" ${this.salesOrg === o.id ? 'selected' : ''}>${o.name}</option>
@@ -116,9 +144,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Canal de Distribuição *</span>
-              <span class="text-xs text-primary font-medium">Consultar XD03</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="distChannel" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Consultar XD03</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.distChannel ? 'border-danger' : ''}" id="input-dist-channel" style="${this.fieldErrors.distChannel ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.distChannel ? 'border-danger' : ''}" id="input-dist-channel" data-help-id="distChannel" style="${this.fieldErrors.distChannel ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione o Canal --</option>
               ${CompanyStructure.distributionChannels.map(c => `
                 <option value="${c.id}" ${this.distChannel === c.id ? 'selected' : ''}>${c.name}</option>
@@ -129,9 +158,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Setor de Atividade *</span>
-              <span class="text-xs text-primary font-medium">Decisão</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="division" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Decisão</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.division ? 'border-danger' : ''}" id="input-division" style="${this.fieldErrors.division ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.division ? 'border-danger' : ''}" id="input-division" data-help-id="division" style="${this.fieldErrors.division ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione o Setor --</option>
               ${CompanyStructure.divisions.map(d => `
                 <option value="${d.id}" ${this.division === d.id ? 'selected' : ''}>${d.name}</option>
@@ -144,9 +174,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Emissor da Ordem (Sold-to Party / KUNNR) *</span>
-              <span class="text-xs text-primary font-medium">Ação do Trainee</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="customerId" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Ação do Trainee</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.customerId ? 'border-danger' : ''}" id="input-customer-id" style="${this.fieldErrors.customerId ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.customerId ? 'border-danger' : ''}" id="input-customer-id" data-help-id="customerId" style="${this.fieldErrors.customerId ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione o Emissor da Ordem --</option>
               ${customers.map(c => `
                 <option value="${c.id}" ${this.customerId === c.id ? 'selected' : ''}>${c.id} - ${c.name}</option>
@@ -157,12 +188,14 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Nº Pedido de Compra do Cliente (BSTNK) *</span>
-              <span class="text-xs text-primary font-medium">Digitar do Chamado</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="customerPoNumber" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Digitar do Chamado</span>
             </label>
             <input 
               type="text" 
               class="erp-input font-mono ${this.fieldErrors.customerPoNumber ? 'border-danger' : ''}" 
               id="input-po-number" 
+              data-help-id="customerPoNumber"
               value="${this.customerPoNumber}" 
               placeholder="ex: PO-2026-EB01" 
               style="${this.fieldErrors.customerPoNumber ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}"
@@ -172,9 +205,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Condição de Pagamento (ZTERM) *</span>
-              <span class="text-xs text-primary font-medium">Consultar XD03</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="paymentTerms" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Consultar XD03</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.paymentTerms ? 'border-danger' : ''}" id="input-payment-terms" style="${this.fieldErrors.paymentTerms ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.paymentTerms ? 'border-danger' : ''}" id="input-payment-terms" data-help-id="paymentTerms" style="${this.fieldErrors.paymentTerms ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione a Condição de Pagamento --</option>
               ${CompanyStructure.paymentTerms.map(p => `
                 <option value="${p.id}" ${this.paymentTerms === p.id ? 'selected' : ''}>${p.name}</option>
@@ -187,9 +221,10 @@ export class Va01ViewComponent {
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Incoterms (Modalidade de Frete) *</span>
-              <span class="text-xs text-primary font-medium">Consultar XD03</span>
+              <button type="button" class="erp-field-help-btn" data-help-id="incoterms" title="F1 - Ajuda do Campo">?</button>
+              <span class="text-xs text-primary font-medium" style="margin-left: auto;">Consultar XD03</span>
             </label>
-            <select class="erp-select font-mono ${this.fieldErrors.incoterms ? 'border-danger' : ''}" id="input-incoterms" style="${this.fieldErrors.incoterms ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
+            <select class="erp-select font-mono ${this.fieldErrors.incoterms ? 'border-danger' : ''}" id="input-incoterms" data-help-id="incoterms" style="${this.fieldErrors.incoterms ? 'border-color: #b91c1c; background-color: #fef2f2;' : ''}">
               <option value="">-- Selecione o Incoterms --</option>
               ${CompanyStructure.incotermsList.map(i => `
                 <option value="${i.id}" ${this.incoterms === i.id ? 'selected' : ''}>${i.name}</option>
@@ -198,8 +233,17 @@ export class Va01ViewComponent {
           </div>
 
           <div class="erp-form-group">
-            <label class="erp-form-label">Local de Destino do Incoterms</label>
-            <input type="text" class="erp-input" id="input-incoterms-loc" value="${this.incotermsLocation}" placeholder="ex: São Paulo - SP" />
+            <label class="erp-form-label">
+              <span>Local de Destino (Incoterms Parte 2)</span>
+              <span class="text-xs text-muted" style="margin-left: auto;">Determinado pelo Cliente</span>
+            </label>
+            <input
+              type="text"
+              class="erp-input font-mono"
+              id="input-incoterms-loc"
+              value="${this.incotermsLocation}"
+              placeholder="ex: São Paulo - SP"
+            />
           </div>
         </div>
       </div>
@@ -218,11 +262,11 @@ export class Va01ViewComponent {
             <thead>
               <tr>
                 <th style="width: 60px;">Posição</th>
-                <th style="width: 280px;">Material (MATNR) *</th>
-                <th style="width: 90px;">Qtd. Pedida *</th>
+                <th style="width: 280px;">Material (MATNR) * <button type="button" class="erp-field-help-btn" data-help-id="materialId" title="F1 - Ajuda do Campo">?</button></th>
+                <th style="width: 90px;">Qtd. Pedida * <button type="button" class="erp-field-help-btn" data-help-id="quantity" title="F1 - Ajuda do Campo">?</button></th>
                 <th style="width: 60px;">UM</th>
                 <th style="width: 120px;">Preço Base (PR00)</th>
-                <th style="width: 110px;">Desconto (%)</th>
+                <th style="width: 110px;">Desconto (%) <button type="button" class="erp-field-help-btn" data-help-id="manualDiscountPercent" title="F1 - Ajuda do Campo">?</button></th>
                 <th style="width: 130px;">Valor Líquido</th>
                 <th style="width: 100px;">Disponibilidade</th>
                 <th style="width: 60px;">Ação</th>
@@ -603,6 +647,12 @@ export class Va01ViewComponent {
       simBtn.addEventListener('click', () => {
         this.activeTab = 'CONDITIONS';
         this.render();
+        const totals = PricingEngine.calculateOrderTotals(this.items, this.salesOrg || '1000', this.distChannel || '10');
+        if (totals.hasPricingError) {
+          MentorDockComponent.speak('Atenção: uma ou mais posições não possuem condição de preço PR00 ativa. Verifique o material selecionado.', 'WARN');
+        } else {
+          MentorDockComponent.speak('Cálculo comercial simulado. O esquema de preços apurou os valores brutos, descontos e tributos. Confira a aba Condições.', 'SUCCESS');
+        }
       });
     }
 
@@ -617,6 +667,23 @@ export class Va01ViewComponent {
 
   handleSaveOrder() {
     const totals = PricingEngine.calculateOrderTotals(this.items, this.salesOrg || '1000', this.distChannel || '10');
+
+    // Validação de Determinação de Preço (Pricing / Condição PR00)
+    if (totals.hasPricingError) {
+      this.fieldErrors.items = true;
+      diagnosticModal.show({
+        isValid: false,
+        mentorSpeech: 'Atenção ao cálculo comercial: não foi possível determinar o preço base deste material. Verifique a condição de preço antes de gravar a ordem.',
+        whatHappened: 'Inconsistência na determinação de preço: uma ou mais posições selecionadas não possuem condição de preço base (PR00) ativa para esta Área de Vendas.',
+        why: 'No esquema de cálculo padrão (Pricing Procedure), a condição PR00 é obrigatória para a formação do valor bruto e apuração dos tributos.',
+        businessImpact: 'Sem condição de preço ativa, o sistema não pode apurar o valor contábil do pedido nem emitir documentos subsequentes de remessa e faturamento.',
+        onConfirm: () => {
+          this.activeTab = 'ITEMS';
+          this.render();
+        }
+      });
+      return;
+    }
 
     const orderData = {
       orderType: this.orderType,
@@ -639,6 +706,8 @@ export class Va01ViewComponent {
     if (result.isValid) {
       this.fieldErrors = {};
       const createdOrder = db.createSalesOrder(orderData);
+
+      MentorDockComponent.speak(`Ordem de Venda nº ${Formatters.documentNumber(createdOrder.docNumber)} gravada com sucesso no sistema.`, 'SUCCESS');
 
       diagnosticModal.show({
         isValid: true,

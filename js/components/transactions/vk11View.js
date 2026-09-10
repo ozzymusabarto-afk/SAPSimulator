@@ -7,6 +7,7 @@ import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { diagnosticModal } from '../diagnosticModal.js';
+import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
 
 export class Vk11ViewComponent {
   constructor(onNavigate) {
@@ -14,14 +15,36 @@ export class Vk11ViewComponent {
     this.container = document.createElement('div');
     this.container.className = 'vk11-view';
 
+    this.currentScenarioId = null;
     this.conditionCode = 'PR00';
-    this.materialId = 'MAT-4099';
+    this.materialId = '';
     this.salesOrg = '1000';
     this.distChannel = '10';
-    this.amount = 65.00;
+    this.amount = 0;
+    this.resetForm();
+  }
+
+  resetForm() {
+    const activeScenario = scenarioEngine.getActiveScenario();
+    const tc = activeScenario?.targetCriteria;
+
+    this.conditionCode = tc?.conditionCode || 'PR00';
+    this.salesOrg = tc?.salesOrg || '1000';
+    this.distChannel = tc?.distChannel || '10';
+
+    // Prioriza dados declarativos do catálogo/targetCriteria ou fallback do cenário atual
+    this.materialId = tc?.targetMaterialId || tc?.items?.[0]?.materialId || 'MAT-4099';
+    this.amount = (tc?.targetAmount !== undefined ? tc.targetAmount : (tc?.targetPrice !== undefined ? tc.targetPrice : 65.00));
   }
 
   render() {
+    const activeScenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = activeScenario ? activeScenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
+    }
+
     const materials = db.getAllMaterials();
     const records = db.pricingRecords;
 
@@ -144,6 +167,11 @@ export class Vk11ViewComponent {
           amount: this.amount,
           validTo: '31.12.2028'
         });
+
+        const activeScenario = scenarioEngine.getActiveScenario();
+        if (activeScenario) {
+          scenarioEngine.completeObjective('create_pricing_record');
+        }
 
         diagnosticModal.show({
           isValid: true,

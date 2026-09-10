@@ -9,14 +9,23 @@ import { MentorDockComponent } from './components/mentorDock.js';
 
 import { DashboardViewComponent } from './components/transactions/dashboardView.js';
 import { Va01ViewComponent } from './components/transactions/va01View.js';
+import { Va02ViewComponent } from './components/transactions/va02View.js';
 import { Va03ViewComponent } from './components/transactions/va03View.js';
 import { Xd03ViewComponent } from './components/transactions/xd03View.js';
 import { Mm03ViewComponent } from './components/transactions/mm03View.js';
 import { Vk11ViewComponent } from './components/transactions/vk11View.js';
 import { Vkm1ViewComponent } from './components/transactions/vkm1View.js';
+import { Vl01nViewComponent } from './components/transactions/vl01nView.js';
+import { Vl02nViewComponent } from './components/transactions/vl02nView.js';
+import { Vl03nViewComponent } from './components/transactions/vl03nView.js';
+import { Vf01ViewComponent } from './components/transactions/vf01View.js';
+import { Vf02ViewComponent } from './components/transactions/vf02View.js';
+import { Vf03ViewComponent } from './components/transactions/vf03View.js';
 
 import { scenarioEngine } from './core/engine/scenarioEngine.js';
 import { trainee } from './core/engine/traineeEngine.js';
+import { fieldHelpModal } from './components/fieldHelpModal.js';
+import { welcomeModal } from './components/welcomeModal.js';
 
 class App {
   constructor() {
@@ -33,11 +42,18 @@ class App {
     this.views = {
       DASHBOARD: new DashboardViewComponent(this.navigate.bind(this)),
       VA01: new Va01ViewComponent(this.navigate.bind(this)),
+      VA02: new Va02ViewComponent(this.navigate.bind(this)),
       VA03: new Va03ViewComponent(this.navigate.bind(this)),
       XD03: new Xd03ViewComponent(this.navigate.bind(this)),
       MM03: new Mm03ViewComponent(this.navigate.bind(this)),
       VK11: new Vk11ViewComponent(this.navigate.bind(this)),
-      VKM1: new Vkm1ViewComponent(this.navigate.bind(this))
+      VKM1: new Vkm1ViewComponent(this.navigate.bind(this)),
+      VL01N: new Vl01nViewComponent(this.navigate.bind(this)),
+      VL02N: new Vl02nViewComponent(this.navigate.bind(this)),
+      VL03N: new Vl03nViewComponent(this.navigate.bind(this)),
+      VF01: new Vf01ViewComponent(this.navigate.bind(this)),
+      VF02: new Vf02ViewComponent(this.navigate.bind(this)),
+      VF03: new Vf03ViewComponent(this.navigate.bind(this))
     };
 
     // Subscrição para atualizar a statusbar
@@ -45,11 +61,17 @@ class App {
   }
 
   init() {
-    // Inicia o primeiro cenário no catálogo como padrão
-    scenarioEngine.startScenario('SCN-01');
+    // Inicia a missão em andamento ou a próxima pendente da trilha oficial
+    const targetScenarioId = scenarioEngine.getCurrentActiveOrPendingScenarioId();
+    scenarioEngine.startScenario(targetScenarioId);
 
     this.renderLayout();
     this.navigate('DASHBOARD');
+
+    // Exibe a experiência de boas-vindas / primeiro dia se for o primeiro acesso
+    if (welcomeModal.shouldShowOnboarding()) {
+      welcomeModal.show();
+    }
   }
 
   renderLayout() {

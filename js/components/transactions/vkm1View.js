@@ -7,7 +7,9 @@ import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
+import { trainee } from '../../core/engine/traineeEngine.js';
 import { diagnosticModal } from '../diagnosticModal.js';
+import { MentorDockComponent } from '../mentorDock.js';
 
 export class Vkm1ViewComponent {
   constructor(onNavigate) {
@@ -20,10 +22,11 @@ export class Vkm1ViewComponent {
   render() {
     const blocked = db.creditBlockedOrders;
 
-    // Se estiver no cenário 3, marca objetivo de acesso à VKM1
+    // Conclusão declarativa de objetivos de acesso à VKM1
     const scenario = scenarioEngine.getActiveScenario();
-    if (scenario && scenario.id === 'SCN-03') {
+    if (scenario) {
       scenarioEngine.completeObjective('access_vkm1');
+      scenarioEngine.completeObjective('investigate_credit');
     }
 
     this.container.innerHTML = `
@@ -129,15 +132,41 @@ export class Vkm1ViewComponent {
           
           if (success) {
             const scenario = scenarioEngine.getActiveScenario();
-            if (scenario && scenario.id === 'SCN-03') {
+            if (scenario) {
               scenarioEngine.completeObjective('release_with_notes');
+              scenarioEngine.completeObjective('release_credit_order');
+              scenarioEngine.completeObjective('analyze_credit');
+              scenarioEngine.completeObjective('release_order');
+
+              // Verifica se o cenário tem como alvo esta ordem ou requer liberação VKM1
+              const targetDoc = scenario.targetCriteria?.targetDocNumber;
+              const isTargetOrder = !targetDoc || targetDoc === docNumber;
+
+              if (isTargetOrder && (scenario.targetCriteria?.requiresVkm1Release || scenario.targetCriteria?.action === 'CREDIT_RELEASE' || scenario.validationRules?.actionType === 'CREDIT_RELEASE')) {
+                if (scenario.objectives && Array.isArray(scenario.objectives)) {
+                  scenario.objectives.forEach(obj => scenarioEngine.completeObjective(obj.id));
+                }
+
+                const xpEarned = scenario.xpReward || 300;
+                trainee.addXp(xpEarned, `Conclusão do chamado de crédito [${scenario.code}] ${scenario.title}`);
+                trainee.recordAction(true, 'Liberação de Crédito VKM1', `Ordem ${docNumber} liberada com alçada comercial`);
+                if (scenario.badgeReward) {
+                  trainee.unlockBadge(scenario.badgeReward);
+                }
+                const summary = `Ordem ${docNumber} liberada na VKM1 • Parecer comercial supervisionado`;
+                trainee.completeScenario(scenario.id, scenario.title, summary, xpEarned);
+              }
             }
+
+            const feedback = scenario?.completionFeedback || {};
+            MentorDockComponent.speak(`Ordem nº ${Formatters.documentNumber(docNumber)} liberada na gestão de crédito (VKM1). O bloqueio de remessa foi removido com sucesso.`, 'SUCCESS');
 
             diagnosticModal.show({
               isValid: true,
-              whatHappened: `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito.`,
-              why: 'O status global de fornecimento foi alterado de BLOQUEADO para ABERTO, permitindo a criação da remessa na transação VL01N.',
-              businessImpact: 'A mercadoria pode agora ser separada no centro de distribuição, garantindo o cumprimento do prazo contratual com a indústria.',
+              mentorSpeech: feedback.mentorSpeech || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito na VKM1.`,
+              whatHappened: feedback.whatHappened || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito.`,
+              why: feedback.why || 'O status global de fornecimento foi alterado de BLOQUEADO para ABERTO, permitindo a criação da remessa na transação VL01N.',
+              businessImpact: feedback.businessImpact || 'A mercadoria pode agora ser separada no centro de distribuição, garantindo o cumprimento do prazo contratual com a indústria.',
               onConfirm: () => this.render()
             });
           }

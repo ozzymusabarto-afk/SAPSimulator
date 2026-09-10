@@ -5,6 +5,7 @@
  */
 
 import { Icons } from '../utils/icons.js';
+import { MentorDockComponent } from './mentorDock.js';
 
 export class DiagnosticModalComponent {
   constructor() {
@@ -24,7 +25,7 @@ export class DiagnosticModalComponent {
       <div class="erp-modal-window">
         <div class="erp-modal-header" style="background-color: ${isSuccess ? '#15803d' : '#0f172a'};">
           <div class="erp-modal-title">
-            ${isSuccess ? `${Icons.check} Conformidade Aprovada!` : `${Icons.lightbulb} Orientação do Sr. Wilson`}
+            ${isSuccess ? `${Icons.check} Missão Concluída • Conformidade Aprovada!` : `${Icons.lightbulb} Orientação do Sr. Wilson`}
           </div>
           <button class="erp-modal-close" id="modal-close-btn" title="Fechar">
             ${Icons.x}
@@ -32,6 +33,13 @@ export class DiagnosticModalComponent {
         </div>
 
         <div class="erp-modal-body">
+          ${isSuccess ? `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 6px 12px;">
+              <span class="erp-badge erp-badge-success font-mono text-xs">${Icons.check} ATIVIDADE HOMOLOGADA</span>
+              <span style="font-size: 11px; color: #166534; font-weight: 500;">Registrada no Histórico do Trainee</span>
+            </div>
+          ` : ''}
+
           <!-- Fala Encorajadora do Sr. Wilson -->
           ${data.mentorSpeech ? `
             <div class="mentor-speech-bubble" style="border-left-color: ${isSuccess ? '#15803d' : '#0265dc'};">
@@ -87,11 +95,25 @@ export class DiagnosticModalComponent {
 
     this.overlay.classList.add('active');
 
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') {
+        close();
+      }
+    };
+
     const close = () => {
+      document.removeEventListener('keydown', handleKeydown);
       this.overlay.classList.remove('active');
+      if (!isSuccess) {
+        MentorDockComponent.speak(
+          'Atenção ao ponto apontado no diagnóstico. Revise o formulário e faça a correção antes de gravar novamente.',
+          'WARN'
+        );
+      }
       if (data.onConfirm) data.onConfirm();
     };
 
+    document.addEventListener('keydown', handleKeydown);
     this.overlay.querySelector('#modal-close-btn').addEventListener('click', close);
     this.overlay.querySelector('#modal-action-btn').addEventListener('click', close);
   }
