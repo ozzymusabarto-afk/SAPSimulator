@@ -2354,6 +2354,631 @@ export const ScenarioCatalog = [
       why: 'A rápida orquestração entre consulta cadastral e geração de fornecimento garantiu a saída do veículo.',
       businessImpact: 'O datacenter da DataCore em Alphaville recebeu os novos servidores sem indisponibilidade de rede.'
     }
+  },
+  {
+    id: 'SCN-38',
+    code: 'TRN-130',
+    title: 'Sobreposição de Condição de Pagamento com Alçada na VA01',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 300,
+    badgeReward: 'terms_negotiator',
+    initialTcode: 'VA01',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Ordem de Compra Especial com Prazo Estendido: InovaCorp (PO-INOVA-Z60)',
+    briefing: 'Olá! A InovaCorp Soluções Tecnológicas fechou a aquisição de 6 unidades do Roteador de Borda SD-WAN Multi-WAN (MAT-2010). O cliente está cadastrado sob a conta 100045, cujo mestre comercial em KNVV propõe automaticamente a condição Z030 (30 dias). Porém, em negociação formal autorizada pela diretoria comercial, foi concedido o prazo especial estendido de 60 dias líquido (Z060). Abra a VA01, preencha a estrutura comercial nacional (1000/10/01), selecione o parceiro 100045, sobreponha manualmente o campo Condição de Pagamento de Z030 para Z060 no cabeçalho e lance os itens com frete CIF!',
+
+    purchaseOrderDocument: {
+      buyerName: 'InovaCorp Soluções Tecnológicas (Varejo Eletro Brasil - Conta Corp)',
+      buyerCnpj: '12.345.678/0001-90',
+      poNumber: 'PO-INOVA-Z60',
+      operationType: 'Venda Comercial com Alçada de Prazo Estendido Autorizada',
+      itemsRequested: [
+        { description: 'Roteador de Borda SD-WAN Gigabit Multi-WAN (MAT-2010)', quantity: 6, unit: 'UN' }
+      ],
+      deliveryAddress: 'Av. das Nações Unidas, 14200 - São Paulo/SP',
+      freightResponsibility: 'CIF - Entrega e seguro por conta da NexusTech',
+      paymentInstructions: '60 dias líquido (Z060) - Aprovado formalmente pela Diretoria Comercial'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Ao selecionar o cliente 100045 na VA01, observe que o sistema puxa Z030 por padrão. Altere manualmente o campo ZTERM para Z060 antes de simular e gravar. Isso demonstra o domínio sobre a sobreposição de dados mestres em SD!',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA01 / XD03',
+      tables: 'VBAK (Cabeçalho da Ordem), KNVV (Dados de Vendas do Cliente)',
+      concept: 'No SAP SD, os dados mestres do cliente (tabela KNVV) propõem valores padrão para a ordem de venda. Contudo, usuários com perfil autorizado podem sobrepor a condição de pagamento (ZTERM) ou Incoterms diretamente no cabeçalho da ordem para refletir negociações pontuais com alçada.'
+    },
+
+    objectives: [
+      { id: 'set_org_structure', text: 'Configurar Área de Vendas 1000 / 10 / 01 e Tipo de Ordem OR na VA01', done: false },
+      { id: 'select_customer', text: 'Selecionar Cliente corporativo (100045) e informar Pedido PO-INOVA-Z60', done: false },
+      { id: 'fill_terms', text: 'Sobrepor a Condição de Pagamento padrão para Z060 conforme alçada e Incoterms CIF', done: false },
+      { id: 'add_item', text: 'Inserir 6 unidades do Roteador de Borda SD-WAN (MAT-2010)', done: false },
+      { id: 'save_order', text: 'Simular os preços e gravar a ordem de venda com a nova condição de pagamento', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_SUBMISSION',
+      orderType: 'OR',
+      salesOrg: '1000',
+      distChannel: '10',
+      division: '01',
+      customerId: '100045',
+      customerPoNumber: 'PO-INOVA-Z60',
+      paymentTerms: 'Z060',
+      incoterms: 'CIF',
+      items: [
+        { materialId: 'MAT-2010', quantity: 6, discountPercent: 0 }
+      ]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Perfeita sobreposição de parâmetros comerciais! Você manteve a rastreabilidade cadastral e aplicou o prazo estendido Z060 autorizado pela diretoria, demonstrando maturidade operacional em SD. +300 XP.',
+      whatHappened: 'Ordem de venda gravada com condição Z060 sobreposta manualmente ao mestre do cliente.',
+      why: 'A flexibilidade de sobreposição no cabeçalho permite atender alçadas comerciais sem necessidade de alterar o cadastro permanente do cliente.',
+      businessImpact: 'O cliente receberá faturamento com vencimento correto em 60 dias sem gerar retrabalho contábil ou financeiro.'
+    }
+  },
+  {
+    id: 'SCN-41',
+    code: 'TRN-133',
+    title: 'Diagnóstico de Bloqueio O2C: Remessa sem Baixa Travando VF01',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'o2c_troubleshooter',
+    initialTcode: 'VA03',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Chamado do Faturamento: Remessa 80000070 Travada sem Faturamento (VF01)',
+    briefing: 'Atenção, trainee! O setor de faturamento entrou em contato relatando um impasse: a Ordem de Venda nº 10000070 para a DataCore Cloud possui a Remessa 80000070 gerada, mas a transação VF01 recusa a emissão da Nota Fiscal Comercial F2, exibindo mensagem de pré-requisito pendente. Acesse a VA03 para investigar o Fluxo de Documentos (VBFA). Descubra por que a expedição física ainda não liberou o faturamento, regularize a pendência na transação correspondente e conclua a emissão da fatura F2 na VF01.',
+
+    purchaseOrderDocument: {
+      buyerName: 'DataCore Cloud & Datacenters Brasil Ltda (Barueri/SP)',
+      buyerCnpj: '34.567.890/0001-12',
+      poNumber: 'PO-DC-PGI-PENDING',
+      operationType: 'Expedição e Faturamento Comercial de Servidores Rack 1U',
+      itemsRequested: [
+        { description: 'Servidor Rack 1U Nexus Edge Entry (Single Xeon 32GB) (MAT-1010)', quantity: 2, unit: 'UN' }
+      ],
+      deliveryAddress: 'DataCore DC1 - Alphaville Barueri / SP',
+      freightResponsibility: 'CIF - Entrega expressa por conta da NexusTech',
+      paymentInstructions: '15 dias líquido (Z015)'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Abra a Ordem 10000070 na VA03 e observe o status da Remessa 80000070 no fluxo de documentos. Ela está criada, mas falta a Saída de Mercadorias (PGI / Movimento MM 601). Vá até a VL02N, confirme o picking e registre o PGI. Depois volte à VF01 e gere a fatura comercial F2!',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA03 / VL02N / VF01',
+      tables: 'VBAK / LIKP (Cabeçalho da Remessa) / VBRK (Faturamento) / VBFA (Fluxo de Documentos)',
+      concept: 'No ciclo padrão Order-to-Cash (O2C) relevante para remessa, o faturamento comercial (VF01) exige como pré-requisito mandatório a conclusão da Saída de Mercadorias (Post Goods Issue - PGI). Sem a baixa contábil do estoque físico (movimento 601), o SAP impede a geração da Nota Fiscal.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000070',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '10',
+        division: '01',
+        customerId: '100180',
+        customerPoNumber: 'PO-DC-PGI-PENDING',
+        paymentTerms: 'Z015',
+        incoterms: 'CIF',
+        incotermsLocation: 'Barueri',
+        items: [
+          { materialId: 'MAT-1010', quantity: 2, unitPrice: 4200.00, manualDiscountPercent: 0, manualFreight: 0 }
+        ],
+        totalValue: 10689.00,
+        netValue: 8400.00,
+        taxValue: 2289.00,
+        overallStatus: 'OPEN',
+        creditStatus: 'RELEASED',
+        deliveryStatus: 'IN_PROCESS',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    initialDeliveries: [
+      {
+        deliveryNumber: '80000070',
+        salesOrderNumber: '10000070',
+        shippingPoint: '1000',
+        customerId: '100180',
+        autoPgi: false,
+        items: [
+          { materialId: 'MAT-1010', quantity: 2 }
+        ]
+      }
+    ],
+
+    objectives: [
+      { id: 'check_flow_va03', text: 'Consultar a Ordem 10000070 na VA03 e verificar o Fluxo de Documentos (VBFA)', done: false },
+      { id: 'post_goods_issue', text: 'Acessar a transação VL02N e executar a Saída de Mercadorias (PGI) para a Remessa 80000070', done: false },
+      { id: 'create_invoice', text: 'Acessar a transação VF01 e emitir a Fatura Comercial F2', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000070',
+      billingType: 'F2',
+      action: 'CREATE_INVOICE'
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Diagnóstico e resolução impecáveis! Você identificou no fluxo documental a falta do PGI na expedição, realizou a baixa na VL02N e liberou o faturamento na VF01 com total conformidade. +350 XP.',
+      whatHappened: 'Saída de mercadorias registrada na VL02N e fatura comercial emitida na VF01 para a ordem 10000070.',
+      why: 'O faturamento depende estritamente da baixa física do estoque para manter a consistência contábil entre MM, SD e FI.',
+      businessImpact: 'O cliente recebeu a Nota Fiscal Eletrônica e os produtos foram despachados legalmente com manifesto de carga.'
+    }
+  },
+  {
+    id: 'SCN-42',
+    code: 'TRN-134',
+    title: 'Ajuste de Preço e Desconto por Volume com Alçada na VA02',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 300,
+    badgeReward: 'volume_negotiator',
+    initialTcode: 'VA02',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Aditivo Comercial de Grande Volume: TechLog Soluções (Ordem 10000072)',
+    briefing: 'Olá, trainee! A distribuidora TechLog Soluções (Cliente 100120) enviou um aditivo comercial urgente para a Ordem de Venda nº 10000072. Eles ampliaram o pedido inicial de 20 para 60 unidades do SSD Server Grade 3.84TB (MAT-3010). Conforme nossa política comercial de atacado, pedidos acima de 50 unidades possuem alçada aprovada para concessão de 10% de desconto comercial na condição RB00. Abra a VA02, carregue a ordem 10000072, ajuste a quantidade para 60 unidades, aplique o desconto de 10%, simule o recálculo dos impostos e grave a alteração!',
+
+    purchaseOrderDocument: {
+      buyerName: 'TechLog Soluções em TI e Distribuição (Curitiba/PR)',
+      buyerCnpj: '45.112.890/0002-34',
+      poNumber: 'PO-TL-VOL-2026',
+      operationType: 'Aditivo Comercial com Ampliação de Escala e Desconto por Volume',
+      itemsRequested: [
+        { description: 'SSD NVMe Server Grade 3.84TB U.2 Enterprise (MAT-3010)', quantity: 60, unit: 'UN' }
+      ],
+      deliveryAddress: 'Rua das Indústrias, 500 - Curitiba/PR',
+      freightResponsibility: 'CIF - Centro de Distribuição Curitiba',
+      paymentInstructions: '15 dias líquido (Z015) com desconto comercial de volume de 10%'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a VA02 e selecione a Ordem 10000072. Na aba de Posições, mude a quantidade de 20 para 60 e defina o desconto manual para 10%. Clique em "Recalcular Preço" para conferir a base de impostos antes de gravar.',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA02 / XD03',
+      tables: 'VBAK / VBAP (Posições da Ordem) / KONV (Condições de Preço da Ordem)',
+      concept: 'Ao alterar posições na VA02, o SAP SD executa uma atualização do esquema de cálculo (Pricing Update). A inserção de descontos comerciais por volume (RB00) requer validação de alçadas e recalcula automaticamente o ICMS e PIS/COFINS sobre a nova base líquida.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000072',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '20',
+        division: '01',
+        customerId: '100120',
+        customerPoNumber: 'PO-TL-VOL-2026',
+        paymentTerms: 'Z015',
+        incoterms: 'CIF',
+        incotermsLocation: 'Curitiba',
+        items: [
+          { materialId: 'MAT-3010', quantity: 20, manualDiscountPercent: 0 }
+        ],
+        overallStatus: 'OPEN',
+        creditStatus: 'RELEASED',
+        deliveryStatus: 'NOT_DELIVERED',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    objectives: [
+      { id: 'access_va02', text: 'Localizar e abrir a Ordem de Venda 10000072 na transação VA02', done: false },
+      { id: 'update_order_quantity', text: 'Ajustar a quantidade da posição de 20 para 60 unidades de MAT-3010', done: false },
+      { id: 'apply_volume_discount', text: 'Inserir o desconto comercial de 10% na condição RB00 conforme alçada de volume', done: false },
+      { id: 'save_modified_order', text: 'Simular o recálculo de impostos e gravar a ordem alterada na VA02', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_MODIFICATION',
+      targetDocNumber: '10000072',
+      paymentTerms: 'Z015',
+      incoterms: 'CIF',
+      items: [
+        { materialId: 'MAT-3010', quantity: 60, discountPercent: 10 }
+      ]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Excelente gestão comercial! Você atualizou o volume do pedido, aplicou a política de desconto por escala e garantiu que o recálculo fiscal fosse realizado com absoluta integridade. +300 XP.',
+      whatHappened: 'Ordem 10000072 alterada para 60 unidades com 10% de desconto comercial RB00.',
+      why: 'Alterações de quantidade exigem recálculo automático da estrutura de preços e impostos proporcionais.',
+      businessImpact: 'A venda em escala foi formalizada com margem protegida e reserva de estoque ampliada no CD.'
+    }
+  },
+  {
+    id: 'SCN-43',
+    code: 'TRN-135',
+    title: 'Venda Governamental com Empenho Obrigatório (BSTNK)',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 250,
+    badgeReward: 'public_sector_pro',
+    initialTcode: 'VA01',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Licitação e Nota de Empenho Homologada: Prefeitura Nova Esperança (EMP-2026-99881)',
+    briefing: 'Olá! Vencemos o pregão eletrônico da Prefeitura Municipal de Nova Esperança (Cliente 100650) para fornecimento de 4 Servidores Enterprise Nexus Pro X (MAT-1001) para a Secretaria de Educação. No setor público (B2G), a legislação e o Tribunal de Contas exigem que o número exato da Nota de Empenho conste no campo "Nº Pedido de Compra do Cliente" (BSTNK) para fins de liquidação orçamentária e emissão do DANFE. Acesse a VA01, selecione a estrutura comercial (1000/10/01), informe o cliente 100650, preencha rigorosamente o BSTNK como "EMP-2026-99881", selecione o prazo Z060 e frete CIF e lance os 4 servidores!',
+
+    purchaseOrderDocument: {
+      buyerName: 'Prefeitura Municipal de Nova Esperança (Secretaria de Educação)',
+      buyerCnpj: '55.667.788/0001-33',
+      poNumber: 'EMP-2026-99881',
+      operationType: 'Fornecimento para Órgão Público Municipal sob Nota de Empenho',
+      itemsRequested: [
+        { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB) (MAT-1001)', quantity: 4, unit: 'UN' }
+      ],
+      deliveryAddress: 'Secretaria Municipal de Educação e Tecnologia - Nova Esperança/SP',
+      freightResponsibility: 'CIF - Entrega e descarga no almoxarifado da Secretaria',
+      paymentInstructions: '60 dias líquido (Z060) - Liquidação orçamentária por empenho'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: No campo "Nº Pedido do Cliente" (BSTNK), digite exatamente EMP-2026-99881. Sem essa informação idêntica ao empenho, o fiscal de contratos da Prefeitura glosará a entrega e recusará a Nota Fiscal.',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA01',
+      tables: 'VBAK (Campo BSTNK - Customer Purchase Order Number)',
+      concept: 'Em vendas governamentais e corporativas formais, o campo BSTNK transporta a amarração jurídica do contrato para a Nota Fiscal Eletrônica (tag xPed). A divergência nesse campo inviabiliza o recebimento físico e a liquidação do contas a pagar público.'
+    },
+
+    objectives: [
+      { id: 'set_org_structure', text: 'Definir Org. Vendas 1000, Canal 10, Setor 01 e Tipo OR na VA01', done: false },
+      { id: 'select_customer', text: 'Selecionar Cliente Prefeitura Nova Esperança (100650) e preencher BSTNK EMP-2026-99881', done: false },
+      { id: 'fill_terms', text: 'Selecionar Condição de Pagamento Z060 e Incoterms CIF', done: false },
+      { id: 'add_item', text: 'Adicionar 4 unidades do Servidor Enterprise Nexus Pro X (MAT-1001)', done: false },
+      { id: 'save_order', text: 'Simular os preços e gravar a ordem de venda governamental', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_SUBMISSION',
+      orderType: 'OR',
+      salesOrg: '1000',
+      distChannel: '10',
+      division: '01',
+      customerId: '100650',
+      customerPoNumber: 'EMP-2026-99881',
+      paymentTerms: 'Z060',
+      incoterms: 'CIF',
+      items: [
+        { materialId: 'MAT-1001', quantity: 4, discountPercent: 0 }
+      ]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Conformidade fiscal perfeita! A ordem foi emitida com a identificação formal do empenho no BSTNK, atendendo rigorosamente às exigências de contratação pública. Parabéns! +250 XP.',
+      whatHappened: 'Ordem emitida para a Prefeitura de Nova Esperança com vinculação do Empenho EMP-2026-99881.',
+      why: 'O número de empenho no cabeçalho garante a rastreabilidade exigida pelos órgãos de controle fiscal.',
+      businessImpact: 'A entrega dos servidores será recebida pelo almoxarifado público sem risco de recusa ou glosa orçamentária.'
+    }
+  },
+  {
+    id: 'SCN-45',
+    code: 'DSF-208',
+    title: 'Desafio SLA: Liberação de Crédito com Parecer e Expedição Crítica',
+    mode: 'CHALLENGE',
+    levelRequired: 1,
+    slaMinutes: 5,
+    xpReward: 450,
+    badgeReward: 'fast_credit_commander',
+    initialTcode: 'VA03',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'DESAFIO SLA (5 MIN): Despacho Crítico com Parecer de Crédito - Metal Paulista',
+    briefing: 'Chamado Urgente sob SLA de 5 minutos! A Indústria Metalúrgica Paulista (Cliente 100088) está com a produção ameaçada de parada por queima de nobreaks de data center. A Ordem de Venda nº 10000075 (2 Nobreaks 10kVA - MAT-1090) foi cadastrada, mas está retida na expedição por bloqueio de crédito na VKM1. O cronômetro de 5 minutos está correndo: consulte o bloqueio na VA03, acesse a VKM1 e aprove a liberação supervisionada com parecer comercial, crie o fornecimento na VL01N (Ponto de Expedição 1000) e registre a Saída de Mercadorias (PGI) na VL02N antes de estourar o SLA!',
+
+    purchaseOrderDocument: {
+      buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
+      buyerCnpj: '98.765.432/0001-11',
+      poNumber: 'PO-MP-CRIT-01',
+      operationType: 'Despacho Crítico com Liberação de Crédito e Expedição Imediata',
+      itemsRequested: [
+        { description: 'Nobreak Online Dupla Conversão 10kVA Rackmount (MAT-1090)', quantity: 2, unit: 'UN' }
+      ],
+      deliveryAddress: 'Fábrica Campinas - Portão 3 Logística',
+      freightResponsibility: 'FOB - Coleta urgente pelo cliente',
+      paymentInstructions: '60 dias líquido (Z060) - Liberação supervisionada por alçada'
+    },
+
+    mentorInitialTip: 'Aviso de Desafio com SLA (5 minutos): Inicie na VA03 para confirmar a ordem 10000075. Vá rapidamente à VKM1 e libere a ordem. Em seguida abra a VL01N com Ponto de Expedição 1000 e gere a remessa. Finalize na VL02N registrando o PGI para bater o cronômetro!',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA03 / VKM1 / VL01N / VL02N',
+      tables: 'VBAK / KNKK / LIKP / LIPS',
+      concept: 'Em cenários de emergência operacional, a orquestração rápida entre liberação financeira de crédito (VKM1), geração do documento logístico de fornecimento (VL01N) e baixa contábil de saída (VL02N) viabiliza o atendimento sem violar as regras de governança corporativa.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000075',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '10',
+        division: '01',
+        customerId: '100088',
+        customerPoNumber: 'PO-MP-CRIT-01',
+        paymentTerms: 'Z060',
+        incoterms: 'FOB',
+        incotermsLocation: 'CD NexusTech SP',
+        items: [
+          { materialId: 'MAT-1090', quantity: 2, unitPrice: 7800.00 }
+        ],
+        totalValue: 19851.00,
+        netValue: 15600.00,
+        taxValue: 4251.00,
+        deliveryStatus: 'NOT_DELIVERED',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    objectives: [
+      { id: 'analyze_order', text: 'Consultar a Ordem 10000075 na VA03 e diagnosticar o bloqueio de crédito', done: false },
+      { id: 'release_credit_order', text: 'Acessar a transação VKM1 e liberar a ordem retida com parecer comercial', done: false },
+      { id: 'create_delivery', text: 'Acessar a transação VL01N e criar a remessa para a Ordem 10000075', done: false },
+      { id: 'post_goods_issue', text: 'Registrar a Saída de Mercadorias (PGI) na VL02N dentro do tempo de SLA', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000075',
+      shippingPoint: '1000',
+      action: 'POST_GOODS_ISSUE'
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Performance magistral sob pressão extrema! Você destravou o crédito na VKM1 e realizou o fornecimento e o PGI na VL01N/VL02N dentro do prazo estrito de 5 minutos, salvando a operação fabril do cliente. +450 XP.',
+      whatHappened: 'Crédito liberado na VKM1, remessa gerada e PGI concluído dentro do prazo de SLA para a ordem 10000075.',
+      why: 'A rápida integração entre o setor de crédito e a expedição garantiu o carregamento antes do corte logístico.',
+      businessImpact: 'A Metalúrgica Paulista evitou a paralisação da sua fábrica e os equipamentos foram entregues sob protocolo de emergência.'
+    }
+  },
+  {
+    id: 'SCN-46',
+    code: 'TRN-137',
+    title: 'Diagnóstico de Causa Raiz: Ordem Corporativa Travada sem Expedição',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'root_cause_analyst',
+    initialTcode: 'VA03',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Reclamação de Cliente Corporativo: AutoPeças Guanabara (Ordem 10000076)',
+    briefing: 'Olá, trainee! O SAC abriu um chamado com prioridade alta: o cliente AutoPeças e Motores Guanabara (100750) relata que o pedido nº 10000076 foi emitido há 2 dias e o Centro de Distribuição ainda não iniciou a separação dos produtos. Acesse a transação VA03 para analisar o cabeçalho e os status da ordem. Identifique a causa raiz que está impedindo a geração automática da remessa, acesse a transação VKM1 para tratar a restrição e registre o parecer de liberação com governança.',
+
+    purchaseOrderDocument: {
+      buyerName: 'AutoPeças e Motores Guanabara S/A (Rio de Janeiro/RJ)',
+      buyerCnpj: '77.889.900/0001-55',
+      poNumber: 'PO-AG-PARADA-01',
+      operationType: 'Investigação e Desbloqueio Comercial de Ordem Paralisada',
+      itemsRequested: [
+        { description: 'Placa de Rede Dual Port 10G SFP+ PCIe (MAT-3080)', quantity: 4, unit: 'UN' },
+        { description: 'Fonte Redundante Hot-Plug 800W Titanium (MAT-3090)', quantity: 2, unit: 'UN' }
+      ],
+      deliveryAddress: 'Unidade Industrial São Cristóvão RJ',
+      freightResponsibility: 'FOB - Retirada na origem pelo comprador',
+      paymentInstructions: '30 dias direto (Z030) - Restrição cadastral temporária'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Na VA03, verifique a aba de Status e o Fluxo de Documentos da Ordem 10000076. Você notará que o status de crédito consta como BLOCKED devido a restrições do parceiro. Abra a VKM1, analise a pendência e execute a liberação para destravar a expedição!',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA03 / VKM1',
+      tables: 'VBAK (Status da Ordem) / KNKK (Controle de Crédito)',
+      concept: 'Muitas vezes, ordens aparentemente corretas não avançam para fornecimento porque estão retidas por travas preventivas de crédito. O consultor de SD deve saber diagnosticar na VA03 a exata natureza do bloqueio antes de acionar a área financeira ou de faturamento.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000076',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '10',
+        division: '02',
+        customerId: '100750',
+        customerPoNumber: 'PO-AG-PARADA-01',
+        paymentTerms: 'Z030',
+        incoterms: 'FOB',
+        incotermsLocation: 'Rio de Janeiro',
+        items: [
+          { materialId: 'MAT-3080', quantity: 4 },
+          { materialId: 'MAT-3090', quantity: 2 }
+        ],
+        deliveryStatus: 'NOT_DELIVERED',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    objectives: [
+      { id: 'analyze_order', text: 'Consultar a Ordem 10000076 na VA03 e verificar o bloqueio de crédito ativo', done: false },
+      { id: 'access_vkm1', text: 'Acessar a transação VKM1 e analisar o histórico financeiro e risco do cliente', done: false },
+      { id: 'release_credit_order', text: 'Executar a liberação de crédito da Ordem 10000076 com parecer comercial supervisionado', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000076',
+      customerId: '100750',
+      action: 'CREDIT_RELEASE',
+      requiresVkm1Release: true
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Diagnóstico cirúrgico de causa raiz! Você identificou a trava financeira na VA03 e destravou o fluxo na VKM1 com parecer fundamentado, restabelecendo a confiança do cliente corporativo. +350 XP.',
+      whatHappened: 'Ordem 10000076 diagnosticada e liberada do bloqueio de crédito na VKM1.',
+      why: 'A liberação supervisionada formaliza a anuência comercial e reativa o documento para geração de remessa.',
+      businessImpact: 'O Centro de Distribuição recebeu a ordem liberada e incluiu as placas de rede no plano de separação do dia.'
+    }
+  },
+  {
+    id: 'SCN-48',
+    code: 'TRN-139',
+    title: 'Diagnóstico de Erro de Preço: Condição Ausente e Recálculo na VA02',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'pricing_auditor',
+    initialTcode: 'VA03',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Ordem Incompleta por Falha de Precificação: MinasTech (Ordem 10000078)',
+    briefing: 'Olá! Um assistente comercial registrou a Ordem de Venda nº 10000078 para o cliente MinasTech Automação (100210), mas o pedido ficou travado com status incompleto e valor total R$ 0,00. Investigue a ordem na VA03 para identificar qual material está sem determinação de preço base. Em seguida, acesse a transação VK11 e cadastre a condição de preço PR00 oficial no valor de R$ 65,00 para o Cabo de Fibra Óptica (MAT-4099). Por fim, acesse a transação VA02, recarregue a ordem 10000078 e grave as alterações para forçar o recálculo comercial de preços e tributos!',
+
+    purchaseOrderDocument: {
+      buyerName: 'MinasTech Automação Industrial Ltda (Belo Horizonte/MG)',
+      buyerCnpj: '45.678.901/0001-23',
+      poNumber: 'PO-MT-PRECO-ERR',
+      operationType: 'Correção de Esquema de Cálculo e Atualização de Preço',
+      itemsRequested: [
+        { description: 'Cabo de Fibra Óptica 10m Duplex LC-LC Patch Cord (MAT-4099)', quantity: 20, unit: 'UN' }
+      ],
+      deliveryAddress: 'MinasTech - Centro de Engenharia e Montagem BH / MG',
+      freightResponsibility: 'CIF - Entrega no destino por conta da NexusTech',
+      paymentInstructions: '30 dias líquido (Z030) - Preço de tabela R$ 65,00/un'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro abra a VA03 e veja o item MAT-4099 com valor zero. Vá para a VK11, escolha Org 1000 / Canal 10, material MAT-4099, condição PR00 e valor R$ 65,00 e clique em Gravar. Depois abra a VA02 na ordem 10000078 e clique em Gravar Alterações para atualizar o documento!',
+
+    sapKnowledgeBridge: {
+      tcode: 'VA03 / VK11 / VA02',
+      tables: 'KONP (Condições de Preço) / VBAK / VBAP',
+      concept: 'Quando uma ordem é salva com itens sem condição de preço obrigatória (PR00), o sistema registra o documento com log de incompletude. O cadastramento posterior da condição na VK11 deve ser seguido de uma atualização de preços (Pricing Update) na VA02 para que a ordem apure o novo valor contábil.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000078',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '10',
+        division: '02',
+        customerId: '100210',
+        customerPoNumber: 'PO-MT-PRECO-ERR',
+        paymentTerms: 'Z030',
+        incoterms: 'CIF',
+        incotermsLocation: 'Belo Horizonte',
+        items: [
+          { materialId: 'MAT-4099', quantity: 20, manualDiscountPercent: 0 }
+        ],
+        netValue: 0.00,
+        taxValue: 0.00,
+        totalValue: 0.00,
+        overallStatus: 'OPEN',
+        creditStatus: 'RELEASED',
+        deliveryStatus: 'NOT_DELIVERED',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    objectives: [
+      { id: 'analyze_order', text: 'Consultar a Ordem 10000078 na VA03 e identificar o preço zerado por falta de PR00', done: false },
+      { id: 'create_pricing_record', text: 'Acessar a transação VK11 e cadastrar a condição PR00 (R$ 65,00) para MAT-4099', done: false },
+      { id: 'access_va02', text: 'Abrir a Ordem 10000078 na transação VA02', done: false },
+      { id: 'save_modified_order', text: 'Gravar a ordem na VA02 para forçar o recálculo do esquema de preços e impostos', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_MODIFICATION',
+      targetDocNumber: '10000078',
+      paymentTerms: 'Z030',
+      incoterms: 'CIF',
+      items: [
+        { materialId: 'MAT-4099', quantity: 20 }
+      ]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Solução magistral de ciclo de preços! Você identificou a falta de PR00 no mestre, realizou o cadastro na VK11 e forçou o recálculo na VA02, regularizando o documento contábil com maestria. +350 XP.',
+      whatHappened: 'Condição PR00 cadastrada na VK11 e ordem 10000078 recalculada e salva na VA02.',
+      why: 'O cadastramento da condição de preço na tabela KONP permite que o motor de precificação determine o valor bruto e liquide os impostos devidos.',
+      businessImpact: 'A ordem da MinasTech foi destravada e liberada para emissão de remessa e faturamento regular.'
+    }
+  },
+  {
+    id: 'SCN-49',
+    code: 'TRN-140',
+    title: 'Decisão de Risco Comercial: Análise de Limite vs Histórico na XD03',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 400,
+    badgeReward: 'credit_risk_master',
+    initialTcode: 'XD03',
+
+    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    emailSubject: 'Decisão de Risco Comercial e Liberação: Varejo Eletro Brasil (Ordem 10000080)',
+    briefing: 'Olá, trainee! O cliente Varejo Eletro Brasil (100045) fechou um pedido de grande porte: 12 Servidores Enterprise Nexus Pro X (MAT-1001), totalizando mais de R$ 120.000,00. A ordem nº 10000080 foi retida na VKM1 por ultrapassar o limite global de crédito aprovado. Consulte os dados cadastrais e financeiros do parceiro na transação XD03. Avalie a Categoria de Risco e a pontualidade histórica do cliente. Diante do histórico exemplar de pagamentos, tome a decisão executiva na transação VKM1 e aprove a liberação supervisionada com parecer comercial fundamentado!',
+
+    purchaseOrderDocument: {
+      buyerName: 'Varejo Eletro Brasil Ltda (Matriz SP)',
+      buyerCnpj: '12.345.678/0001-90',
+      poNumber: 'PO-EB-EXP-105K',
+      operationType: 'Análise de Risco Comercial e Alçada de Liberação de Crédito',
+      itemsRequested: [
+        { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB) (MAT-1001)', quantity: 12, unit: 'UN' }
+      ],
+      deliveryAddress: 'Av. das Nações Unidas, 14200 - São Paulo/SP',
+      freightResponsibility: 'CIF - Entrega dedicada por conta da NexusTech',
+      paymentInstructions: '30 dias líquido (Z030) - Limite de Crédito BR01 Excedido'
+    },
+
+    mentorInitialTip: 'Dica do Sr. Wilson: Na XD03, selecione o cliente 100045 e clique na aba Controle de Crédito. Veja que a Categoria de Risco é A (Baixo Risco) e o histórico é 100% pontual. Com essa evidência, abra a VKM1 e libere a Ordem 10000080 com segurança comercial!',
+
+    sapKnowledgeBridge: {
+      tcode: 'XD03 / VKM1',
+      tables: 'KNKK (Controle de Crédito) / KNA1 / VBAK',
+      concept: 'A governança de crédito no SAP SD não visa apenas travar vendas, mas permitir decisões comerciais embasadas. Clientes com Categoria de Risco A e bom histórico de pagamento podem ter ordens liberadas com parecer de alçada mesmo excedendo pontualmente a linha de crédito padrão.'
+    },
+
+    initialDocuments: [
+      {
+        docNumber: '10000080',
+        orderType: 'OR',
+        salesOrg: '1000',
+        distChannel: '10',
+        division: '01',
+        customerId: '100045',
+        customerPoNumber: 'PO-EB-EXP-105K',
+        paymentTerms: 'Z030',
+        incoterms: 'CIF',
+        incotermsLocation: 'São Paulo',
+        items: [
+          { materialId: 'MAT-1001', quantity: 12, unitPrice: 8500.00 }
+        ],
+        deliveryStatus: 'NOT_DELIVERED',
+        billingStatus: 'NOT_BILLED'
+      }
+    ],
+
+    objectives: [
+      { id: 'check_customer', text: 'Consultar os dados de crédito e categoria de risco do cliente 100045 na XD03', done: false },
+      { id: 'access_vkm1', text: 'Acessar a transação VKM1 e analisar o excesso de limite da Ordem 10000080', done: false },
+      { id: 'release_credit_order', text: 'Executar a liberação de crédito da Ordem 10000080 com parecer baseado no Risco A', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000080',
+      customerId: '100045',
+      action: 'CREDIT_RELEASE',
+      requiresVkm1Release: true
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Postura executiva de alto nível! Você avaliou a exposição financeira na XD03, reconheceu a solidez do cliente de Risco A e deliberou a liberação comercial na VKM1 com segurança e equilíbrio entre receita e risco. +400 XP.',
+      whatHappened: 'Ordem 10000080 liberada na VKM1 após fundamentação de baixo risco na XD03.',
+      why: 'O histórico de pagamentos e a classificação de risco justificam a concessão de limite operacional temporário.',
+      businessImpact: 'A NexusTech garantiu uma venda estratégica de R$ 129.000,00 sem expor a operação a inadimplência real.'
+    }
   }
 ];
 

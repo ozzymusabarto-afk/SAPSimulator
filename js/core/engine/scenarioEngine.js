@@ -357,6 +357,19 @@ class ScenarioEngine {
       };
     }
 
+    if (target.customerPoNumber && orderData.customerPoNumber.trim() !== target.customerPoNumber.trim()) {
+      trainee.recordAction(false, 'Tentativa de Gravação', `Nº do Pedido de Compra divergente: ${orderData.customerPoNumber}`);
+      return {
+        isValid: false,
+        fieldError: 'customerPoNumber',
+        activeTabHint: 'HEADER',
+        mentorSpeech: `Atenção ao Nº Pedido do Cliente (BSTNK): você informou "${orderData.customerPoNumber}", mas o documento da solicitação exige exatamente "${target.customerPoNumber}". Corrija o número do pedido/empenho no cabeçalho e tente novamente!`,
+        whatHappened: `Nº Pedido de Compra do Cliente (BSTNK) divergente. Informado: "${orderData.customerPoNumber}". Esperado: "${target.customerPoNumber}".`,
+        why: 'O campo BSTNK vincula formalmente a ordem de venda ao contrato/empenho do cliente para fins contábeis e fiscais no DANFE.',
+        businessImpact: 'Divergência no número de pedido/empenho gera recusa do recebimento na portaria e glosa orçamentária no faturamento.'
+      };
+    }
+
     // 7. Validação da Condição de Pagamento (ZTERM)
     if (!orderData.paymentTerms) {
       trainee.recordAction(false, 'Tentativa de Gravação', 'Condição de pagamento em branco');
