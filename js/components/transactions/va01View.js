@@ -1,7 +1,7 @@
 /**
  * NexusTech ERP • VA01 View Component
  * Transação Interativa de Criação de Ordem de Venda (Sales Order Creation)
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  */
 
 import { Icons } from '../../utils/icons.js';

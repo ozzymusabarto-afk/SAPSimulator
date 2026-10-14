@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
   window.__NEXUS_DEV_MODE__ = true;
 }
 
-export const AUTH_DEV_ENV_BANNER = 'AMBIENTE DE DESENVOLVIMENTO LOCAL • AUTH MOCK';
+export const AUTH_DEV_ENV_BANNER = 'AMBIENTE DE DESENVOLVIMENTO • AUTH MOCK • NÃO USAR PARA DADOS REAIS';
 
 const STORAGE_KEYS = Object.freeze({
   SESSION: 'nexustech_auth_session_dev_v1',
@@ -99,7 +99,7 @@ export class AuthService {
         uid: defaultUser.uid,
         name: defaultUser.name,
         email: defaultUser.email,
-        passwordHash: devSimulatedHash('trainee123'),
+        passwordHash: devSimulatedHash('TraineeDev2026!'),
         role: UserRole.USER,
         status: UserStatus.ACTIVE,
         createdAt: defaultUser.createdAt
@@ -108,9 +108,9 @@ export class AuthService {
         storage.setItem(STORAGE_KEYS.MOCK_USERS, JSON.stringify(users));
       } catch {}
     } else {
-      // Garante que o trainee dev oficial sempre possua a senha padrão 'trainee123' sincronizada
+      // Garante que o trainee dev oficial sempre possua a senha padrão 'TraineeDev2026!' sincronizada
       const currentHash = users[existingIndex].passwordHash;
-      const expectedHash = devSimulatedHash('trainee123');
+      const expectedHash = devSimulatedHash('TraineeDev2026!');
       if (currentHash !== expectedHash) {
         users[existingIndex].passwordHash = expectedHash;
         users[existingIndex].uid = defaultUser.uid;
@@ -260,8 +260,12 @@ export class AuthService {
       throw new Error('Informe um endereço de e-mail válido.');
     }
 
-    if (!cleanPass || cleanPass.length < 6) {
-      throw new Error('A senha deve ter no mínimo 6 caracteres.');
+    if (!cleanPass || cleanPass.length < 12) {
+      throw new Error('A senha deve ter no mínimo 12 caracteres.');
+    }
+
+    if (!/[A-Z]/.test(cleanPass) || !/[a-z]/.test(cleanPass) || !/[0-9]/.test(cleanPass)) {
+      throw new Error('A senha deve conter maiúscula, minúscula e número.');
     }
 
     if (passwordConfirm !== undefined && cleanPass !== String(passwordConfirm).trim()) {

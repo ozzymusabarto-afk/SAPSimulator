@@ -1,7 +1,7 @@
 /**
  * NexusTech ERP • XD03 View Component
  * Transação de Consulta de Dados Mestres de Clientes (Customer Master Data)
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  */
 
 import { Icons } from '../../utils/icons.js';

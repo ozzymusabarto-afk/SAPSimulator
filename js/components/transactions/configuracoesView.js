@@ -220,7 +220,7 @@ export class ConfiguracoesViewComponent {
           if (msg) { msg.textContent = 'Preencha todos os campos de senha.'; msg.style.color = '#e11d48'; }
           return;
         }
-        if (newPwd.length < 6) {
+        if (newPwd.length < 12) {
           if (msg) { msg.textContent = 'A nova senha deve ter no mínimo 6 caracteres.'; msg.style.color = '#e11d48'; }
           return;
         }

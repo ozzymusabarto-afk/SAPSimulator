@@ -1,6 +1,6 @@
 /**
  * NexusTech ERP • Catálogo de Cenários e Casos Práticos
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  * Filosofia: "Treinar o Olhar do Trainee" (Análise e Decisão Real de Dados Comerciais)
  */
 
@@ -16,7 +16,7 @@ export const ScenarioCatalog = [
     badgeReward: 'first_order',
     initialTcode: 'XD03',
     
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra Recebida: Varejo Eletro Brasil (PO-2026-EB01)',
     briefing: 'Olá! O departamento de compras do nosso cliente corporativo Varejo Eletro Brasil acaba de enviar o pedido de compra formal nº PO-2026-EB01 para aquisição de 2 unidades do Servidor Enterprise Nexus Pro X. Como é uma venda comercial padrão no mercado nacional com entrega em São Paulo, precisamos montar a Ordem de Venda correspondente. Antes de preencher a VA01, consulte o cadastro do cliente na transação XD03 para checar a Área de Vendas (Org. Vendas, Canal e Setor), a Condição de Pagamento e os termos de frete (Incoterms). Observe atentamente as alternativas no formulário e tome as decisões comerciais corretas!',
     
@@ -34,7 +34,7 @@ export const ScenarioCatalog = [
       paymentInstructions: 'Faturamento comercial conforme cadastro aprovado em conta corrente (30 dias)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro abra a transação XD03 para consultar o mestre do cliente Varejo Eletro Brasil (100045). Na aba de Vendas, observe a Organização de Vendas, o Canal de Distribuição, o Setor de Atividade, a Condição de Pagamento e o Incoterms. Depois vá até a VA01 e selecione cada campo com base nessa análise!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro abra a transação XD03 para consultar o mestre do cliente Varejo Eletro Brasil (100045). Na aba de Vendas, observe a Organização de Vendas, o Canal de Distribuição, o Setor de Atividade, a Condição de Pagamento e o Incoterms. Depois vá até a VA01 e selecione cada campo com base nessa análise!',
     
     sapKnowledgeBridge: {
       tcode: 'VA01 / XD03',
@@ -83,7 +83,7 @@ export const ScenarioCatalog = [
     badgeReward: 'pricing_master',
     initialTcode: 'VA01',
     
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Negociação Atacado - TechLog Soluções (Desconto Comercial de 5%)',
     briefing: 'Excelente trabalho na emissão anterior! Agora temos uma negociação no canal de atacado. A distribuidora TechLog Soluções fechou a compra de 10 unidades do Switch Gigabit Managed (MAT-2004). Como é uma compra de volume atacadista, a gerência autorizou 5% de desconto comercial sobre a tabela. Abra a VA01, configure a área de vendas correspondente ao cliente TechLog e monte o pedido aplicando exatamente 5% de desconto na condição comercial RB00.',
     
@@ -100,7 +100,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) com desconto comercial acordado de 5%'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Consulte o cliente TechLog (100120) na XD03 para ver o canal de distribuição (20 - Revenda / Atacado). Na VA01, selecione a Área de Vendas correta, informe a condição de pagamento Z015 e, na grade de itens, coloque o material MAT-2004 com 10 unidades e 5% de desconto.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o cliente TechLog (100120) na XD03 para ver o canal de distribuição (20 - Revenda / Atacado). Na VA01, selecione a Área de Vendas correta, informe a condição de pagamento Z015 e, na grade de itens, coloque o material MAT-2004 com 10 unidades e 5% de desconto.',
     
     sapKnowledgeBridge: {
       tcode: 'VA01 / VK11',
@@ -147,7 +147,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_guardian',
     initialTcode: 'XD03',
     
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'DESAFIO COM SLA: Pedido retido da Indústria Metalúrgica Paulista S/A',
     briefing: 'Atenção, trainee! Chegou um chamado urgente da diretoria. A Metalúrgica Paulista tentou faturar um pedido de 3 Servidores Enterprise (MAT-1001), mas o sistema gerou um bloqueio comercial. Você precisa investigar a causa-raiz no cadastro do cliente (XD03), testar a emissão na VA01 para entender o bloqueio e utilizar a transação de análise de crédito VKM1 para realizar a liberação supervisionada com parecer comercial.',
     
@@ -164,7 +164,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060)'
     },
 
-    mentorInitialTip: 'Orientação do Sr. Wilson (Modo Desafio): Você está no comando! Consulte a aba de Crédito do cliente 100088 na XD03 para ver o limite e os títulos em aberto. Depois crie o pedido na VA01 para constatar a retenção automática e acesse a transação VKM1 para liberar com justificativa. Mantenha a calma, você tem 8 minutos no SLA!',
+    mentorInitialTip: 'Orientação do Chefe Wilson (Modo Desafio): Você está no comando! Consulte a aba de Crédito do cliente 100088 na XD03 para ver o limite e os títulos em aberto. Depois crie o pedido na VA01 para constatar a retenção automática e acesse a transação VKM1 para liberar com justificativa. Mantenha a calma, você tem 8 minutos no SLA!',
     
     sapKnowledgeBridge: {
       tcode: 'VKM1 / FD32',
@@ -211,7 +211,7 @@ export const ScenarioCatalog = [
     badgeReward: 'flawless_trainee',
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Comercial Urgente: Aumento de Volume TechLog (PO-TL-2026-042)',
     briefing: 'Olá, trainee! O cliente corporativo TechLog Soluções em TI enviou uma solicitação de aditivo para o pedido que acabamos de registrar. Devido a uma nova demanda contratual no projeto de Curitiba, eles precisam aumentar a quantidade do Switch Gigabit Managed de 10 para 25 unidades. Eles solicitam a manutenção da condição comercial acordada (desconto de 5%, faturamento em 15 dias e frete CIF). Em vez de cancelarmos o pedido ou gerarmos duplicidade, localize a ordem de venda existente no sistema e utilize a transação VA02 para ajustar o volume. Não se esqueça de conferir a disponibilidade de estoque ATP e simular o recálculo dos impostos antes de gravar!',
 
@@ -228,7 +228,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) com manutenção do desconto comercial de 5%'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: No dia a dia de SD, alterações de pedidos são frequentes. Abra a transação VA02 e carregue a Ordem nº 10000042 da TechLog. Verifique se o estoque disponível (ATP de 120 UN) suporta o novo volume de 25 unidades. Em seguida, altere a quantidade na grade de posições mantendo o desconto de 5% e simule o recálculo antes de gravar!',
+    mentorInitialTip: 'Dica do Chefe Wilson: No dia a dia de SD, alterações de pedidos são frequentes. Abra a transação VA02 e carregue a Ordem nº 10000042 da TechLog. Verifique se o estoque disponível (ATP de 120 UN) suporta o novo volume de 25 unidades. Em seguida, altere a quantidade na grade de posições mantendo o desconto de 5% e simule o recálculo antes de gravar!',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / VA03 / MM03',
@@ -289,7 +289,7 @@ export const ScenarioCatalog = [
     badgeReward: 'pricing_specialist',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Novo Pedido de Infraestrutura: Expansão Óptica DataCore (PO-DC-2026-088)',
     briefing: 'Olá, trainee! O cliente corporativo DataCore Cloud & Datacenters Brasil enviou uma Ordem de Compra para aquisição de 50 unidades do Cabo de Fibra Óptica 10m Duplex LC-LC (MAT-4099), com objetivo de interconectar novos racks no data center de Barueri/SP. Trata-se de uma operação de venda direta faturada em 15 dias líquido (Z015) com frete CIF. Inicie a criação da ordem de venda na transação VA01. Caso o sistema acuse alguma inconsistência comercial durante a determinação de valores ou impeça a gravação por falta de preço, investigue a situação cadastral do produto e execute a manutenção da tabela de condições de preço antes de finalizar a emissão!',
 
@@ -306,7 +306,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias direto (Z015) - Preço de tabela corporativa acordado de R$ 65,00 por unidade'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Consulte o cliente DataCore (100180) na XD03 para conferir os dados comerciais. Na VA01, informe a Área de Vendas 1000 / 10 / 01 e insira o material MAT-4099 com 50 unidades. Se o sistema acusar erro de determinação de preço, lembre-se do conceito de Esquema de Cálculo (Pricing Procedure): o SAP precisa de um registro de condição PR00 ativo. Você pode consultar a situação do item na MM03 e criar o registro de preço de R$ 65,00 na transação VK11 antes de retornar à VA01 para gravar!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o cliente DataCore (100180) na XD03 para conferir os dados comerciais. Na VA01, informe a Área de Vendas 1000 / 10 / 01 e insira o material MAT-4099 com 50 unidades. Se o sistema acusar erro de determinação de preço, lembre-se do conceito de Esquema de Cálculo (Pricing Procedure): o SAP precisa de um registro de condição PR00 ativo. Você pode consultar a situação do item na MM03 e criar o registro de preço de R$ 65,00 na transação VK11 antes de retornar à VA01 para gravar!',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / VK11 / MM03 / VA03',
@@ -357,7 +357,7 @@ export const ScenarioCatalog = [
     badgeReward: 'atp_specialist',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra: AutoPeças Guanabara (5x Firewall UTM MAT-2050)',
     briefing: 'Olá, trainee! O cliente AutoPeças Guanabara enviou a Ordem de Compra PO-AG-2026-ATP1 solicitando 5 unidades do Firewall UTM Next-Gen 1Gbps (MAT-2050). Inicie a criação da ordem de venda na transação VA01. Durante o preenchimento, observe atentamente a coluna de disponibilidade do item. Se o sistema indicar inconsistência ou ruptura de estoque (Ruptura ATP), investigue a situação física e reservada do produto na transação MM03 para identificar o saldo livre disponível para entrega imediata (ATP). Ajuste a quantidade da ordem para o volume que pode ser atendido agora antes de efetuar a gravação!',
 
@@ -374,7 +374,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030) - Preço de tabela corporativa sem desconto adicional'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Ao preencher a VA01 com as 5 unidades solicitadas no PO, note o aviso de [Ruptura ATP] na grade. Abra a transação MM03, consulte o material MAT-2050 e examine a aba de Verificação de Disponibilidade. Veja quanto temos de Estoque Físico, quanto já está Reservado e qual é o saldo Disponível (ATP). Retorne à VA01 e ajuste a quantidade da posição exatamente para o saldo disponível!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Ao preencher a VA01 com as 5 unidades solicitadas no PO, note o aviso de [Ruptura ATP] na grade. Abra a transação MM03, consulte o material MAT-2050 e examine a aba de Verificação de Disponibilidade. Veja quanto temos de Estoque Físico, quanto já está Reservado e qual é o saldo Disponível (ATP). Retorne à VA01 e ajuste a quantidade da posição exatamente para o saldo disponível!',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / MM03 / CO09',
@@ -433,7 +433,7 @@ export const ScenarioCatalog = [
     badgeReward: 'atp_specialist',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra: UltraLink Provedor (4x Fonte Redundante MAT-3090)',
     briefing: 'Olá! O provedor UltraLink nos enviou o pedido de compra PO-UL-2026-ATP2 para aquisição de 4 unidades da Fonte Redundante Hot-Plug 800W (MAT-3090). Analise as informações comerciais recebidas, certifique-se da viabilidade de atendimento de ponta a ponta e proceda com a emissão da ordem de venda na transação VA01. Ajuste a ordem de acordo com a capacidade real de atendimento imediato da nossa operação.',
 
@@ -450,7 +450,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias direto (Z015) conforme cadastro aprovado'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Preste muita atenção em cada detalhe comercial da ordem de compra da UltraLink. Lembre-se de validar se temos cobertura integral de estoque para o volume pedido antes de finalizar a emissão!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Preste muita atenção em cada detalhe comercial da ordem de compra da UltraLink. Lembre-se de validar se temos cobertura integral de estoque para o volume pedido antes de finalizar a emissão!',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / MM03',
@@ -509,7 +509,7 @@ export const ScenarioCatalog = [
     badgeReward: 'atp_master',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO URGENTE: Upgrade Servidores Banco Horizonte (PO-BH-2026-D02)',
     briefing: 'Chamado prioritário! O departamento de compras do Banco Horizonte enviou a Ordem de Compra PO-BH-2026-D02 solicitando 10 unidades do Módulo de Memória ECC 64GB DDR5 (MAT-3050). Como analista responsável pela conta, processe este pedido com total autonomia técnica e comercial, garantindo que o documento seja gravado com 100% de conformidade operacional dentro do SLA estabelecido.',
 
@@ -584,7 +584,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_analyst',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem Retida por Crédito: UltraLink Provedor (Doc 10000006)',
     briefing: 'Olá, trainee! O cliente corporativo UltraLink Provedor de Internet Banda Larga abriu um chamado informando que a Ordem de Venda nº 10000006 (6x Switch 48 Portas PoE+ MAT-2080) está retida pelo sistema e não avançou para a expedição física. Consulte a ordem na transação VA03 para confirmar a situação no Fluxo de Documentos (VBFA). Em seguida, investigue o perfil financeiro do cliente na transação XD03 e acesse a transação VKM1 para analisar a exposição comercial e realizar a liberação supervisionada com parecer comercial, concluindo sua etapa de alçada.',
 
@@ -601,7 +601,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) - Limite de Crédito Corporativo BR01'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro abra a VA03 e carregue a Ordem 10000006 para ver o status [Bloqueado por Crédito (VKM1)]. Depois abra a XD03 no cliente 100800 para checar o limite (R$ 250.000,00) e o saldo utilizado (R$ 240.000,00). Na VKM1, localize a ordem e execute a liberação comercial. Retorne à VA03 para confirmar que a remessa está pronta para expedição!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro abra a VA03 e carregue a Ordem 10000006 para ver o status [Bloqueado por Crédito (VKM1)]. Depois abra a XD03 no cliente 100800 para checar o limite (R$ 250.000,00) e o saldo utilizado (R$ 240.000,00). Na VKM1, localize a ordem e execute a liberação comercial. Retorne à VA03 para confirmar que a remessa está pronta para expedição!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / XD03 / VKM1',
@@ -641,7 +641,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_analyst',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Bloqueio de Expedição: AutoPeças Guanabara (Doc 10000005)',
     briefing: 'Olá, trainee! O cliente AutoPeças e Motores Guanabara entrou em contato para saber por que o fornecimento de componentes da Ordem nº 10000005 está paralisado. Investigue a situação comercial do documento e do parceiro de negócios na VA03 e XD03. Identifique a causa-raiz da retenção no sistema e realize a liberação formal do bloqueio de crédito na transação VKM1 com parecer de alçada, regularizando a ordem para as etapas logísticas subsequentes.',
 
@@ -659,7 +659,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Observe que o valor total desta ordem (R$ 5.166,15) é relativamente baixo e está dentro do limite financeiro. Consulte a ficha do cliente na XD03 e o motivo na VKM1 para descobrir por que a ordem foi retida. Após entender que se trata de uma restrição cadastral prévia, execute a liberação supervisionada na VKM1!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Observe que o valor total desta ordem (R$ 5.166,15) é relativamente baixo e está dentro do limite financeiro. Consulte a ficha do cliente na XD03 e o motivo na VKM1 para descobrir por que a ordem foi retida. Após entender que se trata de uma restrição cadastral prévia, execute a liberação supervisionada na VKM1!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / XD03 / VKM1',
@@ -699,7 +699,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_master',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO PRIORITÁRIO: Pedido Crítico Retido - Metalúrgica Paulista (Doc 10000004)',
     briefing: 'Chamado Comercial Prioritário! A diretoria da Indústria Metalúrgica Paulista entrou em contato com a gerência geral cobrando o despacho imediato da Ordem nº 10000004 (Servidores Enterprise MAT-1001), afirmando que a linha de produção em Campinas/SP depende desses equipamentos. Como consultor SD de plantão, assuma este chamado sob controle de SLA: investigue a causa da retenção financeira da ordem e execute a aprovação formal do crédito na transação VKM1 para regularizar a liberação comercial dentro do prazo estipulado.',
 
@@ -756,7 +756,7 @@ export const ScenarioCatalog = [
     badgeReward: 'delivery_specialist',
     initialTcode: 'VL01N',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Fornecimento Autorizado: Rede Hospitalar São Lucas (Doc 10000007)',
     briefing: 'Olá, trainee! A Ordem de Venda nº 10000007 foi devidamente aprovada e liberada comercialmente para faturamento. O cliente aguarda o envio dos equipamentos a partir da nossa matriz em São Paulo. Acesse a transação VL01N, informe o Ponto de Expedição 1000 (CD Central SP), carregue a Ordem 10000007, confira as posições e quantidades a fornecer e grave o documento de Fornecimento (Remessa / Outbound Delivery).',
 
@@ -774,7 +774,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Vá até a transação VL01N, preencha o Ponto de Expedição com 1000 e a Ordem de Venda com 10000007. Clique em "Carregar Ordem" para conferir os itens na grade e, em seguida, clique em "Gerar Remessa / Fornecimento (Gravar)". O sistema criará o documento oficial na faixa 80000000!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Vá até a transação VL01N, preencha o Ponto de Expedição com 1000 e a Ordem de Venda com 10000007. Clique em "Carregar Ordem" para conferir os itens na grade e, em seguida, clique em "Gerar Remessa / Fornecimento (Gravar)". O sistema criará o documento oficial na faixa 80000000!',
 
     sapKnowledgeBridge: {
       tcode: 'VL01N / LIKP',
@@ -813,7 +813,7 @@ export const ScenarioCatalog = [
     badgeReward: 'shipping_specialist',
     initialTcode: 'VL01N',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Despacho Urgente: MinasTech Automação (Doc 10000008)',
     briefing: 'Olá, trainee! A Ordem de Venda nº 10000008 da MinasTech Automação precisa ser despachada com urgência para a filial de Belo Horizonte. Crie a remessa correspondente na transação VL01N, acerte o picking dos materiais na transação VL02N e execute a etapa crucial da logística: o Post Goods Issue (PGI / Saída de Mercadorias). Em seguida, consulte o mestre de materiais (MM03) para comprovar a redução física do estoque e verifique o fluxo atualizado na VA03.',
 
@@ -830,7 +830,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro crie a remessa para a ordem 10000008 na VL01N. Ao ser direcionado para a VL02N (ou acessando-a diretamente), clique em "Copiar Qtd Fornecimento para Picking" e depois no botão verde "Registrar Saída de Mercadorias (PGI)". Isso disparará o movimento MM 601 e baixará o estoque físico do depósito!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro crie a remessa para a ordem 10000008 na VL01N. Ao ser direcionado para a VL02N (ou acessando-a diretamente), clique em "Copiar Qtd Fornecimento para Picking" e depois no botão verde "Registrar Saída de Mercadorias (PGI)". Isso disparará o movimento MM 601 e baixará o estoque físico do depósito!',
 
     sapKnowledgeBridge: {
       tcode: 'VL02N / MM03 / MARD',
@@ -868,7 +868,7 @@ export const ScenarioCatalog = [
     badgeReward: 'shipping_master',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO CRÍTICO: Despacho Imediato de Switches (Doc 10000006)',
     briefing: 'Chamado Crítico da Diretoria! O provedor UltraLink acionou a gerência informando que a Ordem de Venda nº 10000006 (6x Switches 48P PoE+ MAT-2080) precisa ser liberada e expedida imediatamente para o centro operacional de Fortaleza/CE. O chamado está sob controle de SLA (6 minutos). Como consultor SD de plantão, investigue a situação completa do documento, solucione qualquer retenção comercial que impeça o fornecimento, gere a remessa física e conclua o Post Goods Issue (PGI) dentro do prazo limite!',
 
@@ -923,7 +923,7 @@ export const ScenarioCatalog = [
     badgeReward: 'billing_specialist',
     initialTcode: 'VF01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Faturamento Liberado: Rede Hospitalar São Lucas (Doc 10000007)',
     briefing: 'Olá, trainee! A Remessa da Ordem de Venda nº 10000007 (Rede Hospitalar São Lucas) foi devidamente separada e expedida com Saída de Mercadorias (PGI) concluída no Centro de Distribuição. Agora precisamos realizar a escrituração contábil e emitir a Fatura Comercial oficial (Tipo F2) para cobrança bancária. Acesse a transação VF01, informe o Tipo de Fatura F2, carregue a remessa expedida, confira os valores líquidos e os tributos incidentes (ICMS e PIS/COFINS) e grave o faturamento. Em seguida, consulte o resultado e o fluxo de documentos na VF03.',
 
@@ -941,7 +941,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Vá até a transação VF01, selecione o Tipo de Faturamento "F2", certifique-se de que a remessa associada à ordem 10000007 está carregada e clique em "Gravar Fatura Comercial (Post)". O sistema criará o documento na faixa 90000000 e atualizará o status da ordem para COMPLETED!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Vá até a transação VF01, selecione o Tipo de Faturamento "F2", certifique-se de que a remessa associada à ordem 10000007 está carregada e clique em "Gravar Fatura Comercial (Post)". O sistema criará o documento na faixa 90000000 e atualizará o status da ordem para COMPLETED!',
 
     sapKnowledgeBridge: {
       tcode: 'VF01 / VF03 / VBRK',
@@ -984,7 +984,7 @@ export const ScenarioCatalog = [
     badgeReward: 'billing_specialist',
     initialTcode: 'VF01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Rejeição de Faturamento: Sul Distribuidora (Doc 10000009)',
     briefing: 'Olá, trainee! A gerência financeira solicitou com urgência a emissão da Fatura Comercial da Ordem de Venda nº 10000009 (Sul Distribuidora). O setor de faturamento relatou que está ocorrendo uma rejeição de sistema ao tentar emitir o documento na VF01. Como consultor SD, assuma a análise, investigue a causa raiz da rejeição, execute as ações necessárias na transação correta para regularizar o processo e conclua a emissão da fatura com sucesso.',
 
@@ -1002,7 +1002,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '45 dias líquido (Z045)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: No SAP SD, a emissão da Fatura F2 baseada em remessa exige que todas as etapas logísticas precedentes estejam concluídas. Se a VF01 rejeitar o documento, verifique na VL02N ou na VA03 se a remessa já possui a Saída de Mercadorias (PGI / Mov. 601) registrada!',
+    mentorInitialTip: 'Dica do Chefe Wilson: No SAP SD, a emissão da Fatura F2 baseada em remessa exige que todas as etapas logísticas precedentes estejam concluídas. Se a VF01 rejeitar o documento, verifique na VL02N ou na VA03 se a remessa já possui a Saída de Mercadorias (PGI / Mov. 601) registrada!',
 
     sapKnowledgeBridge: {
       tcode: 'VF01 / VL02N / VBFA',
@@ -1045,7 +1045,7 @@ export const ScenarioCatalog = [
     badgeReward: 'o2c_master',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO DIRETORIA: Fechamento O2C Urgente - Metalúrgica Paulista (Doc 10000004)',
     briefing: 'Chamado Crítico da Diretoria Executiva! A Indústria Metalúrgica Paulista S/A (Doc 10000004) aguarda com urgência o fechamento comercial e a emissão da nota fiscal para envio dos servidores de automação fabril de Campinas/SP. A ordem encontra-se parada no ambiente com retenções pendentes. Como consultor sênior de plantão, você tem 6 minutos de SLA para diagnosticar o documento, resolver todas as travas comerciais, expedir e faturar a operação ponta a ponta até a homologação final do fluxo na VF03!',
 
@@ -1120,7 +1120,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Inicie conferindo o parceiro 100310 na XD03 para validar a área de vendas (1000/10/01) e o local de entrega. Na VA01, insira as duas linhas de materiais com suas respectivas quantidades para calcular o pedido composto.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Inicie conferindo o parceiro 100310 na XD03 para validar a área de vendas (1000/10/01) e o local de entrega. Na VA01, insira as duas linhas de materiais com suas respectivas quantidades para calcular o pedido composto.',
 
     sapKnowledgeBridge: {
       tcode: 'XD03 / VA01',
@@ -1187,7 +1187,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Consulte o material MAT-2020 na MM03 para auditar o saldo em estoque. Em seguida, na VA01, configure a área de vendas de revenda (1000/20/01), informe o cliente 100120 e insira o desconto de 8% no item.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o material MAT-2020 na MM03 para auditar o saldo em estoque. Em seguida, na VA01, configure a área de vendas de revenda (1000/20/01), informe o cliente 100120 e insira o desconto de 8% no item.',
 
     sapKnowledgeBridge: {
       tcode: 'MM03 / VA01',
@@ -1253,7 +1253,7 @@ export const ScenarioCatalog = [
       paymentInstructions: 'Condição escalonada 28 dias (Z28D)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Inicie na MM03 conferindo a aba Estoque Centro/Depósito do material MAT-2080. Na VA01, certifique-se de selecionar o cliente 100240, Canal 20 e o prazo Z28D.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Inicie na MM03 conferindo a aba Estoque Centro/Depósito do material MAT-2080. Na VA01, certifique-se de selecionar o cliente 100240, Canal 20 e o prazo Z28D.',
 
     sapKnowledgeBridge: {
       tcode: 'MM03 / VA01',
@@ -1319,7 +1319,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra a VA03 para examinar o status da Ordem 10000031. Em seguida, valide o risco na XD03 e utilize a transação VKM1 para executar o release com parecer comercial favorável.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra a VA03 para examinar o status da Ordem 10000031. Em seguida, valide o risco na XD03 e utilize a transação VKM1 para executar o release com parecer comercial favorável.',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / XD03 / VKM1',
@@ -1397,7 +1397,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Inicie na VL01N informando o Ponto de Expedição 1000 e o número da Ordem 10000032. Em seguida, na VL02N, confirme as quantidades separadas e clique em Registrar Saída de Mercadorias (PGI).',
+    mentorInitialTip: 'Dica do Chefe Wilson: Inicie na VL01N informando o Ponto de Expedição 1000 e o número da Ordem 10000032. Em seguida, na VL02N, confirme as quantidades separadas e clique em Registrar Saída de Mercadorias (PGI).',
 
     sapKnowledgeBridge: {
       tcode: 'VL01N / VL02N / VL03N',
@@ -1475,7 +1475,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a VF01, selecione o Tipo de Faturamento F2 e clique em Gravar Fatura Comercial. Em seguida, acesse a VF03 para auditar o fluxo e o título a receber em FI.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a VF01, selecione o Tipo de Faturamento F2 e clique em Gravar Fatura Comercial. Em seguida, acesse a VF03 para auditar o fluxo e o título a receber em FI.',
 
     sapKnowledgeBridge: {
       tcode: 'VF01 / VF03',
@@ -1557,7 +1557,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra a Ordem 10000034 na VA02. Na aba Cabeçalho, altere a Condição de Pagamento para Z015. Na aba Posições, modifique a quantidade de 2 para 5 unidades e clique em Salvar Ordem.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra a Ordem 10000034 na VA02. Na aba Cabeçalho, altere a Condição de Pagamento para Z015. Na aba Posições, modifique a quantidade de 2 para 5 unidades e clique em Salvar Ordem.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / VA03',
@@ -1622,7 +1622,7 @@ export const ScenarioCatalog = [
     badgeReward: 'fast_responder',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Plantão de Encerramento)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Plantão de Encerramento)',
     emailSubject: 'SLA PLANTÃO: Liberação e Faturamento Express - Hospital São Lucas (Ordem 10000035)',
     briefing: 'Chamado de Emergência do Plantão Comercial! A Rede Hospitalar São Lucas (Doc 10000035) necessita do envio imediato de 4 módulos de Memória Server Grade DDR5 (MAT-3050) para substituição em servidores críticos de UTI. O pedido encontra-se aprovado no sistema, mas você tem 7 minutos de SLA para executar todo o ciclo logístico e fiscal: auditar a ordem na VA03, gerar o fornecimento na VL01N (Ponto de Expedição 1000), confirmar o picking e registrar o PGI na VL02N, e emitir a Fatura Comercial F2 na VF01 antes do encerramento da janela do transporte aéreo!',
 
@@ -1702,7 +1702,7 @@ export const ScenarioCatalog = [
     badgeReward: null,
     initialTcode: 'XD03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'PO Corporativa: Rede Hospitalar São Lucas - Copacabana (PO-HSL-COPA-2026)',
     briefing: 'Olá, trainee! A Rede Hospitalar São Lucas enviou uma ordem de compra para aquisição de 4 unidades do SSD NVMe Server Grade (MAT-3010) para ampliação do storage da unidade de Copacabana. Como hospitais possuem múltiplos endereços e cadastros de entrega, acesse a transação XD03 e consulte o mestre do cliente 100150 para validar a Área de Vendas (1000/10/01), o endereço de entrega em Copacabana, a condição de pagamento Z030 e o Incoterms CIF. Em seguida, acesse a VA01 e emita a ordem de venda com precisão cadastral!',
 
@@ -1719,7 +1719,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra primeiro a XD03 para o cliente 100150. Na aba de Vendas, valide a Área de Vendas (1000 / 10 / 01), a Condição Z030 e o Incoterms CIF Rio de Janeiro. Depois vá para a VA01 e selecione os mesmos dados.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra primeiro a XD03 para o cliente 100150. Na aba de Vendas, valide a Área de Vendas (1000 / 10 / 01), a Condição Z030 e o Incoterms CIF Rio de Janeiro. Depois vá para a VA01 e selecione os mesmos dados.',
 
     sapKnowledgeBridge: {
       tcode: 'XD03 / VA01',
@@ -1768,7 +1768,7 @@ export const ScenarioCatalog = [
     badgeReward: null,
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem Comercial Atacado: Sul Distribuidora (PO-SDI-2026-08)',
     briefing: 'A distribuidora parceira Sul Distribuidora de Informática enviou a ordem de compra PO-SDI-2026-08 solicitando 10 unidades de Access Point Wi-Fi 6 (MAT-2020). Como se trata de um cliente do canal indireto atacadista (Canal 20), certifique-se de configurar a Área de Vendas com Canal 20 na VA01, aplicar a condição de pagamento negociada para revendas (Z28D - 28 dias) e manter o Incoterms CIF Joinville conforme registrado no cadastro.',
 
@@ -1785,7 +1785,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '28 dias líquido (Z28D) conforme acordo comercial de atacado'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Atenção ao Canal de Distribuição na VA01! Para o cliente 100240, utilize o Canal 20 (Revenda / Atacado) e selecione a condição de pagamento Z28D no cabeçalho.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Atenção ao Canal de Distribuição na VA01! Para o cliente 100240, utilize o Canal 20 (Revenda / Atacado) e selecione a condição de pagamento Z28D no cabeçalho.',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / XD03',
@@ -1833,7 +1833,7 @@ export const ScenarioCatalog = [
     badgeReward: 'pricing_specialist',
     initialTcode: 'VK11',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Manutenção de Condição PR00 e Pedido: MinasTech (PO-MT-FIBRA-2026)',
     briefing: 'Olá! A MinasTech Automação Industrial (Cliente 100210) enviou a PO-MT-FIBRA-2026 solicitando 20 unidades de Cabo de Fibra Óptica (MAT-4099). Como este material é um item recém-cadastrado no portfólio de peças (Setor 02), ele ainda não possui registro de preço base PR00 na tabela de condições KONP. Acesse a transação VK11, crie a condição de preço PR00 no valor unitário de R$ 65,00 para a combinação Org. 1000 / Canal 10. Em seguida, acesse a VA01 e emita a ordem comercial para a MinasTech.',
 
@@ -1850,7 +1850,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030) - Preço de tabela acordado: R$ 65,00/un'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Inicie na VK11 criando a condição PR00 para o material MAT-4099 com valor de R$ 65,00. Depois acesse a VA01 (Área 1000 / 10 / 02, Cliente 100210) e emita o pedido com 20 unidades.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Inicie na VK11 criando a condição PR00 para o material MAT-4099 com valor de R$ 65,00. Depois acesse a VA01 (Área 1000 / 10 / 02, Cliente 100210) e emita o pedido com 20 unidades.',
 
     sapKnowledgeBridge: {
       tcode: 'VK11 / VA01',
@@ -1902,7 +1902,7 @@ export const ScenarioCatalog = [
     badgeReward: null,
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Comercial: Aplicação de Desconto 8% na Ordem 10000050 - TechLog',
     briefing: 'Olá! A gerência comercial formalizou um aditivo para a distribuidora TechLog Soluções (Ordem nº 10000050), concedendo 8% de desconto comercial (condição RB00) em virtude da parceria anual. Acesse a transação VA02, abra a Ordem 10000050, aplique exatamente 8% de desconto comercial na posição do material MAT-2004 e salve as alterações.',
 
@@ -1919,7 +1919,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) com desconto comercial homologado de 8%'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra a Ordem 10000050 na transação VA02. Na grade de itens, localize a linha do material MAT-2004, altere o campo Desconto (%) para 8 e clique em Salvar Ordem.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra a Ordem 10000050 na transação VA02. Na grade de itens, localize a linha do material MAT-2004, altere o campo Desconto (%) para 8 e clique em Salvar Ordem.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / VA03',
@@ -1984,7 +1984,7 @@ export const ScenarioCatalog = [
     badgeReward: null,
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Regularização Contratual: Ordem 10000052 - Metalúrgica Paulista (Z060 / FOB)',
     briefing: 'A auditoria de contratos identificou que a Ordem nº 10000052 da Indústria Metalúrgica Paulista (Cliente 100088) foi lançada com modalidade CIF e prazo Z030, em desacordo com o contrato mestre que estabelece retirada pelo comprador (FOB) e prazo estendido de 60 dias (Z060). Acesse a VA02, corrija a Condição de Pagamento para Z060 e o Incoterms para FOB no cabeçalho da ordem, e salve o documento regularizado.',
 
@@ -2001,7 +2001,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060) conforme contrato corporativo'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na transação VA02, abra a Ordem 10000052. No cabeçalho, altere a Condição de Pagamento para Z060 e o Incoterms para FOB. Em seguida, clique em Salvar Ordem.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na transação VA02, abra a Ordem 10000052. No cabeçalho, altere a Condição de Pagamento para Z060 e o Incoterms para FOB. Em seguida, clique em Salvar Ordem.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / XD03',
@@ -2084,7 +2084,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '28 dias líquido (Z28D)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a transação VL01N. Como esta ordem é atendida pelo centro de distribuição do Sul, informe obrigatoriamente o Ponto de Expedição 2000 e o número da ordem 10000055.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VL01N. Como esta ordem é atendida pelo centro de distribuição do Sul, informe obrigatoriamente o Ponto de Expedição 2000 e o número da ordem 10000055.',
 
     sapKnowledgeBridge: {
       tcode: 'VL01N',
@@ -2162,7 +2162,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a transação VL02N com a Remessa 80000060. Verifique se as 5 unidades estão conferidas e clique no botão verde "Registrar Saída de Mercadorias (PGI)".',
+    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VL02N com a Remessa 80000060. Verifique se as 5 unidades estão conferidas e clique no botão verde "Registrar Saída de Mercadorias (PGI)".',
 
     sapKnowledgeBridge: {
       tcode: 'VL02N',
@@ -2252,7 +2252,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a transação VF01. Selecione o Tipo de Faturamento F2, insira o número da remessa 80000065 como documento de referência e clique em Gravar Fatura.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VF01. Selecione o Tipo de Faturamento F2, insira o número da remessa 80000065 como documento de referência e clique em Gravar Fatura.',
 
     sapKnowledgeBridge: {
       tcode: 'VF01 / VF03',
@@ -2326,7 +2326,7 @@ export const ScenarioCatalog = [
     badgeReward: 'fast_responder',
     initialTcode: 'XD03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'DESAFIO SLA (6 MIN): Expedição Urgente de Servidores para DataCore Cloud',
     briefing: 'Chamado de Emergência com SLA! O cliente DataCore Cloud & Datacenters (Cliente 100180) solicitou despacho urgente para a Ordem de Venda nº 10000065 (2 Servidores Rack 1U - MAT-1010) para ampliação de capacidade no data center de Alphaville. Você tem 6 minutos no cronômetro de SLA para: consultar o cadastro do parceiro na XD03 e confirmar as condições de entrega e expedição, acessar a VL01N com o Ponto de Expedição 1000 e gerar a remessa de saída correspondente antes do encerramento da janela logística!',
 
@@ -2405,7 +2405,7 @@ export const ScenarioCatalog = [
     badgeReward: 'terms_negotiator',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra Especial com Prazo Estendido: InovaCorp (PO-INOVA-Z60)',
     briefing: 'Olá! A InovaCorp Soluções Tecnológicas fechou a aquisição de 6 unidades do Roteador de Borda SD-WAN Multi-WAN (MAT-2010). O cliente está cadastrado sob a conta 100045, cujo mestre comercial em KNVV propõe automaticamente a condição Z030 (30 dias). Porém, em negociação formal autorizada pela diretoria comercial, foi concedido o prazo especial estendido de 60 dias líquido (Z060). Abra a VA01, preencha a estrutura comercial nacional (1000/10/01), selecione o parceiro 100045, sobreponha manualmente o campo Condição de Pagamento de Z030 para Z060 no cabeçalho e lance os itens com frete CIF!',
 
@@ -2422,7 +2422,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060) - Aprovado formalmente pela Diretoria Comercial'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Ao selecionar o cliente 100045 na VA01, observe que o sistema puxa Z030 por padrão. Altere manualmente o campo ZTERM para Z060 antes de simular e gravar. Isso demonstra o domínio sobre a sobreposição de dados mestres em SD!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Ao selecionar o cliente 100045 na VA01, observe que o sistema puxa Z030 por padrão. Altere manualmente o campo ZTERM para Z060 antes de simular e gravar. Isso demonstra o domínio sobre a sobreposição de dados mestres em SD!',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / XD03',
@@ -2471,7 +2471,7 @@ export const ScenarioCatalog = [
     badgeReward: 'o2c_troubleshooter',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Chamado do Faturamento: Remessa 80000070 Travada sem Faturamento (VF01)',
     briefing: 'Atenção, trainee! O setor de faturamento entrou em contato relatando um impasse: a Ordem de Venda nº 10000070 para a DataCore Cloud possui a Remessa 80000070 gerada, mas a transação VF01 recusa a emissão da Nota Fiscal Comercial F2, exibindo mensagem de pré-requisito pendente. Acesse a VA03 para investigar o Fluxo de Documentos (VBFA). Descubra por que a expedição física ainda não liberou o faturamento, regularize a pendência na transação correspondente e conclua a emissão da fatura F2 na VF01.',
 
@@ -2488,7 +2488,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra a Ordem 10000070 na VA03 e observe o status da Remessa 80000070 no fluxo de documentos. Ela está criada, mas falta a Saída de Mercadorias (PGI / Movimento MM 601). Vá até a VL02N, confirme o picking e registre o PGI. Depois volte à VF01 e gere a fatura comercial F2!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra a Ordem 10000070 na VA03 e observe o status da Remessa 80000070 no fluxo de documentos. Ela está criada, mas falta a Saída de Mercadorias (PGI / Movimento MM 601). Vá até a VL02N, confirme o picking e registre o PGI. Depois volte à VF01 e gere a fatura comercial F2!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VL02N / VF01',
@@ -2564,7 +2564,7 @@ export const ScenarioCatalog = [
     badgeReward: 'volume_negotiator',
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Comercial de Grande Volume: TechLog Soluções (Ordem 10000072)',
     briefing: 'Olá, trainee! A distribuidora TechLog Soluções (Cliente 100120) enviou um aditivo comercial urgente para a Ordem de Venda nº 10000072. Eles ampliaram o pedido inicial de 20 para 60 unidades do SSD Server Grade 3.84TB (MAT-3010). Conforme nossa política comercial de atacado, pedidos acima de 50 unidades possuem alçada aprovada para concessão de 10% de desconto comercial na condição RB00. Abra a VA02, carregue a ordem 10000072, ajuste a quantidade para 60 unidades, aplique o desconto de 10%, simule o recálculo dos impostos e grave a alteração!',
 
@@ -2581,7 +2581,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) com desconto comercial de volume de 10%'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Acesse a VA02 e selecione a Ordem 10000072. Na aba de Posições, mude a quantidade de 20 para 60 e defina o desconto manual para 10%. Clique em "Recalcular Preço" para conferir a base de impostos antes de gravar.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a VA02 e selecione a Ordem 10000072. Na aba de Posições, mude a quantidade de 20 para 60 e defina o desconto manual para 10%. Clique em "Recalcular Preço" para conferir a base de impostos antes de gravar.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / XD03',
@@ -2646,7 +2646,7 @@ export const ScenarioCatalog = [
     badgeReward: 'public_sector_pro',
     initialTcode: 'VA01',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Licitação e Nota de Empenho Homologada: Prefeitura Nova Esperança (EMP-2026-99881)',
     briefing: 'Olá! Vencemos o pregão eletrônico da Prefeitura Municipal de Nova Esperança (Cliente 100650) para fornecimento de 4 Servidores Enterprise Nexus Pro X (MAT-1001) para a Secretaria de Educação. No setor público (B2G), a legislação e o Tribunal de Contas exigem que o número exato da Nota de Empenho conste no campo "Nº Pedido de Compra do Cliente" (BSTNK) para fins de liquidação orçamentária e emissão do DANFE. Acesse a VA01, selecione a estrutura comercial (1000/10/01), informe o cliente 100650, preencha rigorosamente o BSTNK como "EMP-2026-99881", selecione o prazo Z060 e frete CIF e lance os 4 servidores!',
 
@@ -2663,7 +2663,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060) - Liquidação orçamentária por empenho'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: No campo "Nº Pedido do Cliente" (BSTNK), digite exatamente EMP-2026-99881. Sem essa informação idêntica ao empenho, o fiscal de contratos da Prefeitura glosará a entrega e recusará a Nota Fiscal.',
+    mentorInitialTip: 'Dica do Chefe Wilson: No campo "Nº Pedido do Cliente" (BSTNK), digite exatamente EMP-2026-99881. Sem essa informação idêntica ao empenho, o fiscal de contratos da Prefeitura glosará a entrega e recusará a Nota Fiscal.',
 
     sapKnowledgeBridge: {
       tcode: 'VA01',
@@ -2712,7 +2712,7 @@ export const ScenarioCatalog = [
     badgeReward: 'fast_credit_commander',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'DESAFIO SLA (5 MIN): Despacho Crítico com Parecer de Crédito - Metal Paulista',
     briefing: 'Chamado Urgente sob SLA de 5 minutos! A Indústria Metalúrgica Paulista (Cliente 100088) está com a produção ameaçada de parada por queima de nobreaks de data center. A Ordem de Venda nº 10000075 (2 Nobreaks 10kVA - MAT-1090) foi cadastrada, mas está retida na expedição por bloqueio de crédito na VKM1. O cronômetro de 5 minutos está correndo: consulte o bloqueio na VA03, acesse a VKM1 e aprove a liberação supervisionada com parecer comercial, crie o fornecimento na VL01N (Ponto de Expedição 1000) e registre a Saída de Mercadorias (PGI) na VL02N antes de estourar o SLA!',
 
@@ -2791,7 +2791,7 @@ export const ScenarioCatalog = [
     badgeReward: 'root_cause_analyst',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Reclamação de Cliente Corporativo: AutoPeças Guanabara (Ordem 10000076)',
     briefing: 'Olá, trainee! O SAC abriu um chamado com prioridade alta: o cliente AutoPeças e Motores Guanabara (100750) relata que o pedido nº 10000076 foi emitido há 2 dias e a expedição não avançou. Acesse a transação VA03 para analisar o cabeçalho e diagnosticar a restrição ativa no status da ordem. Em seguida, acesse a transação VKM1 para tratar o bloqueio de crédito e registre a liberação supervisionada com parecer de governança.',
 
@@ -2809,7 +2809,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030) - Restrição cadastral temporária'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na VA03, verifique a aba de Status e o Fluxo de Documentos da Ordem 10000076. Você notará que o status de crédito consta como BLOCKED devido a restrições do parceiro. Abra a VKM1, analise a pendência e execute a liberação para destravar a expedição!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na VA03, verifique a aba de Status e o Fluxo de Documentos da Ordem 10000076. Você notará que o status de crédito consta como BLOCKED devido a restrições do parceiro. Abra a VKM1, analise a pendência e execute a liberação para destravar a expedição!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VKM1',
@@ -2869,7 +2869,7 @@ export const ScenarioCatalog = [
     badgeReward: 'pricing_auditor',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem Incompleta por Falha de Precificação: MinasTech (Ordem 10000078)',
     briefing: 'Olá! Um assistente comercial registrou a Ordem de Venda nº 10000078 para o cliente MinasTech Automação (100210), mas o pedido ficou travado com status incompleto e valor total R$ 0,00. Investigue a ordem na VA03 para identificar qual material está sem determinação de preço base. Em seguida, acesse a transação VK11 e cadastre a condição de preço PR00 oficial no valor de R$ 65,00 para o Cabo de Fibra Óptica (MAT-4099). Por fim, acesse a transação VA02, recarregue a ordem 10000078 e grave as alterações para forçar o recálculo comercial de preços e tributos!',
 
@@ -2886,7 +2886,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030) - Preço de tabela R$ 65,00/un'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro abra a VA03 e veja o item MAT-4099 com valor zero. Vá para a VK11, escolha Org 1000 / Canal 10, material MAT-4099, condição PR00 e valor R$ 65,00 e clique em Gravar. Depois abra a VA02 na ordem 10000078 e clique em Gravar Alterações para atualizar o documento!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro abra a VA03 e veja o item MAT-4099 com valor zero. Vá para a VK11, escolha Org 1000 / Canal 10, material MAT-4099, condição PR00 e valor R$ 65,00 e clique em Gravar. Depois abra a VA02 na ordem 10000078 e clique em Gravar Alterações para atualizar o documento!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VK11 / VA02',
@@ -2957,7 +2957,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_risk_master',
     initialTcode: 'XD03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Decisão de Risco Comercial e Liberação: Varejo Eletro Brasil (Ordem 10000080)',
     briefing: 'Olá, trainee! O cliente Varejo Eletro Brasil (100045) fechou um pedido de grande porte: 12 Servidores Enterprise Nexus Pro X (MAT-1001), totalizando mais de R$ 120.000,00. A ordem nº 10000080 foi retida na VKM1 por ultrapassar o limite global de crédito aprovado. Consulte os dados cadastrais e financeiros do parceiro na transação XD03. Avalie a Categoria de Risco e a pontualidade histórica do cliente. Diante do histórico exemplar de pagamentos, tome a decisão executiva na transação VKM1 e aprove a liberação supervisionada com parecer comercial fundamentado!',
 
@@ -2974,7 +2974,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030) - Limite de Crédito BR01 Excedido'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na XD03, selecione o cliente 100045 e clique na aba Controle de Crédito. Veja que a Categoria de Risco é A (Baixo Risco) e o histórico é 100% pontual. Com essa evidência, abra a VKM1 e libere a Ordem 10000080 com segurança comercial!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na XD03, selecione o cliente 100045 e clique na aba Controle de Crédito. Veja que a Categoria de Risco é A (Baixo Risco) e o histórico é 100% pontual. Com essa evidência, abra a VKM1 e libere a Ordem 10000080 com segurança comercial!',
 
     sapKnowledgeBridge: {
       tcode: 'XD03 / VKM1',
@@ -3033,7 +3033,7 @@ export const ScenarioCatalog = [
     badgeReward: 'shipping_specialist',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Falha de Remessa Regional: Centro Sul 2000 (Ordem 10000082)',
     briefing: 'Olá, trainee! O assistente da expedição abriu um chamado urgente: a Ordem de Venda nº 10000082 para a EletroPeças Brasil (100600) está gravada e confirmada, mas ao tentar criar o fornecimento na VL01N o sistema acusa erro informando que nenhum item foi selecionado. Acesse a transação VA03 para consultar o cabeçalho e os itens da ordem. Identifique a qual Centro de Distribuição e filial os itens foram atribuídos, vá para a transação VL01N, informe o Ponto de Expedição correspondente (2000 - CD Regional Sul) e gere a remessa com sucesso!',
 
@@ -3050,7 +3050,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na VA03, observe que a ordem está vinculada à estrutura regional. Na tela inicial da VL01N, o Ponto de Expedição proposto vem como 1000 (CD Central SP). Altere para 2000 para carregar a ordem e gerar o fornecimento!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na VA03, observe que a ordem está vinculada à estrutura regional. Na tela inicial da VL01N, o Ponto de Expedição proposto vem como 1000 (CD Central SP). Altere para 2000 para carregar a ordem e gerar o fornecimento!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VL01N',
@@ -3110,7 +3110,7 @@ export const ScenarioCatalog = [
     badgeReward: 'freight_specialist',
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Retificação de Frete em Pedido Vivo: MinasTech Automação (Ordem 10000084)',
     briefing: 'Olá! A MinasTech Automação (Cliente 100210) entrou em contato para retificar a modalidade logística da Ordem de Venda nº 10000084 (30 Cabos DAC - MAT-4050). O pedido foi gravado com frete CIF por equívoco, mas o cliente já possui contrato de retirada com transportadora própria na portaria do nosso Centro de Distribuição. Acesse a transação VA02, altere o Incoterms de CIF para FOB, atualize o local de destino para "CD Central NexusTech SP" e grave as alterações!',
 
@@ -3127,7 +3127,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Abra a VA02 na ordem 10000084. No cabeçalho, localize o campo Incoterms e troque de CIF para FOB. Lembre-se de gravar para atualizar o documento no SAP!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra a VA02 na ordem 10000084. No cabeçalho, localize o campo Incoterms e troque de CIF para FOB. Lembre-se de gravar para atualizar o documento no SAP!',
 
     sapKnowledgeBridge: {
       tcode: 'VA02',
@@ -3191,7 +3191,7 @@ export const ScenarioCatalog = [
     badgeReward: 'atp_controller',
     initialTcode: 'MM03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Alerta de Ruptura de Estoque: Pedido TechLog Soluções (Ordem 10000086)',
     briefing: 'Atenção, trainee! A TechLog Soluções (Cliente 100120) emitiu a Ordem nº 10000086 solicitando 30 Roteadores de Borda SD-WAN (MAT-2010). O almoxarifado informou que o saldo livre está comprometido. Acesse a MM03, verifique o estoque físico e o saldo disponível para promessa (ATP) do material MAT-2010. Em seguida, acesse a transação VA02 e adeque responsavelmente a quantidade do item para 18 unidades, evitando o cancelamento integral do pedido e garantindo faturamento parcial imediato!',
 
@@ -3208,7 +3208,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na MM03, consulte o material MAT-2010 na aba Estoque/ATP. Você verá que o saldo disponível é exatamente 18 UN. Vá para a VA02, altere a quantidade de 30 para 18 na ordem 10000086 e salve!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na MM03, consulte o material MAT-2010 na aba Estoque/ATP. Você verá que o saldo disponível é exatamente 18 UN. Vá para a VA02, altere a quantidade de 30 para 18 na ordem 10000086 e salve!',
 
     sapKnowledgeBridge: {
       tcode: 'MM03 / VA02',
@@ -3273,7 +3273,7 @@ export const ScenarioCatalog = [
     badgeReward: 'fiscal_troubleshooter',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Plantão de Fechamento sob SLA: Fatura Pendente DataCore (Ordem 10000088)',
     briefing: 'Alerta da Diretoria Financeira: "Estamos no fechamento do corte fiscal e a fatura da Ordem nº 10000088 (DataCore Cloud) precisa ser emitida impreterivelmente nos próximos 5 minutos! O setor de faturamento relata que a VF01 recusa o documento alegando pré-requisito pendente". O cronômetro de 5 minutos está ativo: diagnostique a causa raiz no fluxo documental da VA03, vá à transação responsável pela pendência logística e emita a Fatura F2 na VF01 antes de estourar o prazo!',
 
@@ -3290,7 +3290,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson sob SLA: Abra a VA03 e veja o fluxo da ordem 10000088. A remessa 80000088 existe mas o PGI não foi registrado! Corra para a VL02N, confirme o picking e registre a Saída de Mercadorias. Em seguida, acesse a VF01 e grave a fatura F2 antes do tempo acabar!',
+    mentorInitialTip: 'Dica do Chefe Wilson sob SLA: Abra a VA03 e veja o fluxo da ordem 10000088. A remessa 80000088 existe mas o PGI não foi registrado! Corra para a VL02N, confirme o picking e registre a Saída de Mercadorias. Em seguida, acesse a VF01 e grave a fatura F2 antes do tempo acabar!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VL02N / VF01',
@@ -3366,7 +3366,7 @@ export const ScenarioCatalog = [
     badgeReward: 'contract_modifier',
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Contratual Duplo: Mineração Serra Azul (Ordem 10000090)',
     briefing: 'Olá! A Mineração Serra Azul (Cliente 100210) aprovou um aditivo comercial para a Ordem de Venda nº 10000090. Eles ampliaram a quantidade de Switches Gigabit (MAT-2004) de 5 para 12 unidades. Em contrapartida pelo volume adicional, a gerência concedeu a extensão do prazo de pagamento para Z015 (15 dias líquido). Acesse a transação VA02, abra a ordem 10000090, atualize a quantidade da posição para 12 unidades, altere a Condição de Pagamento no cabeçalho para Z015, simule o recálculo dos impostos e salve a ordem!',
 
@@ -3383,7 +3383,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) - Prazo especial de aditivo'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na VA02, lembre-se de alterar dois campos: na aba Cabeçalho, mude o prazo para Z015; na aba Posições, mude a quantidade para 12. Clique em Simular para conferir os totais e grave as alterações.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na VA02, lembre-se de alterar dois campos: na aba Cabeçalho, mude o prazo para Z015; na aba Posições, mude a quantidade para 12. Clique em Simular para conferir os totais e grave as alterações.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02',
@@ -3448,7 +3448,7 @@ export const ScenarioCatalog = [
     badgeReward: 'corp_governance',
     initialTcode: 'XD03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra Corporativa Centralizada: DataCore Cloud (PO-DC-CORP-CENTRAL)',
     briefing: 'Olá, trainee! A filial regional da DataCore Cloud solicitou a aquisição de 10 Roteadores SD-WAN (MAT-2010). No entanto, o Contrato Guarda-Chuva corporativo exige que todas as ordens de compra sejam formalmente emitidas e faturadas contra a Matriz pagadora central (Cliente 100180 - DataCore Cloud Matriz Barueri/SP). Consulte na XD03 os dados cadastrais da matriz. Em seguida, acesse a VA01, selecione a Área de Vendas 1000/10/01, informe a conta matriz 100180, informe o pedido PO-DC-CORP-CENTRAL, selecione prazo Z015 e frete CIF e lance os 10 roteadores!',
 
@@ -3465,7 +3465,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) - Faturamento centralizado'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Inicie na XD03 e confira a razão social e endereço da matriz 100180. Ao abrir a VA01, garanta que o cliente selecionado seja 100180 e preencha exatamente o PO PO-DC-CORP-CENTRAL!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Inicie na XD03 e confira a razão social e endereço da matriz 100180. Ao abrir a VA01, garanta que o cliente selecionado seja 100180 e preencha exatamente o PO PO-DC-CORP-CENTRAL!',
 
     sapKnowledgeBridge: {
       tcode: 'XD03 / VA01',
@@ -3514,7 +3514,7 @@ export const ScenarioCatalog = [
     badgeReward: 'credit_governance',
     initialTcode: 'VA03',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Comprovação de Adiantamento Financeiro: Metalúrgica Paulista (Ordem 10000092)',
     briefing: 'Olá! A Indústria Metalúrgica Paulista (Cliente 100088) teve a Ordem nº 10000092 (4 Nobreaks 10kVA - MAT-1090) retida preventivamente por bloqueio de crédito na VKM1, pois o valor de R$ 38.000,00 excede a linha cadastrada. Contudo, o cliente apresentou comprovante de depósito de 50% de entrada (Sinal Financeiro via TED). A gerência autorizou a liberação assistida. Acesse a VA03 para diagnosticar a ordem retida, vá até a transação VKM1 e clique em Liberar Ordem para concluir a liberação de alçada comercial!',
 
@@ -3531,7 +3531,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060) - 50% antecipado via TED'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Primeiro veja na VA03 o status da ordem 10000092 retida por crédito. Abra a VKM1, localize a ordem retida na tabela e clique em "Liberar Ordem" com segurança!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro veja na VA03 o status da ordem 10000092 retida por crédito. Abra a VKM1, localize a ordem retida na tabela e clique em "Liberar Ordem" com segurança!',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / VKM1',
@@ -3593,7 +3593,7 @@ export const ScenarioCatalog = [
     badgeReward: 'margin_guardian',
     initialTcode: 'VA02',
 
-    sender: 'Sr. Wilson (Coordenador Comercial | Mentor SD)',
+    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Alerta de Margem Negativa: Retificação de Desconto TechLog (Ordem 10000094)',
     briefing: 'Olá, trainee! A controladoria comercial barrou a Ordem nº 10000094 para a TechLog Soluções (100120): o vendedor aplicou um desconto excessivo de 15% na condição RB00 para 10 Switches Gigabit (MAT-2004), estourando a alçada de rentabilidade. A gerência determinou a readequação imediata do desconto para exatamente 5%, que é o teto máximo permitido para esse lote. Abra a VA02 na ordem 10000094, reduza o desconto manual de 15% para 5% na posição, simule o recálculo dos impostos e salve a ordem retificada!',
 
@@ -3610,7 +3610,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) - Desconto comercial readequado para 5%'
     },
 
-    mentorInitialTip: 'Dica do Sr. Wilson: Na VA02, abra a ordem 10000094. Na aba de Posições, mude o percentual de desconto de 15 para 5. Clique em Simular para conferir o novo valor líquido e salve a ordem.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Na VA02, abra a ordem 10000094. Na aba de Posições, mude o percentual de desconto de 15 para 5. Clique em Simular para conferir o novo valor líquido e salve a ordem.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02',

@@ -1,6 +1,6 @@
 /**
  * NexusTech ERP • Welcome Modal Component (Onboarding - Primeiro Dia na Empresa)
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  * Experiência de Primeiro Acesso Corporativo, Acolhimento e Orientação Inicial
  */
 
@@ -37,7 +37,7 @@ export class WelcomeModalComponent {
   }
 
   /**
-   * Abre o modal de boas-vindas do Sr. Wilson
+   * Abre o modal de boas-vindas do Chefe Wilson
    */
   show() {
     const profile = trainee.getProfile();

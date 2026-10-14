@@ -95,7 +95,7 @@ export class AuthViewComponent {
     if (!this.statusMessage) return '';
     const alertClass = this.statusType === 'ERROR' ? 'auth-alert-error' : 'auth-alert-info';
     return `
-      <div class="auth-alert ${alertClass}">
+      <div class="auth-alert ${alertClass}" role="${this.statusType === 'ERROR' ? 'alert' : 'status'}" aria-live="polite">
         <span>${this.statusMessage}</span>
       </div>
     `;
@@ -137,7 +137,7 @@ export class AuthViewComponent {
             id="login-password" 
             class="auth-form-input" 
             placeholder="••••••••" 
-            value="trainee123"
+            value="TraineeDev2026!"
             required 
             autocomplete="current-password"
           />
@@ -147,15 +147,16 @@ export class AuthViewComponent {
           <span>Entrar no Nexus ERP Lab</span>
         </button>
 
+        ${import.meta.env.DEV ? `
         <button type="button" class="auth-btn-secondary" id="btn-quick-dev-login" title="Login imediato como Trainee SD padrão">
           <span>Entrar como Trainee SD (Acesso Rápido Dev)</span>
-        </button>
+        </button>` : ''}
 
         <div class="auth-divider">
           <span>ou</span>
         </div>
 
-        <button type="button" class="auth-btn-google auth-btn-google--disabled" id="btn-google-login" title="Autenticação Google será integrada via OAuth em ambiente de produção" disabled style="opacity: 0.55; cursor: not-allowed;">
+        <button type="button" aria-disabled="true" class="auth-btn-google auth-btn-google--disabled" id="btn-google-login" title="Autenticação Google será integrada via OAuth em ambiente de produção" disabled style="opacity: 0.55; cursor: not-allowed;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -214,7 +215,7 @@ export class AuthViewComponent {
             required 
             autocomplete="new-password"
           />
-          <div class="auth-form-help">Mínimo de 6 caracteres.</div>
+          <div class="auth-form-help">Mínimo de 12 caracteres, com maiúscula, minúscula e número.</div>
         </div>
 
         <div class="auth-form-group">

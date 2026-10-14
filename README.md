@@ -1,70 +1,69 @@
-# NexusTech ERP • Simulador Educacional de Treinamento SAP SD
+# Nexus ERP Lab • Simulador Educacional SAP SD
 
-Um simulador web moderno, profissional e interativo projetado no conceito de **"Enterprise Serious Game"** para capacitar iniciantes, trainees e consultores juniores no módulo de **Vendas e Distribuição (Sales & Distribution - SAP® SD)**.
+O Nexus ERP Lab é um simulador web de treinamento prático em **Vendas e Distribuição (SAP SD)**. Ele usa cenários de negócio, transações, feedback do Chefe Wilson, competências, tentativas e progresso para ensinar o fluxo Order-to-Cash.
 
----
+> **Estado atual:** protótipo/MVP educacional com autenticação mock local. Não usar para dados reais, cobrança, informações de clientes ou controle de acesso comercial.
 
-## 🌟 Diferenciais do Simulador
+## Produto e progressão
 
-1. **Foco no Processo Comercial Ponta a Ponta**:
-   $$\text{Cliente (XD03)} \longrightarrow \text{Ordem (VA01)} \longrightarrow \text{Disponibilidade ATP (MM03)} \longrightarrow \text{Preço (VK11)} \longrightarrow \text{Crédito (VKM1)} \longrightarrow \text{Remessa} \longrightarrow \text{Faturamento}$$
-   O usuário aprende o impacto de cada decisão na cadeia de valor da empresa, e não apenas comandos isolados.
+O **Trainee** é a experiência gratuita de entrada. A evolução planejada é:
 
-2. **Modo Treinamento vs. Modo Desafio**:
-   - **Modo Treinamento**: O gestor Carlos Eduardo orienta passo a passo, sugere consultas e fornece dicas conceituais.
-   - **Modo Desafio**: O trainee recebe chamados reais com cronômetro de **SLA (ex: 8 minutos)** e precisa diagnosticar o problema sozinho usando as ferramentas e transações disponíveis.
+| Nível | Proposta |
+|---|---|
+| Trainee | Fundamentos, primeiro ciclo guiado e missões introdutórias gratuitas |
+| Júnior Pro | Preço, ATP, crédito, remessa, PGI, faturamento e desafios com SLA |
+| Pleno Pro | Ciclos O2C completos, exceções, análise de causa-raiz, alçada e relatórios |
 
-3. **Diagnóstico Estruturado com Impacto no Negócio**:
-   Ao errar ou acertar, o sistema apresenta um feedback pedagógico em 3 partes:
-   - **1. O que ocorreu**: Análise do preenchimento ou decisão tomada.
-   - **2. Por quê? (Regra SAP SD)**: O conceito e a tabela mestre que regem aquela validação (`VBAK`, `VBAP`, `KNVV`, `MARA`, `KONP`, `KNKK`).
-   - **3. Impacto no Negócio**: A consequência real na operação da empresa (ex: parada de expedição, recusa fiscal, perda de margem de lucro ou inadimplência).
+A versão atual contém **50 missões** distribuídas em pilares de dados mestres, ordens, preço, ATP, crédito, expedição e faturamento. O catálogo e o script `npm run audit:missions` são a fonte operacional da contagem.
 
-4. **Identidade Visual Corporativa "Enterprise Grade"**:
-   - Desenvolvido com paleta de cores corporativa, tipografia precisa (`Inter` e `JetBrains Mono`), tabelas densas com alta legibilidade e barra de comandos executável (OK-Code: `VA01`, `VA03`, `XD03`, `MM03`, `VK11`, `VKM1`).
+## Diferenciais
 
-5. **Gamificação e Trilha de Carreira**:
-   - Progressão: *Estagiário de SD* $\rightarrow$ *Trainee Comercial* $\rightarrow$ *Analista Júnior I* $\rightarrow$ *Analista Júnior II*.
-   - Indicadores de desempenho: Acurácia Comercial (%), Pontualidade em SLA (%), Conquistas (Badges) e Trilha de Auditoria com log de decisões.
+- Processo comercial ponta a ponta: `XD03 → VA01 → MM03 → VK11 → VKM1 → VL01N/VL02N → VF01/VF03`.
+- Modo treinamento com orientação e Modo Desafio com SLA.
+- Diagnóstico estruturado: o que ocorreu, por que ocorreu e qual impacto no negócio.
+- Hub de prática para repetir cenários sem conceder XP vitalício novamente.
+- Mapa de competências, jornada, ranking, bônus, progresso e histórico.
+- Interface corporativa com command bar, stepper, sidebar, PWA e deploy para GitHub Pages.
 
----
+## Como executar
 
-## 🏢 A Empresa Fictícia: NexusTech Distribuidora S/A
+Requer Node.js 20 ou superior.
 
-- **Empresa Contábil (FI)**: `BR10 - NexusTech Brasil Distribuidora S/A`
-- **Organização de Vendas (SD)**: `1000 - NexusTech Vendas Nacionais`
-- **Canais de Distribuição**:
-  - `10 - Venda Direta / Corporativo (B2B)`
-  - `20 - Revenda / Atacado Distribuidor`
-- **Setores de Atividade**: `01 - Equipamentos & Hardware` | `02 - Componentes e Peças`
-- **Centro / Depósito (MM)**: `1000 (CD Matriz São Paulo)` / `DEP1 (Geral)` | `DEP2 (Críticos)`
-
----
-
-## 🚀 Como Executar
-
-O simulador foi construído em **HTML5, CSS Vanilla e Módulos JavaScript (ES6 Nativos)** sem dependência de processos de build complexos.
-
-### Opção 1: Abrir diretamente no navegador
-Basta dar um duplo clique no arquivo `index.html` ou abri-lo no Google Chrome / Microsoft Edge / Firefox.
-
-### Opção 2: Executar via servidor local
-No terminal (PowerShell / Command Prompt), dentro da pasta do projeto:
 ```bash
-python -m http.server 3000
+npm ci
+npm run dev
 ```
-E acesse no navegador: `http://localhost:3000`
 
----
+Abra o endereço informado pelo Vite. Para validar uma build de produção:
 
-## 🧭 Transações Disponíveis no Simulador
+```bash
+npm run build
+npm run preview
+```
 
-| Transação | Nome / Finalidade | Principais Tabelas SAP SD |
-|---|---|---|
-| `/nVA01` | Criar Ordem do Cliente (Cabeçalho, Itens, Condições, Parceiros) | `VBAK`, `VBAP`, `VBPA` |
-| `/nVA03` | Exibir Ordem & Fluxo de Documentos Comercial | `VBAK`, `VBFA` |
-| `/nXD03` | Consulta ao Mestre de Clientes (Área de Vendas & Crédito) | `KNA1`, `KNVV`, `KNKK` |
-| `/nMM03` | Consulta ao Mestre de Materiais (Estoque Físico & ATP) | `MARA`, `MARC`, `MARD` |
-| `/nVK11` | Manutenção de Condições de Preço (`PR00`, Descontos) | `KONP`, `KONH` |
-| `/nVKM1` | Liberação de Ordens Bloqueadas por Crédito Comercial | `VBUK`, `KNKK` |
-| `/nDASH` | Central de Chamados, KPIs e Painel de Carreira | - |
+Para validar a integridade das missões:
+
+```bash
+npm run audit:missions
+```
+
+O acesso rápido de desenvolvimento existe somente durante `npm run dev`. Em uma build pública, ele não é renderizado.
+
+## Segurança
+
+A autenticação atual é um **mock de desenvolvimento baseado em armazenamento local**. Hash local, role no navegador e entitlement local não constituem segurança. O projeto ainda não está pronto para vender planos ou guardar dados de usuários reais.
+
+Antes de liberar Júnior/Pleno pagos, é obrigatório implementar backend de autenticação, sessão segura, autorização server-side, banco isolado por usuário/tenant, cobrança por webhook idempotente, recuperação de senha real, MFA para equipe, rate limiting, logs, backups e requisitos de LGPD.
+
+Leia [SECURITY.md](SECURITY.md) e [docs/SAAS-ROADMAP.md](docs/SAAS-ROADMAP.md) para o plano detalhado.
+
+## Empresa fictícia
+
+- Empresa contábil: `BR10 - NexusTech Brasil Distribuidora S/A`
+- Organização de vendas: `1000 - NexusTech Vendas Nacionais`
+- Canais: `10 - Venda Direta / Corporativo` e `20 - Revenda / Atacado`
+- Centro principal: `1000 - CD Matriz São Paulo`
+
+## Licença e escopo
+
+Este repositório é uma demonstração educacional. SAP, nomes de transações e tabelas são referências de treinamento; o comportamento do simulador é simplificado e não substitui um sistema SAP real nem uma homologação profissional.

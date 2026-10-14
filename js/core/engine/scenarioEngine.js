@@ -1,6 +1,6 @@
 /**
  * NexusTech ERP • Motor de Execução de Cenários (Scenario Engine)
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  * Lógica Pedagógica: Treinar o Olhar do Trainee com Feedback Progressivo
  */
 
@@ -389,7 +389,7 @@ class ScenarioEngine {
   }
 
   /**
-   * Valida o envio de Ordem de Venda na VA01 com feedback pedagógico rigoroso e amigável do Sr. Wilson
+   * Valida o envio de Ordem de Venda na VA01 com feedback pedagógico rigoroso e amigável do Chefe Wilson
    * @param {Object} orderData
    * @returns {Object} { isValid, mentorSpeech, whatHappened, why, businessImpact, fieldError, activeTabHint }
    */

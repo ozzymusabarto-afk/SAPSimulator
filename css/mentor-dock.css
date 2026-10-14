@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NexusTech ERP • Mentor Dock (Painel do Gestor Carlos Eduardo)
+   NexusTech ERP • Mentor Dock (Painel do Gestor Chefe Wilson)
    ========================================================================== */
 
 .mentor-dock {
@@ -230,7 +230,7 @@
   margin-bottom: 10px;
 }
 
-/* Mensagem / Fala do Carlos / Sr. Wilson */
+/* Mensagem / Fala do Carlos / Chefe Wilson */
 .mentor-speech-bubble {
   position: relative;
   background: #ffffff;

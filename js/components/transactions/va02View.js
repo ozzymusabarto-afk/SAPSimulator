@@ -1,7 +1,7 @@
 /**
  * NexusTech ERP • VA02 View Component
  * Transação de Modificação de Ordem de Venda (Change Sales Order)
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  */
 
 import { Icons } from '../../utils/icons.js';

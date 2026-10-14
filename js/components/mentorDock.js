@@ -1,6 +1,6 @@
 /**
  * NexusTech ERP • Mentor Dock Component
- * Painel Interativo do Gestor Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Painel Interativo do Gestor Chefe Wilson (Coordenador Comercial | Mentor SD)
  * Exibição de Briefings, Documentos de Compra Anexos, Dicas e Orientação do Mentor
  */
 
@@ -43,7 +43,7 @@ export class MentorDockComponent {
   }
 
   /**
-   * Dispara uma fala estática do Sr. Wilson no dock ativo
+   * Dispara uma fala estática do Chefe Wilson no dock ativo
    * @param {string} speechText - Texto da fala do supervisor
    * @param {string} type - 'DEFAULT' | 'HELP' | 'SUCCESS' | 'WARN'
    */
@@ -63,7 +63,7 @@ export class MentorDockComponent {
   }
 
   /**
-   * Atualiza a mensagem falada pelo Sr. Wilson no Dock
+   * Atualiza a mensagem falada pelo Chefe Wilson no Dock
    * @param {string} speechText - Texto da fala do supervisor
    * @param {string} type - 'DEFAULT' | 'HELP' | 'SUCCESS' | 'WARN'
    */
@@ -244,7 +244,7 @@ export class MentorDockComponent {
           </button>
         ` : ''}
 
-        <!-- Orientação e Fala do Supervisor Sr. Wilson -->
+        <!-- Orientação e Fala do Supervisor Chefe Wilson -->
         <div class="mentor-speech-bubble ${
           this.speechType === 'HELP' ? 'speech-help' :
           this.speechType === 'SUCCESS' ? 'speech-success' :

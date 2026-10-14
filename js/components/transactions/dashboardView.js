@@ -1,7 +1,7 @@
 /**
  * NexusTech ERP • Dashboard View Component
  * Mesa de Trabalho do Trainee SD, KPIs Operacionais e Histórico de Chamados
- * Mentor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+ * Mentor: Chefe Wilson (Coordenador Comercial | Mentor SD)
  */
 
 import { Icons } from '../../utils/icons.js';
