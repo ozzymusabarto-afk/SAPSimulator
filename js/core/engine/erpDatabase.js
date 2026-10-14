@@ -29,8 +29,24 @@ class ErpDatabase {
   }
 
   // --- Métodos de Clientes ---
-  getCustomer(id) {
-    return this.customers.find(c => c.id === id) || null;
+  getCustomer(identifier) {
+    if (!identifier) return null;
+    const cleanId = String(identifier).trim();
+    // 1. Busca direta por código exato (KUNNR)
+    let found = this.customers.find(c => c.id === cleanId);
+    if (found) return found;
+
+    // 2. Busca por CNPJ
+    found = this.customers.find(c => c.cnpj && c.cnpj.replace(/\D/g, '') === cleanId.replace(/\D/g, ''));
+    if (found) return found;
+
+    // 3. Busca por Nome / Razão Social ou Nome Fantasia (case-insensitive substring)
+    const lower = cleanId.toLowerCase();
+    found = this.customers.find(c => 
+      (c.name && c.name.toLowerCase().includes(lower)) ||
+      (c.tradeName && c.tradeName.toLowerCase().includes(lower))
+    );
+    return found || null;
   }
 
   getAllCustomers() {
@@ -265,6 +281,17 @@ class ErpDatabase {
 
     if (order.overallStatus === 'CREDIT_BLOCKED' || order.creditStatus === 'BLOCKED') {
       return { success: false, error: `A Ordem de Venda nº ${order.docNumber} possui Bloqueio de Crédito Comercial (VKM1). A remessa não pode ser criada sem prévia liberação financeira.` };
+    }
+
+    // Lote F: Verificação de unicidade — impede múltiplas remessas ativas para a mesma OR
+    const existingDelivery = this.deliveries.find(
+      d => d.salesOrderNumber === deliveryData.salesOrderNumber && d.status !== 'CANCELLED'
+    );
+    if (existingDelivery) {
+      return {
+        success: false,
+        error: `A Ordem de Venda nº ${deliveryData.salesOrderNumber} já possui uma remessa ativa (Documento ${existingDelivery.deliveryNumber}). Para processar o fornecimento, utilize a transação VL02N.`
+      };
     }
 
     const deliveryNumber = deliveryData.deliveryNumber || String(this.nextDeliveryNumber++);

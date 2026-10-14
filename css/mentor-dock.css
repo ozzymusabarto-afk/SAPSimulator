@@ -13,6 +13,7 @@
   z-index: 60;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .mentor-dock.collapsed {
@@ -49,6 +50,14 @@
   font-size: 13px;
   color: #ffffff;
   border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.mentor-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 .mentor-status-online {
@@ -335,4 +344,73 @@
   font-size: 11px;
   color: var(--erp-navy-700);
   line-height: 1.4;
+}
+
+/* ==========================================================================
+   Responsividade do Mentor Dock
+   ========================================================================== */
+@media (max-width: 1440px) {
+  :root {
+    --mentor-dock-width: 340px;
+  }
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --mentor-dock-width: 300px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --mentor-dock-width: 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --mentor-dock-width: 270px;
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --mentor-dock-width: 240px;
+  }
+  .mentor-dock-header {
+    padding: 10px 8px;
+  }
+  .mentor-tab-content {
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  #layout-mentor-slot {
+    position: fixed;
+    right: 0;
+    top: calc(var(--topbar-height) + var(--process-stepper-height));
+    bottom: var(--statusbar-height);
+    z-index: 150;
+    pointer-events: none;
+  }
+
+  .mentor-dock {
+    height: 100%;
+    width: 44px;
+    pointer-events: auto;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .mentor-dock:not(.collapsed) {
+    width: 320px;
+    max-width: 90vw;
+    box-shadow: -6px 0 25px rgba(0, 0, 0, 0.45);
+  }
+
+  .mentor-dock.collapsed {
+    width: 44px;
+  }
 }

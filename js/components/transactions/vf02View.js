@@ -14,11 +14,20 @@ export class Vf02ViewComponent {
     this.onNavigate = onNavigate;
     this.container = document.createElement('div');
     this.container.className = 'vf02-view';
-    this.selectedInvoiceNumber = initialParams.invoiceNumber || '';
+    this.selectedInvoiceNumber = ''; // Lote D+E: não pré-preencher via initialParams
+    this.loadedInvoice = null;
+    this.currentScenarioId = null;  // Lote D: guard de cenário
+  }
+
+  resetForm() {
+    // Lote D: limpa estado ao mudar de missão
+    this.selectedInvoiceNumber = '';
     this.loadedInvoice = null;
   }
 
   setParams(params = {}) {
+    // Lote E: setParams não pré-preenche campos — DADO FORNECIDO NO CHAMADO ≠ DADO PREENCHIDO NA TELA.
+    // Aceita navegação contextual de outro componente.
     if (params.invoiceNumber) {
       this.selectedInvoiceNumber = params.invoiceNumber;
     }
@@ -26,19 +35,26 @@ export class Vf02ViewComponent {
   }
 
   render() {
+    const scenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = scenario ? scenario.id : null;
+
+    // Lote D: guard de cenário
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
+    }
+
     const allInvoices = db.getAllInvoices();
+    // Lote C: remove auto-carregamento — exibe estado vazio enquanto trainee não localizar manualmente
     if (this.selectedInvoiceNumber) {
       this.loadedInvoice = db.getInvoice(this.selectedInvoiceNumber);
-    } else if (allInvoices.length > 0 && !this.loadedInvoice) {
-      this.loadedInvoice = allInvoices[allInvoices.length - 1];
-      this.selectedInvoiceNumber = this.loadedInvoice.invoiceNumber;
     }
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VF02</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Modificar Documento de Faturamento (Change Billing Document)</div>
             <div class="text-xs text-muted">Manutenção de Dados de Cobrança, Observações Fiscais e Cancelamento • Tabela VBRK</div>
           </div>
@@ -68,14 +84,25 @@ export class Vf02ViewComponent {
             <label class="form-label">Número da Fatura (Billing Document):</label>
             <div style="display: flex; gap: 8px;">
               <input type="text" class="erp-input font-mono font-bold" id="vf02-invoice-input" 
-                placeholder="Ex: 90000001" value="${this.selectedInvoiceNumber}" style="flex: 1;">
+                placeholder="Ex: 90000001" value="${this.selectedInvoiceNumber}" style="flex: 1; min-width: 0;">
               <select class="erp-select font-mono text-xs" id="vf02-invoice-quick-select" style="max-width: 260px;">
                 <option value="">-- Selecionar Fatura --</option>
-                ${allInvoices.map(inv => `
-                  <option value="${inv.invoiceNumber}" ${inv.invoiceNumber === this.selectedInvoiceNumber ? 'selected' : ''}>
-                    Fatura ${inv.invoiceNumber} • Ordem ${inv.salesOrderNumber} (${inv.status})
-                  </option>
-                `).join('')}
+                ${(() => {
+                  // F2-A: Filtra faturas pelo cenário ativo
+                  const scenario = scenarioEngine.getActiveScenario();
+                  const scenarioOrderNums = (scenario?.initialDocuments || []).map(d => d.salesOrderNumber).filter(Boolean);
+                  const eligible = scenarioOrderNums.length > 0
+                    ? allInvoices.filter(inv => scenarioOrderNums.includes(inv.salesOrderNumber))
+                    : allInvoices;
+                  if (eligible.length === 0) {
+                    return '<option value="" disabled>Nenhuma fatura disponível</option>';
+                  }
+                  return eligible.map(inv => `
+                    <option value="${inv.invoiceNumber}" ${inv.invoiceNumber === this.selectedInvoiceNumber ? 'selected' : ''}>
+                      Fatura ${inv.invoiceNumber} • OR ${inv.salesOrderNumber} (${inv.status})
+                    </option>
+                  `).join('');
+                })()}
               </select>
             </div>
           </div>
@@ -170,8 +197,8 @@ export class Vf02ViewComponent {
           </div>
 
           <!-- Barra de Ações -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <div style="flex: 1 1 auto;">
               ${this.loadedInvoice.status === 'COMPLETED' ? `
                 <button class="btn btn-danger btn-sm" id="btn-cancel-invoice">
                   ${Icons.trash} Estornar Fatura (Cancelamento S1)

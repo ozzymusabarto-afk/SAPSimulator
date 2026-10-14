@@ -51,27 +51,27 @@ export class WelcomeModalComponent {
             <span style="background: var(--erp-blue-primary); color: #fff; width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
               N
             </span>
-            <span>Seu Primeiro Dia na NexusTech</span>
+            <span>Seu Primeiro Dia no Nexus ERP Lab</span>
           </div>
           <button class="erp-modal-close" id="welcome-close-btn" title="Fechar (Esc)">
             ${Icons.x}
           </button>
         </div>
 
-        <!-- Corpo com Mensagem do Sr. Wilson -->
+        <!-- Corpo com Mensagem do Chefe Wilson -->
         <div class="erp-modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
           
-          <!-- Identidade do Mentor Sr. Wilson -->
+          <!-- Identidade do Mentor Chefe Wilson -->
           <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--erp-border-subtle); padding-bottom: 12px;">
-            <div style="width: 44px; height: 44px; border-radius: 50%; background-color: var(--erp-navy-900); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; border: 2px solid #38bdf8; flex-shrink: 0; box-shadow: var(--erp-shadow-xs);">
-              SW
+            <div style="width: 46px; height: 46px; border-radius: 50%; overflow: hidden; border: 2px solid #0070f2; flex-shrink: 0; box-shadow: var(--erp-shadow-xs);">
+              <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div>
-              <div style="font-size: 14px; font-weight: 700; color: var(--erp-navy-900);">
-                Sr. Wilson
+              <div style="font-size: 14.5px; font-weight: 700; color: var(--erp-navy-900);">
+                Chefe Wilson
               </div>
               <div style="font-size: 11.5px; color: var(--erp-text-muted);">
-                Coordenador Comercial & Mentor SD • NexusTech Distribuidora S/A
+                Mentor SAP • Nexus ERP Lab (SD Practice Environment)
               </div>
             </div>
           </div>
@@ -79,13 +79,13 @@ export class WelcomeModalComponent {
           <!-- Mensagem Humana e Profissional -->
           <div style="font-size: 13px; color: var(--erp-navy-900); line-height: 1.6; display: flex; flex-direction: column; gap: 10px;">
             <p style="margin: 0;">
-              Bom dia, <strong>${traineeName}</strong>! Seja muito bem-vinda à equipe de Vendas e Distribuição da NexusTech.
+              Olá, <strong>${traineeName}</strong>! Seja muito bem-vindo ao <strong>Nexus ERP Lab</strong>.
             </p>
             <p style="margin: 0;">
-              Eu sou o Wilson e vou acompanhar seu desenvolvimento durante esta formação prática. Aqui você vai trabalhar com situações reais da nossa rotina comercial: clientes, ordens de venda, estoque, limite de crédito, expedição e faturamento.
+              Eu sou o Chefe Wilson e vou acompanhar seu desenvolvimento durante esta jornada prática. Aqui você vai trabalhar com processos reais da rotina de Vendas e Distribuição (SD): clientes, ordens de venda, estoque ATP, condições de preço, análise de crédito, remessa e faturamento.
             </p>
             <p style="margin: 0;">
-              O objetivo não é correr nem decorar telas, mas sim aprender a tomar decisões comerciais seguras e compreender o impacto de cada dado no negócio.
+              Nosso princípio aqui é a fidelidade operacional ao processo. O objetivo não é correr nem decorar telas, mas sim aprender a identificar os dados necessários e tomar decisões comerciais com total segurança.
             </p>
           </div>
 

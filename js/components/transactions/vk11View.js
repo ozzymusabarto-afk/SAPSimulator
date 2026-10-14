@@ -159,26 +159,60 @@ export class Vk11ViewComponent {
     const saveBtn = this.container.querySelector('#btn-save-condition');
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
+        const selectedMaterialId = matSel ? matSel.value : this.materialId;
+        const enteredAmount = amtInput ? parseFloat(amtInput.value) : this.amount;
+        const activeScenario = scenarioEngine.getActiveScenario();
+        const target = activeScenario?.targetCriteria;
+        const materialMismatch = target?.targetMaterialId && selectedMaterialId !== target.targetMaterialId;
+        const amountMismatch = target?.targetAmount !== undefined && enteredAmount !== Number(target.targetAmount);
+        if (activeScenario && (materialMismatch || amountMismatch)) {
+          const expectedText = target.targetAmount !== undefined
+            ? `MATNR ${target.targetMaterialId || 'indicado'} por R$ ${Number(target.targetAmount).toFixed(2)}/UN`
+            : `material ${target.targetMaterialId || 'indicado'}`;
+          diagnosticModal.show({
+            isValid: false,
+            mentorSpeech: `Confira o registro solicitado: ${expectedText}. O valor/material informado não corresponde ao chamado.`,
+            whatHappened: `Material informado: ${selectedMaterialId}; valor informado: R$ ${Number(enteredAmount).toFixed(2)}/UN.`,
+            why: 'O registro PR00 precisa refletir o material e o preço unitário acordados no chamado.',
+            businessImpact: 'Um preço incorreto pode gerar uma ordem com valor comercial divergente.',
+            onConfirm: () => this.render()
+          });
+          return;
+        }
+
+        this.materialId = selectedMaterialId;
+        this.amount = enteredAmount;
         db.addOrUpdatePricingRecord({
-          materialId: this.materialId,
+          materialId: selectedMaterialId,
           salesOrg: this.salesOrg,
           distChannel: this.distChannel,
           conditionCode: this.conditionCode,
-          amount: this.amount,
+          amount: enteredAmount,
           validTo: '31.12.2028'
         });
 
-        const activeScenario = scenarioEngine.getActiveScenario();
         if (activeScenario) {
           scenarioEngine.completeObjective('create_pricing_record');
         }
 
         diagnosticModal.show({
           isValid: true,
+          operationSummary: {
+            title: 'Registro de Condição de Preço Gravado',
+            docTypeBadge: `A304 / KONP • Condição ${this.conditionCode}`,
+            primaryLabel: 'Chave da Condição (Tabela / Material):',
+            primaryNumber: `${this.conditionCode} / ${this.materialId}`,
+            statusText: `${Formatters.currency(this.amount)} / UN (Ativo)`,
+            partnerLabel: 'Área de Vendas:',
+            partnerOrOrigin: `Org. ${this.salesOrg} • Canal ${this.distChannel}`,
+            referenceDoc: 'Validade: até 31.12.2028',
+            inspectLabel: 'Concluir e Exibir Registro'
+          },
           whatHappened: `Registro de condição ${this.conditionCode} para o material ${this.materialId} gravado com sucesso no valor de ${Formatters.currency(this.amount)}.`,
           why: 'A determinação de preço busca registros na sequência de acesso de vendas antes de permitir o cálculo da ordem.',
           businessImpact: 'A ordem de venda que antes estava travada por falta de preço agora poderá ser emitida normalmente.',
-          onConfirm: () => this.render()
+          onConfirm: () => this.render(),
+          onInspect: () => this.render()
         });
       });
     }

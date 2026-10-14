@@ -17,25 +17,36 @@ export class Vkm1ViewComponent {
     this.container = document.createElement('div');
     this.container.className = 'vkm1-view';
     this.selectedDocNumber = null;
+    this.currentScenarioId = null; // Lote D: guard de cenário
+  }
+
+  resetForm() {
+    // Lote D: limpa estado ao mudar de missão
+    this.selectedDocNumber = null;
   }
 
   render() {
-    const blocked = db.creditBlockedOrders;
-
-    // Conclusão declarativa de objetivos de acesso à VKM1
     const scenario = scenarioEngine.getActiveScenario();
-    if (scenario) {
-      scenarioEngine.completeObjective('access_vkm1');
-      scenarioEngine.completeObjective('investigate_credit');
+    const activeScenarioId = scenario ? scenario.id : null;
+
+    // Lote D: guard de cenário — limpa estado ao trocar de missão
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
     }
+
+    // Lote B: completeObjective('access_vkm1') e ('investigate_credit') REMOVIDOS do render().
+    // Serão disparados apenas após ação real do trainee no handler de liberação.
+
+    const blocked = db.creditBlockedOrders;
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VKM1</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Documentos de Vendas Bloqueados por Crédito (Credit Management)</div>
-            <div class="text-xs text-muted">Controle de Crédito Comercial • Integração SD & FI-AR</div>
+            <div class="text-xs text-muted">Controle de Crédito Comercial • Integração SD &amp; FI-AR</div>
           </div>
         </div>
         <div class="transaction-actions">
@@ -83,7 +94,7 @@ export class Vkm1ViewComponent {
                         ${b.customer.riskCategory}
                       </span>
                     </td>
-                    <td class="text-xs text-muted" style="max-width: 200px;">
+                    <td class="text-xs text-muted" style="min-width: 180px;">
                       ${b.reason}
                     </td>
                     <td>
@@ -128,45 +139,179 @@ export class Vkm1ViewComponent {
       btn.addEventListener('click', () => {
         const docNumber = btn.getAttribute('data-doc');
         if (docNumber) {
-          const success = db.releaseCreditOrder(docNumber, 'Liberado pelo trainee com alçada comercial supervisionada.');
-          
-          if (success) {
-            const scenario = scenarioEngine.getActiveScenario();
-            if (scenario) {
-              scenarioEngine.completeObjective('release_with_notes');
-              scenarioEngine.completeObjective('release_credit_order');
-              scenarioEngine.completeObjective('analyze_credit');
-              scenarioEngine.completeObjective('release_order');
+          const activeScenario = scenarioEngine.getActiveScenario();
+          const targetCriteria = activeScenario?.targetCriteria || {};
+          const selectedOrder = db.getSalesOrder(docNumber);
+          const matchesTargetDocument = !targetCriteria.targetDocNumber || targetCriteria.targetDocNumber === docNumber;
+          const matchesTargetCustomer = !targetCriteria.customerId || selectedOrder?.customerId === targetCriteria.customerId;
 
-              // Verifica se o cenário tem como alvo esta ordem ou requer liberação VKM1
-              const targetDoc = scenario.targetCriteria?.targetDocNumber;
-              const isTargetOrder = !targetDoc || targetDoc === docNumber;
-
-              if (isTargetOrder && (scenario.targetCriteria?.requiresVkm1Release || scenario.targetCriteria?.action === 'CREDIT_RELEASE' || scenario.validationRules?.actionType === 'CREDIT_RELEASE')) {
-                if (scenario.objectives && Array.isArray(scenario.objectives)) {
-                  scenario.objectives.forEach(obj => scenarioEngine.completeObjective(obj.id));
-                }
-
-                const xpEarned = scenario.xpReward || 300;
-                trainee.addXp(xpEarned, `Conclusão do chamado de crédito [${scenario.code}] ${scenario.title}`);
-                trainee.recordAction(true, 'Liberação de Crédito VKM1', `Ordem ${docNumber} liberada com alçada comercial`);
-                if (scenario.badgeReward) {
-                  trainee.unlockBadge(scenario.badgeReward);
-                }
-                const summary = `Ordem ${docNumber} liberada na VKM1 • Parecer comercial supervisionado`;
-                trainee.completeScenario(scenario.id, scenario.title, summary, xpEarned);
-              }
-            }
-
-            const feedback = scenario?.completionFeedback || {};
-            MentorDockComponent.speak(`Ordem nº ${Formatters.documentNumber(docNumber)} liberada na gestão de crédito (VKM1). O bloqueio de remessa foi removido com sucesso.`, 'SUCCESS');
-
+          if (activeScenario && (!matchesTargetDocument || !matchesTargetCustomer)) {
+            const expected = targetCriteria.targetDocNumber
+              ? `ordem ${targetCriteria.targetDocNumber}`
+              : targetCriteria.customerId
+                ? `ordem bloqueada do cliente ${targetCriteria.customerId}`
+                : 'documento solicitado na missão';
             diagnosticModal.show({
-              isValid: true,
-              mentorSpeech: feedback.mentorSpeech || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito na VKM1.`,
-              whatHappened: feedback.whatHappened || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito.`,
-              why: feedback.why || 'O status global de fornecimento foi alterado de BLOQUEADO para ABERTO, permitindo a criação da remessa na transação VL01N.',
-              businessImpact: feedback.businessImpact || 'A mercadoria pode agora ser separada no centro de distribuição, garantindo o cumprimento do prazo contratual com a indústria.',
+              isValid: false,
+              mentorSpeech: `Esta não é a ordem solicitada. Confira a ${expected} antes de liberar crédito.`,
+              whatHappened: `A ordem ${docNumber} não corresponde ao documento ou cliente esperado pela missão.`,
+              why: 'A alçada de crédito deve ser aplicada somente ao documento indicado no chamado.',
+              businessImpact: 'A liberação de uma ordem diferente pode autorizar uma expedição indevida.',
+              onConfirm: () => this.render()
+            });
+            return;
+          }
+
+          // Lote B+F: desabilita botão imediatamente para evitar dupla liberação
+          btn.disabled = true;
+          btn.textContent = 'Processando...';
+
+          try {
+            const success = db.releaseCreditOrder(docNumber, 'Liberado pelo trainee com alçada comercial supervisionada.');
+
+            if (success) {
+              const scenario = scenarioEngine.getActiveScenario();
+              if (scenario) {
+                const targetDoc = scenario.targetCriteria?.targetDocNumber;
+                const isTargetOrder = !targetDoc || targetDoc === docNumber;
+
+                // Lote B: completeObjective disparado AQUI, após ação real do trainee
+                scenarioEngine.completeObjective('access_vkm1');
+                scenarioEngine.completeObjective('release_with_notes');
+                scenarioEngine.completeObjective('release_credit_order');
+                scenarioEngine.completeObjective('analyze_credit');
+                scenarioEngine.completeObjective('release_order');
+
+                const isFinalCreditMission = isTargetOrder && (
+                  scenario.targetCriteria?.requiresVkm1Release ||
+                  scenario.targetCriteria?.action === 'CREDIT_RELEASE' ||
+                  scenario.validationRules?.actionType === 'CREDIT_RELEASE'
+                );
+
+                if (isFinalCreditMission) {
+                  const summary = `Ordem ${docNumber} liberada na VKM1 • Parecer comercial supervisionado`;
+                  const missionCompleted = scenarioEngine.completeActiveScenarioIfReady('Liberação de Crédito VKM1', summary);
+                  if (!missionCompleted) trainee.recordAction(true, 'Liberação de Crédito VKM1', summary);
+                  const pendingObjectives = scenario.objectives.filter(objective => !objective.done);
+
+                  const feedback = scenario?.completionFeedback || {};
+                  MentorDockComponent.speak(
+                    missionCompleted
+                      ? (feedback.mentorSpeech || `Ordem nº ${Formatters.documentNumber(docNumber)} liberada na VKM1. Missão concluída!`)
+                      : `Ordem nº ${Formatters.documentNumber(docNumber)} liberada na VKM1, mas a missão continua. Conclua também: ${pendingObjectives.map(objective => objective.text).join('; ')}.`,
+                    'SUCCESS'
+                  );
+
+                  const orderObj = db.getSalesOrder(docNumber);
+                  const custName = orderObj ? (db.getCustomer(orderObj.customerId)?.name || orderObj.customerId) : '';
+
+                  diagnosticModal.show({
+                    isValid: true,
+                    operationSummary: {
+                      title: 'Ordem Liberada por Alçada de Crédito',
+                      docTypeBadge: 'VBAK / KNKK • Alçada Comercial',
+                      primaryLabel: 'Nº da Ordem Desbloqueada (VBELN):',
+                      primaryNumber: Formatters.documentNumber(docNumber),
+                      statusText: 'Crédito Liberado (RELEASED_MANUAL)',
+                      partnerLabel: 'Emissor da Ordem:',
+                      partnerOrOrigin: orderObj ? `${orderObj.customerId} - ${custName}` : 'Cliente Comercial',
+                      referenceDoc: 'Status Fornecimento: Aberto (OPEN)',
+                      inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(docNumber)}] em VA03`
+                    },
+                    mentorSpeech: missionCompleted
+                      ? (feedback.mentorSpeech || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito na VKM1.`)
+                      : `Ordem ${docNumber} liberada; a missão permanece em andamento até cumprir as etapas pendentes.`,
+                    whatHappened: missionCompleted
+                      ? (feedback.whatHappened || `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito.`)
+                      : `Ordem liberada; ${pendingObjectives.length} objetivo(s) continuam pendentes.`,
+                    why: feedback.why || 'O status global de fornecimento foi alterado de BLOQUEADO para ABERTO, permitindo a criação da remessa na transação VL01N.',
+                    businessImpact: feedback.businessImpact || 'A mercadoria pode agora ser separada no centro de distribuição, garantindo o cumprimento do prazo contratual com a indústria.',
+                    onConfirm: () => this.render(),
+                    onInspect: () => this.onNavigate('VA03', { docNumber })
+                  });
+                } else {
+                  // Etapa intermediária de cenários compostos (ex: DSF-204, DSF-205, DSF-208)
+                  // Apenas desbloqueia o fluxo logístico sem conceder o XP final ou feedback de encerramento da missão
+                  trainee.recordAction(true, 'Liberação de Crédito VKM1', `Ordem ${docNumber} liberada para continuidade logística`);
+
+                  MentorDockComponent.speak(`Ordem nº ${Formatters.documentNumber(docNumber)} liberada na VKM1. Trava comercial removida! Prossiga para a expedição (VL01N).`, 'SUCCESS');
+
+                  const orderObj = db.getSalesOrder(docNumber);
+                  const custName = orderObj ? (db.getCustomer(orderObj.customerId)?.name || orderObj.customerId) : '';
+
+                  diagnosticModal.show({
+                    isValid: true,
+                    operationSummary: {
+                      title: 'Ordem Liberada por Alçada de Crédito',
+                      docTypeBadge: 'VBAK / KNKK • Alçada Comercial',
+                      primaryLabel: 'Nº da Ordem Desbloqueada (VBELN):',
+                      primaryNumber: Formatters.documentNumber(docNumber),
+                      statusText: 'Crédito Liberado (RELEASED_MANUAL)',
+                      partnerLabel: 'Emissor da Ordem:',
+                      partnerOrOrigin: orderObj ? `${orderObj.customerId} - ${custName}` : 'Cliente Comercial',
+                      referenceDoc: 'Próxima Etapa: Gerar Remessa (VL01N)',
+                      inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(docNumber)}] em VA03`
+                    },
+                    mentorSpeech: `Muito bem! O bloqueio de crédito da Ordem de Venda nº ${Formatters.documentNumber(docNumber)} foi liberado com sucesso na transação VKM1. A trava comercial foi removida no mandante 800. Agora avance para a transação VL01N para criar o documento de remessa (fornecimento)!`,
+                    whatHappened: `Bloqueio de crédito comercial resolvido para a Ordem nº ${Formatters.documentNumber(docNumber)}. Status de fornecimento atualizado para ABERTO.`,
+                    why: 'A alçada comercial foi aprovada na VKM1, destravando a ordem para as etapas físicas de expedição.',
+                    businessImpact: 'A mercadoria está autorizada para movimentação no Centro de Distribuição. A próxima etapa operacional é gerar a remessa na transação VL01N.',
+                    onConfirm: () => {
+                      this.onNavigate('VL01N', { salesOrderNumber: docNumber });
+                    },
+                    onInspect: () => this.onNavigate('VA03', { docNumber })
+                  });
+                }
+              } else {
+                // Fallback defensivo caso não haja cenário ativo
+                MentorDockComponent.speak(`Ordem nº ${Formatters.documentNumber(docNumber)} liberada na gestão de crédito (VKM1).`, 'SUCCESS');
+                const orderObj = db.getSalesOrder(docNumber);
+                const custName = orderObj ? (db.getCustomer(orderObj.customerId)?.name || orderObj.customerId) : '';
+
+                diagnosticModal.show({
+                  isValid: true,
+                  operationSummary: {
+                    title: 'Ordem Liberada por Alçada de Crédito',
+                    docTypeBadge: 'VBAK / KNKK • Alçada Comercial',
+                    primaryLabel: 'Nº da Ordem Desbloqueada (VBELN):',
+                    primaryNumber: Formatters.documentNumber(docNumber),
+                    statusText: 'Crédito Liberado (RELEASED_MANUAL)',
+                    partnerLabel: 'Emissor da Ordem:',
+                    partnerOrOrigin: orderObj ? `${orderObj.customerId} - ${custName}` : 'Cliente Comercial',
+                    referenceDoc: 'Status Fornecimento: Aberto (OPEN)',
+                    inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(docNumber)}] em VA03`
+                  },
+                  mentorSpeech: `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada com sucesso do bloqueio de crédito na VKM1.`,
+                  whatHappened: `Ordem de Venda nº ${Formatters.documentNumber(docNumber)} liberada do bloqueio de crédito.`,
+                  why: 'O status global de fornecimento foi alterado para ABERTO.',
+                  businessImpact: 'A ordem pode agora seguir para as próximas etapas no sistema ERP.',
+                  onConfirm: () => this.render(),
+                  onInspect: () => this.onNavigate('VA03', { docNumber })
+                });
+              }
+            } else {
+              // Falha na liberação: restaura botão e emite diagnóstico
+              btn.disabled = false;
+              btn.innerHTML = `${Icons.unlock} Liberar Ordem`;
+              diagnosticModal.show({
+                isValid: false,
+                mentorSpeech: 'Atenção: Não foi possível liberar esta ordem. O documento pode já ter sido liberado ou cancelado.',
+                whatHappened: `Falha na liberação da Ordem nº ${docNumber}.`,
+                why: 'A ordem não consta com bloqueio de crédito pendente.',
+                businessImpact: 'Nenhuma alteração de status foi gravada.',
+                onConfirm: () => this.render()
+              });
+            }
+          } catch (err) {
+            console.error('Erro na liberação de crédito VKM1:', err);
+            btn.disabled = false;
+            btn.innerHTML = `${Icons.unlock} Liberar Ordem`;
+            diagnosticModal.show({
+              isValid: false,
+              mentorSpeech: 'Ocorreu um erro inesperado durante a liberação. Tente novamente ou consulte o suporte.',
+              whatHappened: `Erro de execução: ${err.message}`,
+              why: 'Ocorreu uma falha inesperada no processamento do evento da VKM1.',
+              businessImpact: 'A operação foi cancelada e o estado anterior foi preservado.',
               onConfirm: () => this.render()
             });
           }

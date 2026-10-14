@@ -1,0 +1,661 @@
+/**
+ * Nexus ERP Lab • SD Practice Environment
+ * Estilos das Áreas de Minha Jornada, Treinamento e Bônus
+ * Arquivo: css/journey-views.css
+ */
+
+/* ==========================================================================
+   CONTAINERS GERAIS
+   ========================================================================== */
+
+.institutional-view-container {
+  padding: 24px;
+  max-width: 1360px;
+  margin: 0 auto;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.view-header-banner {
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 60%, #24344d 100%);
+  border-radius: 10px;
+  padding: 24px 28px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(13, 27, 42, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.view-header-content {
+  flex: 1;
+}
+
+.view-header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #93c5fd;
+  background: rgba(147, 197, 253, 0.12);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.view-header-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.view-header-subtitle {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 780px;
+}
+
+/* ==========================================================================
+   MINHA JORNADA: TIMELINE DE CARREIRA
+   ========================================================================== */
+
+.career-pipeline-card {
+  background: #ffffff;
+  border: 1px solid var(--erp-border-subtle, #e2e8f0);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--erp-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.career-pipeline-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--erp-navy-900, #0f172a);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.career-track-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  position: relative;
+}
+
+.career-step-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.career-step-item.active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
+}
+
+.career-step-item.locked {
+  opacity: 0.72;
+  background: #f1f5f9;
+}
+
+.career-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.career-step-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.career-step-badge.active-badge {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.career-step-badge.locked-badge {
+  background: #cbd5e1;
+  color: #475569;
+}
+
+.career-step-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.career-step-desc {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.career-step-footer {
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   MATRIZ DE COMPETÊNCIAS (7 PILARES)
+   ========================================================================== */
+
+.competency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.competency-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.competency-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.competency-card.needs-reinforcement {
+  border-left: 4px solid #f59e0b;
+}
+
+.competency-card.mastered {
+  border-left: 4px solid #10b981;
+}
+
+.competency-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.competency-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.competency-card-tcodes {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tcode-pill {
+  font-family: var(--erp-font-mono, monospace);
+  font-size: 10.5px;
+  background: #f1f5f9;
+  color: #1e293b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.competency-rate-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.competency-rate-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.competency-rate-bar {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.competency-rate-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.competency-rate-fill.good { background: #10b981; }
+.competency-rate-fill.warn { background: #f59e0b; }
+
+.competency-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #475569;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+}
+
+/* ==========================================================================
+   PAINEL DE DIAGNÓSTICO DO CHEFE WILSON
+   ========================================================================== */
+
+.diagnostic-panel-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.diagnostic-panel-header {
+  background: #f8fafc;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.diagnostic-mentor-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diagnostic-mentor-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #2563eb;
+  object-fit: cover;
+}
+
+.diagnostic-mentor-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.diagnostic-mentor-info span {
+  font-size: 12px;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.diagnostic-status-pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diagnostic-status-pill.passed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.diagnostic-status-pill.reinforcement {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.diagnostic-panel-body {
+  padding: 20px;
+}
+
+.diagnostic-statement {
+  background: #f8fafc;
+  border-left: 4px solid #2563eb;
+  padding: 14px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #1e293b;
+  margin-bottom: 18px;
+}
+
+.diagnostic-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.diagnostic-list-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.diagnostic-list-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagnostic-list-title.strengths { color: #15803d; }
+.diagnostic-list-title.reinforcement { color: #b45309; }
+
+.diagnostic-item {
+  font-size: 12px;
+  color: #334155;
+  padding: 8px 0;
+  border-bottom: 1px dashed #f1f5f9;
+  line-height: 1.45;
+}
+
+.diagnostic-item:last-child {
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   ÁREA DE TREINAMENTO (PRACTICE HUB)
+   ========================================================================== */
+
+.training-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.training-filter-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.training-filter-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.training-filter-btn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.training-scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.training-scenario-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.training-scenario-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.training-scenario-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.training-scenario-code {
+  font-family: var(--erp-font-mono, monospace);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.training-scenario-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 6px 0 4px 0;
+  line-height: 1.35;
+}
+
+.training-scenario-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.training-scenario-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.training-tag {
+  font-size: 10.5px;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.training-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+}
+
+.training-action-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.training-action-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ==========================================================================
+   ÁREA DE BÔNUS
+   ========================================================================== */
+
+.bonus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.bonus-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bonus-card.unlocked {
+  border-color: #86efac;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.bonus-card.locked {
+  background: #f8fafc;
+  opacity: 0.88;
+}
+
+.bonus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.bonus-badge.unlocked {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.bonus-badge.locked {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.bonus-badge.pending-decision {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.bonus-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 6px 0 4px 0;
+}
+
+.bonus-card-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.bonus-card-footer {
+  font-size: 11.5px;
+  color: #475569;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE (MOBILE & TABLET)
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .career-track-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .diagnostic-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .institutional-view-container {
+    padding: 16px;
+  }
+
+  .view-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .career-track-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .competency-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .training-scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bonus-grid {
+    grid-template-columns: 1fr;
+  }
+}

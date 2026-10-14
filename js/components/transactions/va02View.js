@@ -18,6 +18,7 @@ export class Va02ViewComponent {
     this.container = document.createElement('div');
     this.container.className = 'va02-view';
     this.selectedDocNumber = initialParams.docNumber || '';
+    this.searchError = '';
 
     // Estado local da ordem carregada
     this.orderType = 'OR';
@@ -42,6 +43,7 @@ export class Va02ViewComponent {
 
   resetForm() {
     this.selectedDocNumber = '';
+    this.searchError = '';
     this.orderType = 'OR';
     this.salesOrg = '1000';
     this.distChannel = '10';
@@ -57,10 +59,9 @@ export class Va02ViewComponent {
   }
 
   setParams(params = {}) {
-    if (params.docNumber) {
-      this.selectedDocNumber = params.docNumber;
-      this.loadOrder(params.docNumber);
-    }
+    // Lote E: setParams não pré-preenche campos nem carrega a ordem automaticamente.
+    // DADO FORNECIDO NO CHAMADO ≠ DADO PREENCHIDO NA TELA.
+    // O trainee deve digitar o número e executar a consulta.
     this.render();
   }
 
@@ -68,6 +69,7 @@ export class Va02ViewComponent {
     const order = db.getSalesOrder(docNumber);
     if (order) {
       this.selectedDocNumber = order.docNumber;
+      this.searchError = '';
       this.orderType = order.orderType || 'OR';
       this.salesOrg = order.salesOrg || '1000';
       this.distChannel = order.distChannel || '10';
@@ -88,16 +90,6 @@ export class Va02ViewComponent {
     if (this.currentScenarioId !== activeScenarioId) {
       this.resetForm();
       this.currentScenarioId = activeScenarioId;
-      if (activeScenario?.targetCriteria?.targetDocNumber) {
-        this.loadOrder(activeScenario.targetCriteria.targetDocNumber);
-      }
-    }
-
-    const orders = db.getAllSalesOrders();
-    
-    // Se não há ordem selecionada ou a atual não existe no db, tenta pegar a primeira disponível
-    if (!this.selectedDocNumber && orders.length > 0) {
-      this.loadOrder(orders[orders.length - 1].docNumber);
     }
 
     const currentOrder = this.selectedDocNumber ? db.getSalesOrder(this.selectedDocNumber) : null;
@@ -110,24 +102,13 @@ export class Va02ViewComponent {
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VA02</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Modificar Ordem do Cliente: Dados Comerciais & Posições</div>
             <div class="text-xs text-muted">Alteração de Volumes, Descontos e Termos de Fornecimento</div>
           </div>
         </div>
         <div class="transaction-actions">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="text-xs font-semibold">Ordem (VBELN):</span>
-            <select class="erp-select font-mono text-xs" id="va02-order-selector" style="padding: 3px 8px;">
-              ${orders.length === 0 ? '<option value="">Nenhuma ordem gravada</option>' : ''}
-              ${orders.map(o => `
-                <option value="${o.docNumber}" ${o.docNumber === this.selectedDocNumber ? 'selected' : ''}>
-                  ${Formatters.documentNumber(o.docNumber)} - ${o.customerId} (${Formatters.currency(o.totalValue)})
-                </option>
-              `).join('')}
-            </select>
-          </div>
-          <button class="btn btn-secondary btn-sm" id="btn-simulate-pricing" title="Recalcular totais e impostos">
+          <button class="btn btn-secondary btn-sm" id="btn-simulate-pricing" title="Recalcular totais e impostos" ${!currentOrder ? 'disabled' : ''}>
             ${Icons.dollarSign} Recalcular Preço
           </button>
           <button class="btn btn-primary btn-sm" id="btn-save-order" ${!currentOrder ? 'disabled' : ''}>
@@ -136,10 +117,35 @@ export class Va02ViewComponent {
         </div>
       </div>
 
+      <!-- Barra de Seleção de Ordem -->
+      <div class="transaction-selection-bar">
+        <div class="transaction-selection-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span class="transaction-selection-label">Ordem de Venda (VBELN):</span>
+          <input type="text" id="va02-order-input" class="erp-input font-mono font-bold text-xs" placeholder="Ex: 10000007" value="${this.selectedDocNumber || ''}" style="width: 150px; text-transform: uppercase;" />
+          <button class="btn btn-primary btn-sm" id="btn-load-va02-order">
+            ${Icons.search} Modificar
+          </button>
+        </div>
+        <div class="text-xs text-muted font-mono">
+          ${currentOrder ? `Status Geral: <span class="font-bold text-primary">${currentOrder.overallStatus || 'OPEN'}</span>` : 'Acesso Inicial de Modificação'}
+        </div>
+      </div>
+
+      ${this.searchError ? `
+        <div class="erp-alert erp-alert-danger" style="margin: 12px 0; padding: 10px 14px; border-radius: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+          ${Icons.alertTriangle}
+          <span>${this.searchError}</span>
+        </div>
+      ` : ''}
+
       ${!currentOrder ? `
-        <div class="erp-card" style="text-align: center; padding: 40px;">
-          <p class="text-muted" style="margin-bottom: 12px;">Nenhuma ordem de venda encontrada para modificação.</p>
-          <button class="btn btn-primary btn-sm" id="btn-goto-va01">
+        <div class="erp-card" style="text-align: center; padding: 48px 16px; background: #ffffff; margin-top: 16px; border: 1px dashed #cbd5e1; border-radius: 8px;">
+          <div style="color: var(--erp-blue-primary); margin-bottom: 12px; font-size: 28px;">${Icons.fileText}</div>
+          <h4 class="font-semibold" style="color: var(--erp-navy-900); font-size: 16px; margin-bottom: 6px;">Nenhuma ordem de venda carregada para modificação</h4>
+          <p class="text-xs text-muted" style="max-width: 520px; margin: 0 auto; line-height: 1.5; margin-bottom: 16px;">
+            Informe o número da ordem de venda (VBELN) no campo acima e clique em <strong>Modificar</strong> (ou pressione Enter) para carregar os dados comerciais e posições da ordem.
+          </p>
+          <button class="btn btn-secondary btn-sm" id="btn-goto-va01">
             ${Icons.fileText} Criar Nova Ordem (VA01)
           </button>
         </div>
@@ -226,7 +232,7 @@ export class Va02ViewComponent {
           </div>
 
           <!-- Campos Comerciais Editáveis -->
-          <div class="form-grid-3" style="margin-top: 8px;">
+          <div class="form-grid-3">
             <div class="erp-form-group">
               <label class="erp-form-label">
                 <span>Emissor da Ordem (Sold-to Party)</span>
@@ -263,7 +269,7 @@ export class Va02ViewComponent {
             </div>
           </div>
 
-          <div class="form-grid-2" style="margin-top: 8px;">
+          <div class="form-grid-2">
             <div class="erp-form-group">
               <label class="erp-form-label">
                 <span>Incoterms (Modalidade de Frete)</span>
@@ -529,13 +535,40 @@ export class Va02ViewComponent {
   }
 
   bindEvents() {
-    // Seletor de Ordem no Topo
-    const sel = this.container.querySelector('#va02-order-selector');
-    if (sel) {
-      sel.addEventListener('change', (e) => {
-        if (e.target.value) {
-          this.loadOrder(e.target.value);
-          this.render();
+    // Busca / Carregamento de Ordem no Topo
+    const orderInput = this.container.querySelector('#va02-order-input');
+    const loadBtn = this.container.querySelector('#btn-load-va02-order');
+
+    const executeLoadOrder = () => {
+      const val = orderInput ? orderInput.value.trim() : '';
+      if (!val) {
+        this.searchError = 'Informe o número da ordem de venda (VBELN) para modificação.';
+        this.selectedDocNumber = '';
+        this.render();
+        return;
+      }
+
+      const order = db.getSalesOrder(val);
+      if (!order) {
+        this.searchError = `Ordem de venda "${val}" não cadastrada no mandante 800.`;
+        this.selectedDocNumber = '';
+        this.render();
+        return;
+      }
+
+      this.searchError = '';
+      this.loadOrder(order.docNumber);
+      this.render();
+    };
+
+    if (loadBtn) {
+      loadBtn.addEventListener('click', executeLoadOrder);
+    }
+    if (orderInput) {
+      orderInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          executeLoadOrder();
         }
       });
     }
@@ -678,13 +711,30 @@ export class Va02ViewComponent {
       this.fieldErrors = {};
       const updatedOrder = db.updateSalesOrder(this.selectedDocNumber, updatedOrderData);
 
+      const custObj = db.getCustomer(this.customerId);
+      const custDisplay = custObj ? `${this.customerId} - ${custObj.name}` : this.customerId;
+
       diagnosticModal.show({
         isValid: true,
+        operationSummary: {
+          title: 'Ordem de Venda Modificada com Sucesso',
+          docTypeBadge: 'VBAK • Alteração Salva',
+          primaryLabel: 'Nº da Ordem Atualizada (VBELN):',
+          primaryNumber: Formatters.documentNumber(this.selectedDocNumber),
+          statusText: 'Parâmetros Comerciais Atualizados (SAVED)',
+          partnerLabel: 'Emissor da Ordem:',
+          partnerOrOrigin: custDisplay,
+          referenceDoc: `Pedido do Cliente: ${this.customerPoNumber || 'Não informado'}`,
+          inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(this.selectedDocNumber)}] em VA03`
+        },
         mentorSpeech: result.mentorSpeech,
         whatHappened: `Ordem de Venda nº ${Formatters.documentNumber(this.selectedDocNumber)} modificada com sucesso no sistema.`,
         why: result.why,
         businessImpact: result.businessImpact,
         onConfirm: () => {
+          this.onNavigate('VA03', { docNumber: this.selectedDocNumber });
+        },
+        onInspect: () => {
           this.onNavigate('VA03', { docNumber: this.selectedDocNumber });
         }
       });

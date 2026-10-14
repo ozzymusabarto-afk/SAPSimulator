@@ -7,6 +7,8 @@
 import { ScenarioCatalog } from '../scenarios/catalog.js';
 import { db } from './erpDatabase.js';
 import { trainee } from './traineeEngine.js';
+import { traineeRepository } from '../repository/traineeRepository.js';
+import { AttemptOutcome } from '../models/journey.js';
 
 class ScenarioEngine {
   constructor() {
@@ -32,13 +34,64 @@ class ScenarioEngine {
   }
 
   /**
-   * Retorna a próxima solicitação/missão pendente da trilha oficial
-   * com base na ordem do ScenarioCatalog e nas missões já concluídas pelo trainee.
+   * F4-B: Seleciona a próxima missão pendente usando seleção inteligente balanceada.
+   * Regras:
+   *  1. Missões FULL_O2C só aparecem quando >= 80% das demais estão concluídas.
+   *  2. Evita repetir o mesmo tipo de ação duas vezes consecutivas (quando há opções).
+   *  3. Usa hash determinístico do userId + n° de missões concluídas como seed,
+   *     garantindo variedade entre trainees mas reprodutibilidade dentro da mesma sessão.
+   *  4. Fallback: retorna linearmente se não houver candidatos elegíveis.
    */
   getCurrentPendingScenario() {
     const completed = trainee.getCompletedScenarios();
-    const pending = ScenarioCatalog.find(s => !completed.includes(s.id));
-    return pending || ScenarioCatalog[ScenarioCatalog.length - 1];
+    const pending = ScenarioCatalog.filter(s => !completed.includes(s.id));
+
+    if (pending.length === 0) {
+      return ScenarioCatalog[ScenarioCatalog.length - 1];
+    }
+
+    // Regra 1: FULL_O2C só disponível quando >= 80% do catálogo concluído
+    const nonFullO2cTotal = ScenarioCatalog.filter(s => s.targetCriteria?.action !== 'FULL_O2C').length;
+    const nonFullO2cDone  = completed.filter(id => {
+      const s = ScenarioCatalog.find(x => x.id === id);
+      return s && s.targetCriteria?.action !== 'FULL_O2C';
+    }).length;
+    const fullO2cUnlocked = nonFullO2cDone / nonFullO2cTotal >= 0.8;
+
+    let candidates = pending.filter(s => fullO2cUnlocked || s.targetCriteria?.action !== 'FULL_O2C');
+    if (candidates.length === 0) candidates = pending; // fallback
+
+    // Regra 2: Evita repetir o mesmo tipo de ação consecutivo (quando há alternativas)
+    const lastCompleted = completed.length > 0
+      ? ScenarioCatalog.find(s => s.id === completed[completed.length - 1])
+      : null;
+    const lastAction = lastCompleted?.targetCriteria?.action || null;
+
+    const diverseCandidates = lastAction
+      ? candidates.filter(s => s.targetCriteria?.action !== lastAction)
+      : candidates;
+    const pool = diverseCandidates.length > 0 ? diverseCandidates : candidates;
+
+    // Regra 3: Seed determinística userId + progresso para pseudo-aleatoriedade controlada
+    const userId = trainee.getProfile()?.journey?.userId || 'default';
+    const seed   = this._hashSeed(userId + ':' + completed.length);
+    const idx    = Math.abs(seed) % pool.length;
+
+    return pool[idx];
+  }
+
+  /**
+   * Gera um inteiro a partir de uma string usando FNV-1a (mesma lógica do authService).
+   * @param {string} str
+   * @returns {number}
+   */
+  _hashSeed(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return h >>> 0; // unsigned 32-bit
   }
 
   /**
@@ -47,10 +100,11 @@ class ScenarioEngine {
    * 2. Caso a missão salva já tenha sido concluída ou não exista, a próxima missão pendente da trilha.
    */
   getCurrentActiveOrPendingScenarioId() {
-    const savedActiveId = trainee.getActiveScenarioId();
-    if (savedActiveId && ScenarioCatalog.some(s => s.id === savedActiveId)) {
-      if (!trainee.isScenarioCompleted(savedActiveId)) {
-        return savedActiveId;
+    const savedActiveState = traineeRepository.getActiveScenarioState();
+    const candidateId = savedActiveState?.scenarioId || trainee.getActiveScenarioId();
+    if (candidateId && ScenarioCatalog.some(s => s.id === candidateId)) {
+      if (!trainee.isScenarioCompleted(candidateId)) {
+        return candidateId;
       }
     }
     const pending = this.getCurrentPendingScenario();
@@ -74,11 +128,40 @@ class ScenarioEngine {
    * @param {string} scenarioId
    */
   startScenario(scenarioId) {
+    const previousActiveState = traineeRepository.getActiveScenarioState();
     const raw = ScenarioCatalog.find(s => s.id === scenarioId) || ScenarioCatalog[0];
+    const customerAnalysisRewarded = Boolean(
+      previousActiveState?.scenarioId === raw.id && previousActiveState.customerAnalysisRewarded
+    );
+
+    // Se já havia um cenário ativo diferente e não concluído, registra abandono
+    if (
+      this.activeScenario &&
+      this.activeScenario.id !== raw.id &&
+      !trainee.isScenarioCompleted(this.activeScenario.id)
+    ) {
+      trainee.recordAttempt({
+        scenarioId: this.activeScenario.id,
+        outcome: AttemptOutcome.ABANDONED,
+        performanceScore: 0,
+        xpGranted: 0,
+        mistakesLogged: [{ field: 'SYSTEM', message: 'Missão interrompida para início de outra solicitação.' }]
+      });
+    }
+
     this.activeScenario = JSON.parse(JSON.stringify(raw));
+    this.activeScenario.customerAnalysisRewarded = customerAnalysisRewarded;
     
-    // Atualiza a missão ativa salva no perfil do trainee
+    // Atualiza a missão ativa salva no perfil do trainee e no repositório de retomada
     trainee.setActiveScenarioId(this.activeScenario.id);
+    traineeRepository.saveActiveScenarioState({
+      scenarioId: this.activeScenario.id,
+      code: this.activeScenario.code,
+      title: this.activeScenario.title,
+      initialTcode: this.activeScenario.initialTcode || 'VA01',
+      startedAt: Date.now(),
+      customerAnalysisRewarded
+    });
 
     db.resetDatabase();
     if (this.activeScenario.initialDocuments && Array.isArray(this.activeScenario.initialDocuments)) {
@@ -105,7 +188,7 @@ class ScenarioEngine {
 
     trainee.logAction(
       'Atividade Iniciada',
-      `[${this.activeScenario.code}] ${this.activeScenario.title} • Orientado pelo Sr. Wilson`,
+      `[${this.activeScenario.code}] ${this.activeScenario.title} • Orientado pelo Chefe Wilson`,
       'INFO'
     );
 
@@ -148,6 +231,28 @@ class ScenarioEngine {
     }
   }
 
+  areActiveScenarioObjectivesComplete() {
+    const objectives = this.activeScenario?.objectives;
+    return Array.isArray(objectives) && objectives.length > 0 && objectives.every(objective => objective.done);
+  }
+
+  completeObjectives(objectiveIds = []) {
+    for (const objectiveId of objectiveIds) this.completeObjective(objectiveId);
+  }
+
+  completeActiveScenarioIfReady(actionName, summary) {
+    const scenario = this.activeScenario;
+    if (!scenario || !this.areActiveScenarioObjectivesComplete()) return false;
+
+    const isRedo = trainee.isScenarioCompleted(scenario.id);
+    const xpEarned = isRedo ? 0 : (scenario.xpReward || 300);
+    if (!isRedo) trainee.addXp(xpEarned, `Conclusão do chamado [${scenario.code}] ${scenario.title}`);
+    trainee.recordAction(true, actionName, summary);
+    if (!isRedo && scenario.badgeReward) trainee.unlockBadge(scenario.badgeReward);
+    trainee.completeScenario(scenario.id, scenario.title, summary, xpEarned);
+    return true;
+  }
+
   /**
    * Validação interativa da análise de dados do cliente na XD03
    */
@@ -155,18 +260,34 @@ class ScenarioEngine {
     const scenario = this.activeScenario;
     if (!scenario) return { isValid: true };
 
-    const target = scenario.targetCriteria;
-    if (target.customerId && customerId === target.customerId) {
+    const target = scenario.targetCriteria || {};
+    const expectedCustomerId = target.customerId || scenario.initialDocuments?.[0]?.customerId || null;
+
+    if (!expectedCustomerId || customerId === expectedCustomerId) {
       this.completeObjective('check_customer');
+      this.completeObjective('check_customer_xd03');
       this.completeObjective('investigate_credit');
 
-      trainee.addXp(30, `Consulta precisa do cadastro do cliente ${customerId} na XD03`);
-      trainee.recordAction(true, 'Consulta Mestre de Clientes', `Cliente ${customerId} analisado na XD03`);
+      if (!scenario.customerAnalysisRewarded) {
+        trainee.addXp(30, `Consulta precisa do cadastro do cliente ${customerId} na XD03`);
+        trainee.recordAction(true, 'Consulta Mestre de Clientes', `Cliente ${customerId} analisado na XD03`);
+        scenario.customerAnalysisRewarded = true;
+        const activeState = traineeRepository.getActiveScenarioState();
+        if (activeState?.scenarioId === scenario.id) {
+          traineeRepository.saveActiveScenarioState({ ...activeState, customerAnalysisRewarded: true });
+        }
+      }
+
+      const salesOrg = target.salesOrg || '1000';
+      const distChannel = target.distChannel || '10';
+      const division = target.division || '01';
+      const paymentTerms = target.paymentTerms || 'Z030';
+      const incoterms = target.incoterms || 'CIF';
 
       return {
         isValid: true,
         feedback: {
-          mentorSpeech: `Excelente análise! Você conferiu com precisão os dados cadastrais do cliente ${customerId}. Na tabela KNVV podemos ver a Área de Vendas (${target.salesOrg}/${target.distChannel}/${target.division}), a Condição de Pagamento (${target.paymentTerms}) e o Incoterms (${target.incoterms}). Agora vamos para a VA01 selecionar cada um desses parâmetros!`,
+          mentorSpeech: `Excelente análise! Você conferiu com precisão os dados cadastrais do cliente ${customerId}. Na tabela KNVV podemos ver a Área de Vendas (${salesOrg}/${distChannel}/${division}), a Condição de Pagamento (${paymentTerms}) e o Incoterms (${incoterms}).`,
           whatHappened: `Cliente ${customerId} consultado com sucesso na transação XD03.`,
           why: 'No SAP SD, a validação cadastral prévia evita erros de faturamento e devoluções fiscais.',
           businessImpact: 'Garante que os prazos e responsabilidades de frete acordados em contrato sejam fielmente replicados na ordem de venda.'
@@ -177,11 +298,93 @@ class ScenarioEngine {
     return {
       isValid: false,
       feedback: {
-        mentorSpeech: `Atenção: Você está visualizando o cliente ${customerId}, mas o chamado do cliente solicita análise do parceiro ${target.customerId}. Selecione o cliente correto no menu superior da XD03 e confira os dados comerciais.`,
-        whatHappened: `Cliente selecionado na consulta: ${customerId}. Cliente solicitado pelo chamado: ${target.customerId}.`,
+        mentorSpeech: `Atenção: Você está visualizando o cliente ${customerId}, mas a solicitação do chamado é para análise do cliente ${expectedCustomerId}. Selecione o cliente correto no menu de consulta da XD03 e confira os dados comerciais.`,
+        whatHappened: `Cliente selecionado na consulta: ${customerId}. Cliente solicitado pelo chamado: ${expectedCustomerId}.`,
         why: 'Cada cliente possui sua própria área de vendas (KNVV) e perfil financeiro.',
         businessImpact: 'Consultar dados de outro cliente pode levar à aplicação indevida de prazos ou limites de crédito incompatíveis.'
       }
+    };
+  }
+
+  validateMaterialAnalysis(materialId) {
+    const scenario = this.activeScenario;
+    if (!scenario) return { isValid: true };
+
+    const target = scenario.targetCriteria || {};
+    const expectedMaterials = [
+      ...(target.items || []).map(item => item.materialId),
+      target.targetMaterialId
+    ].filter(Boolean);
+    if (expectedMaterials.length && !expectedMaterials.includes(materialId)) {
+      return {
+        isValid: false,
+        mentorSpeech: `A missão solicita a análise de ${expectedMaterials.join(' ou ')}; o material consultado foi ${materialId}.`
+      };
+    }
+
+    const priceRecord = db.getPricingRecord(
+      materialId,
+      target.salesOrg || '1000',
+      target.distChannel || '10',
+      target.conditionCode || 'PR00'
+    );
+    const material = db.getMaterial(materialId);
+    if (!(Number(priceRecord?.amount ?? material?.basePrice ?? 0) > 0)) {
+      this.completeObjective('check_pricing_error');
+    }
+
+    this.completeObjectives([
+      'check_stock_atp', 'check_stock_mm03', 'check_material', 'investigate_availability'
+    ]);
+    return { isValid: true, material: db.getMaterial(materialId) };
+  }
+
+  validatePurchaseOrderAnalysis(poNumber) {
+    const scenario = this.activeScenario;
+    if (!scenario) return { isValid: true };
+    const expectedPo = scenario.purchaseOrderDocument?.poNumber || scenario.targetCriteria?.customerPoNumber;
+    if (expectedPo && poNumber !== expectedPo) {
+      return { isValid: false, mentorSpeech: `O chamado solicita a análise do pedido ${expectedPo}; o documento informado foi ${poNumber}.` };
+    }
+    this.completeObjectives(['analyze_po', 'process_demand']);
+    return { isValid: true, poNumber: expectedPo || poNumber };
+  }
+
+  validateSalesOrderInspection(docNumber) {
+    const scenario = this.activeScenario;
+    const order = db.getSalesOrder(docNumber);
+    if (!order) return { isValid: false, mentorSpeech: `Ordem de venda ${docNumber} não encontrada na VA03.` };
+
+    const targetDoc = scenario?.targetCriteria?.targetDocNumber;
+    if (targetDoc && targetDoc !== order.docNumber) {
+      return { isValid: false, mentorSpeech: `A missão solicita a ordem ${targetDoc}; a ordem exibida é ${order.docNumber}.` };
+    }
+
+    const targetNetValue = scenario?.targetCriteria?.targetNetValue;
+    const firstPriceDiagnosis = scenario?.objectives?.some(objective => objective.id === 'analyze_order' && !objective.done);
+    if (targetNetValue !== undefined && !(firstPriceDiagnosis && Number(order.netValue) === 0) && Math.abs(Number(order.netValue) - Number(targetNetValue)) > 0.01) {
+      return {
+        isValid: false,
+        order,
+        mentorSpeech: `O valor líquido da ordem é R$ ${Number(order.netValue).toFixed(2)}, mas a missão espera R$ ${Number(targetNetValue).toFixed(2)}. Confira o preço e o recálculo antes de concluir a análise.`
+      };
+    }
+
+    this.completeObjectives([
+      'check_order_va03', 'check_flow_va03', 'analyze_order', 'diagnose_situation',
+      'verify_document_flow', 'verify_created_order', 'verify_order'
+    ]);
+    const completed = this.completeActiveScenarioIfReady(
+      'Inspeção de Ordem VA03',
+      `Ordem ${order.docNumber} conferida na VA03 • Valor líquido R$ ${Number(order.netValue || 0).toFixed(2)}`
+    );
+    return {
+      isValid: true,
+      completed,
+      order,
+      mentorSpeech: completed
+        ? (scenario.completionFeedback?.mentorSpeech || `Ordem ${order.docNumber} conferida na VA03. Missão concluída! +${scenario.xpReward || 300} XP.`)
+        : `Ordem ${order.docNumber} localizada e analisada na VA03. Consulte os objetivos restantes para continuar.`
     };
   }
 
@@ -203,6 +406,20 @@ class ScenarioEngine {
     }
 
     const target = scenario.targetCriteria;
+    const isSalesOrderSubmissionMission = target.action === 'SALES_ORDER_SUBMISSION' ||
+      scenario.validationRules?.actionType === 'SALES_ORDER_SUBMISSION';
+    const isCreditReleaseMission = target.action === 'CREDIT_RELEASE' ||
+      scenario.validationRules?.actionType === 'CREDIT_RELEASE';
+
+    if (!isSalesOrderSubmissionMission && !isCreditReleaseMission) {
+      return {
+        isValid: true,
+        mentorSpeech: 'A VA01 está disponível para a operação. Como a missão atual pede outra etapa do processo, esta gravação não altera o progresso nem concede a recompensa da missão.',
+        whatHappened: 'A gravação da ordem pode prosseguir como operação SAP independente; os objetivos da missão permanecem pendentes.',
+        why: 'O progresso de uma missão depende da ação solicitada no chamado, mesmo quando outra operação comercial é válida.',
+        businessImpact: 'A ordem pode ser registrada sem concluir indevidamente uma missão de faturamento, expedição ou modificação.'
+      };
+    }
 
     // 1. Validação do Tipo de Ordem (Doc. Type)
     if (!orderData.orderType) {
@@ -426,7 +643,48 @@ class ScenarioEngine {
 
     this.completeObjective('fill_terms');
 
-    // 9. Validação dos Itens / Materiais e Quantidades
+    // 9. Verifica se existe uma condição de preço válida para cada material-alvo.
+    // Um material sem PR00 e sem preço-base não pode gerar uma ordem de valor zero.
+    for (const targetItem of target.items || []) {
+      const pricingRecord = db.getPricingRecord(
+        targetItem.materialId,
+        target.salesOrg || orderData.salesOrg || '1000',
+        target.distChannel || orderData.distChannel || '10',
+        target.conditionCode || 'PR00'
+      );
+      const material = db.getMaterial(targetItem.materialId);
+      const unitPrice = Number(pricingRecord?.amount ?? material?.basePrice ?? 0);
+      if (!(unitPrice > 0)) {
+        this.completeObjective('check_pricing_error');
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: `Não há condição de preço PR00 ativa para o material ${targetItem.materialId}. Analise a falta de preço e cadastre o registro correto na VK11 antes de gravar a ordem.`,
+          whatHappened: `A determinação de preço do material ${targetItem.materialId} resultou em valor unitário zero.`,
+          why: 'O registro de condição PR00 precisa existir na área de vendas antes da gravação da ordem.',
+          businessImpact: 'Sem preço válido, o valor da ordem e os impostos ficariam incorretos.'
+        };
+      }
+
+      if (
+        target.targetMaterialId === targetItem.materialId &&
+        target.targetAmount !== undefined &&
+        Math.abs(unitPrice - Number(target.targetAmount)) > 0.005
+      ) {
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: `O preço unitário de ${targetItem.materialId} é R$ ${unitPrice.toFixed(2)}, mas o chamado exige R$ ${Number(target.targetAmount).toFixed(2)} na condição ${target.conditionCode || 'PR00'}. Corrija o registro na VK11.`,
+          whatHappened: `Preço unitário encontrado: R$ ${unitPrice.toFixed(2)}. Preço esperado: R$ ${Number(target.targetAmount).toFixed(2)}.`,
+          why: 'A ordem precisa utilizar o preço comercial autorizado no chamado.',
+          businessImpact: 'Uma condição divergente altera o valor líquido, os impostos e a cobrança ao cliente.'
+        };
+      }
+    }
+
+    // 10. Validação dos Itens / Materiais e Quantidades
     if (!orderData.items || orderData.items.length === 0 || !orderData.items[0].materialId) {
       trainee.recordAction(false, 'Tentativa de Gravação', 'Nenhum material adicionado nas posições');
       return {
@@ -476,6 +734,7 @@ class ScenarioEngine {
         if (targetItem.requestedQuantity !== undefined && Number(matchingItem.quantity) === Number(targetItem.requestedQuantity)) {
           trainee.recordAction(false, 'Tentativa de Gravação', `Quantidade acima do ATP: ${matchingItem.quantity}`);
           if (targetItem.atpFeedback) {
+            this.completeObjective('check_atp_error');
             return {
               isValid: false,
               fieldError: 'items',
@@ -517,30 +776,71 @@ class ScenarioEngine {
       }
     }
 
-    // TUDO CORRETO! Concessão de XP e Registro Positivo
-    if (scenario.objectives && Array.isArray(scenario.objectives)) {
-      scenario.objectives.forEach(obj => {
-        this.completeObjective(obj.id);
-      });
+    if (target.targetNetValue !== undefined && Math.abs(Number(orderData.netValue) - Number(target.targetNetValue)) > 0.01) {
+      return {
+        isValid: false,
+        fieldError: 'items',
+        activeTabHint: 'ITEMS',
+        mentorSpeech: `O valor líquido da ordem é R$ ${Number(orderData.netValue || 0).toFixed(2)}, mas o chamado exige R$ ${Number(target.targetNetValue).toFixed(2)}. Confira preço, quantidade e desconto antes de gravar.`,
+        whatHappened: `Valor líquido informado: R$ ${Number(orderData.netValue || 0).toFixed(2)}. Valor esperado: R$ ${Number(target.targetNetValue).toFixed(2)}.`,
+        why: 'O valor líquido precisa refletir o preço unitário, as quantidades e as condições comerciais do chamado.',
+        businessImpact: 'Uma ordem com valor incorreto cria divergência de cobrança e tributação.'
+      };
     }
 
-    const xpEarned = scenario.xpReward;
-    trainee.addXp(xpEarned, `Conclusão com sucesso do chamado [${scenario.code}] ${scenario.title}`);
-    trainee.recordAction(true, 'Gravação de Ordem de Venda', `Ordem de venda criada com 100% de conformidade`);
-    
-    if (scenario.badgeReward) {
-      trainee.unlockBadge(scenario.badgeReward);
-    }
+    if (isCreditReleaseMission) {
+      const customer = db.getCustomer(orderData.customerId);
+      const projectedCredit = customer ? (Number(customer.creditUsed) || 0) + (Number(orderData.totalValue) || 0) : 0;
+      const willBeCreditBlocked = Boolean(customer && (
+        customer.creditStatus === 'BLOCKED' || projectedCredit > Number(customer.creditLimit || 0)
+      ));
+      if (target.requiresVkm1Release && !willBeCreditBlocked) {
+        trainee.recordAction(false, 'Tentativa de Gravação', 'A ordem não atingiria o bloqueio de crédito exigido pela missão');
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: 'A ordem precisa ultrapassar o limite de crédito para seguir para a análise na VKM1. Revise cliente, quantidade e valores conforme o chamado.',
+          whatHappened: 'Com os valores informados, o sistema não aplicaria o bloqueio de crédito esperado.',
+          why: 'A missão exige observar o bloqueio automático antes de emitir o parecer de crédito.',
+          businessImpact: 'Sem bloqueio ativo, não existe ordem pendente na VKM1 para liberar.'
+        };
+      }
 
-    const summaryText = `Ordem OR • Org 1000/10/01 • Cliente ${orderData.customerId} • ${orderData.items.length} itens • Total: R$ ${(orderData.totalValue || 0).toFixed(2)}`;
-    trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+      return {
+        isValid: true,
+        mentorSpeech: 'Pedido validado para gravação. Após salvar, confirme o bloqueio de crédito e prossiga para a VKM1 para concluir a liberação supervisionada.',
+        whatHappened: 'Os dados comerciais da ordem foram conferidos; a liberação de crédito ainda é uma etapa pendente.',
+        why: 'Uma ordem acima do limite permanece retida até receber parecer formal de crédito.',
+        businessImpact: 'A expedição só poderá começar após a liberação correta na VKM1.'
+      };
+    }
+    // A gravação satisfaz apenas os objetivos executados na VA01. Consultas e
+    // cadastros prévios (XD03, MM03, VK11) e inspeções (VA03) ficam pendentes.
+    this.completeObjectives([
+      'set_org_structure', 'select_customer', 'fill_terms', 'add_item', 'save_order',
+      'create_order_techlog', 'add_switch_items', 'apply_discount', 'verify_pricing',
+      'access_va01', 'fill_header_sales_area', 'fill_header_commercial', 'add_order_items',
+      'create_sales_order', 'create_adjusted_order', 'create_order',
+      'emit_sales_order', 'audit_flow', 'add_items'
+    ]);
+
+    const summaryText = `Ordem OR • Org ${orderData.salesOrg}/${orderData.distChannel}/${orderData.division} • Cliente ${orderData.customerId} • ${orderData.items.length} itens • Total: R$ ${(orderData.totalValue || 0).toFixed(2)}`;
+    const completed = this.completeActiveScenarioIfReady('Gravação de Ordem de Venda', summaryText);
+    if (!completed) trainee.recordAction(true, 'Gravação de Ordem de Venda', summaryText);
+    const pending = scenario.objectives.filter(objective => !objective.done);
 
     return {
       isValid: true,
-      mentorSpeech: (scenario.completionFeedback && scenario.completionFeedback.mentorSpeech) || `Isso! Muito bem! Você analisou os dados com olhar clínico e determinou com perfeição a Área de Vendas, o cliente, as condições comerciais e a grade de materiais. Essa é a postura profissional que forma um excelente consultor de SAP SD! Parabéns! +${xpEarned} XP.`,
-      whatHappened: (scenario.completionFeedback && scenario.completionFeedback.whatHappened) || 'Ordem de venda emitida com 100% de conformidade aos dados mestres e às regras comerciais.',
-      why: (scenario.completionFeedback && scenario.completionFeedback.why) || 'Área de vendas (1000/10/01), dados mestres de parceiro (SP/SH/BP/PY), condições de pagamento (Z030), Incoterms (CIF) e itens foram perfeitamente alinhados.',
-      businessImpact: (scenario.completionFeedback && scenario.completionFeedback.businessImpact) || 'A ordem seguirá diretamente para o picking no Centro de Distribuição sem retenções ou retrabalhos fiscais.'
+      completed,
+      mentorSpeech: completed
+        ? (scenario.completionFeedback?.mentorSpeech || `Ordem ${orderData.customerPoNumber} gravada com sucesso. Missão concluída! +${scenario.xpReward || 300} XP.`)
+        : `Ordem gravada com sucesso, mas a missão continua. Conclua também: ${pending.map(objective => objective.text).join('; ')}.`,
+      whatHappened: completed
+        ? (scenario.completionFeedback?.whatHappened || 'Ordem de venda emitida com 100% de conformidade aos dados mestres e às regras comerciais.')
+        : `Ordem gravada; ${pending.length} objetivo(s) da missão continuam pendentes.`,
+      why: scenario.completionFeedback?.why || 'A missão só é homologada depois que cada etapa prevista no chamado for executada.',
+      businessImpact: scenario.completionFeedback?.businessImpact || 'A ordem seguirá para o próximo passo do fluxo comercial após a conferência dos objetivos pendentes.'
     };
   }
 
@@ -659,30 +959,87 @@ class ScenarioEngine {
       }
     }
 
-    // TUDO CORRETO NA MODIFICAÇÃO!
-    if (scenario.objectives && Array.isArray(scenario.objectives)) {
-      scenario.objectives.forEach(obj => {
-        this.completeObjective(obj.id);
-      });
+    for (const targetItem of target.items || []) {
+      const pricingRecord = db.getPricingRecord(
+        targetItem.materialId,
+        target.salesOrg || updatedOrderData.salesOrg || '1000',
+        target.distChannel || updatedOrderData.distChannel || '10',
+        target.conditionCode || 'PR00'
+      );
+      const material = db.getMaterial(targetItem.materialId);
+      const unitPrice = Number(pricingRecord?.amount ?? material?.basePrice ?? 0);
+      if (!(unitPrice > 0)) {
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: `O material ${targetItem.materialId} continua sem preço PR00 ativo. Cadastre a condição correta na VK11 antes de recalcular a ordem.`,
+          whatHappened: `A ordem ${docNumber} ainda não possui um preço unitário válido para ${targetItem.materialId}.`,
+          why: 'A atualização de uma ordem deve recalcular as condições de preço antes de persistir o documento.',
+          businessImpact: 'Sem PR00, a ordem permanece com valor incorreto e não pode seguir para faturamento.'
+        };
+      }
+      if (target.targetMaterialId === targetItem.materialId && target.targetAmount !== undefined && Math.abs(unitPrice - Number(target.targetAmount)) > 0.005) {
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: `O preço PR00 de ${targetItem.materialId} é R$ ${unitPrice.toFixed(2)}, mas o chamado exige R$ ${Number(target.targetAmount).toFixed(2)}. Corrija o registro na VK11 antes de salvar.`,
+          whatHappened: `Preço encontrado: R$ ${unitPrice.toFixed(2)}. Preço solicitado: R$ ${Number(target.targetAmount).toFixed(2)}.`,
+          why: 'O recálculo deve usar a condição comercial autorizada no chamado.',
+          businessImpact: 'Um preço incorreto contamina o valor líquido e os tributos do documento.'
+        };
+      }
+    }
+    if (target.targetNetValue !== undefined && Math.abs(Number(updatedOrderData.netValue) - Number(target.targetNetValue)) > 0.01) {
+      return {
+        isValid: false,
+        fieldError: 'items',
+        activeTabHint: 'ITEMS',
+        mentorSpeech: `Após o recálculo, o valor líquido ficou em R$ ${Number(updatedOrderData.netValue || 0).toFixed(2)}; o chamado exige R$ ${Number(target.targetNetValue).toFixed(2)}. Revise preço, quantidade e desconto.`,
+        whatHappened: `Valor líquido calculado na ordem: R$ ${Number(updatedOrderData.netValue || 0).toFixed(2)}. Esperado: R$ ${Number(target.targetNetValue).toFixed(2)}.`,
+        why: 'O valor líquido deve refletir o preço PR00 ativo e as quantidades negociadas.',
+        businessImpact: 'Valor divergente causa cobrança e integração fiscal incorretas.'
+      };
     }
 
-    const xpEarned = scenario.xpReward || 200;
-    trainee.addXp(xpEarned, `Conclusão com sucesso do chamado [${scenario.code}] ${scenario.title}`);
-    trainee.recordAction(true, 'Modificação de Ordem de Venda', `Ordem ${docNumber} atualizada com 100% de conformidade`);
-
-    if (scenario.badgeReward) {
-      trainee.unlockBadge(scenario.badgeReward);
+    const isModificationMission = target.action === 'SALES_ORDER_MODIFICATION' ||
+      scenario.validationRules?.actionType === 'SALES_ORDER_MODIFICATION';
+    if (!isModificationMission) {
+      return {
+        isValid: true,
+        mentorSpeech: 'A alteração da ordem foi validada. Esta operação não faz parte do objetivo da missão atual; consulte as metas do Chefe Wilson para continuar.',
+        whatHappened: `A ordem ${docNumber} passou pela validação da VA02, sem avançar os objetivos da missão atual.`,
+        why: 'O progresso da missão depende da ação indicada no chamado, mesmo quando outra transação comercial é válida.',
+        businessImpact: 'A alteração comercial pode ser salva sem registrar uma conclusão indevida nem conceder a recompensa da missão.'
+      };
     }
 
-    const summaryText = `Ordem ${docNumber} alterada com sucesso • Total: R$ ${updatedOrderData.totalValue.toFixed(2)}`;
-    trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+    this.completeObjectives([
+      'access_va02', 'modify_payment_terms', 'modify_incoterms', 'modify_item_quantity',
+      'update_order_quantity', 'apply_discount', 'apply_volume_discount', 'update_incoterms',
+      'adjust_quantity', 'update_header_terms', 'update_item_quantity', 'adjust_discount',
+      'save_order_modification', 'save_modified_order'
+    ]);
+
+    const summaryText = `Ordem ${docNumber} alterada • Total: R$ ${Number(updatedOrderData.totalValue || 0).toFixed(2)}`;
+    const completed = this.completeActiveScenarioIfReady('Modificação de Ordem de Venda', summaryText);
+    if (!completed) trainee.recordAction(true, 'Modificação de Ordem de Venda', summaryText);
+    const pending = scenario.objectives.filter(objective => !objective.done);
 
     return {
       isValid: true,
-      mentorSpeech: `Excelente trabalho! Você analisou o pedido de alteração, ajustou as quantidades e manteve o cálculo comercial e os impostos perfeitamente alinhados. Muito bem! +${xpEarned} XP.`,
-      whatHappened: `Ordem de venda nº ${docNumber} alterada com 100% de conformidade às regras de negócio.`,
-      why: 'Quantidades, condições comerciais e recálculo do esquema de preços foram validados com precisão.',
-      businessImpact: 'O Centro de Distribuição atualizará a reserva de estoque e o faturamento emitirá a Nota Fiscal com os novos valores.'
+      completed,
+      mentorSpeech: completed
+        ? (scenario.completionFeedback?.mentorSpeech || `Excelente trabalho! Você regularizou a ordem ${docNumber} conforme as condições comerciais solicitadas. Muito bem! +${scenario.xpReward || 300} XP.`)
+        : `Ordem ${docNumber} atualizada. A missão continua; conclua também: ${pending.map(objective => objective.text).join('; ')}.`,
+      whatHappened: completed
+        ? (scenario.completionFeedback?.whatHappened || `Ordem de venda nº ${docNumber} alterada com 100% de conformidade às regras de negócio.`)
+        : `Ordem de venda nº ${docNumber} atualizada; ${pending.length} objetivo(s) continuam pendentes.`,
+      why: scenario.completionFeedback?.why ||
+        'As alterações comerciais e o recálculo do esquema de preços foram validados com precisão.',
+      businessImpact: scenario.completionFeedback?.businessImpact ||
+        'O fluxo comercial seguirá com as condições atualizadas na ordem.'
     };
   }
 
@@ -732,30 +1089,34 @@ class ScenarioEngine {
     this.completeObjective('check_order');
     this.completeObjective('select_shipping_point');
 
-    // Se o objetivo final do cenário for exclusivamente a criação da remessa (ex: TRN-108)
+    // A remessa só conclui a missão se as etapas anteriores também estiverem feitas.
     if (target.action === 'CREATE_DELIVERY') {
-      if (scenario.objectives && Array.isArray(scenario.objectives)) {
-        scenario.objectives.forEach(obj => this.completeObjective(obj.id));
-      }
-
-      const xpEarned = scenario.xpReward || 300;
-      trainee.addXp(xpEarned, `Conclusão do chamado de remessa [${scenario.code}] ${scenario.title}`);
-      trainee.recordAction(true, 'Criação de Remessa VL01N', `Remessa ${deliveryData?.deliveryNumber} criada para a ordem ${salesOrderNumber}`);
-
-      if (scenario.badgeReward) {
-        trainee.unlockBadge(scenario.badgeReward);
-      }
-
       const summaryText = `Remessa ${deliveryData?.deliveryNumber} criada • Ponto de Exp. ${shippingPoint} • Ordem ${salesOrderNumber}`;
-      trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+      const completed = this.completeActiveScenarioIfReady('Criação de Remessa VL01N', summaryText);
+      if (!completed) trainee.recordAction(true, 'Criação de Remessa VL01N', summaryText);
+      const pending = scenario.objectives.filter(objective => !objective.done);
+
+      return {
+        isValid: true,
+        completed,
+        mentorSpeech: completed
+          ? (scenario.completionFeedback?.mentorSpeech || `Muito bem! Remessa nº ${deliveryData?.deliveryNumber} gerada com sucesso a partir da ordem ${salesOrderNumber}. Atividade concluída! +${scenario.xpReward || 300} XP.`)
+          : `Remessa ${deliveryData?.deliveryNumber} criada; a missão continua. Conclua também: ${pending.map(objective => objective.text).join('; ')}.`,
+        whatHappened: completed
+          ? (scenario.completionFeedback?.whatHappened || `Documento de Remessa nº ${deliveryData?.deliveryNumber} criado no mandante 800.`)
+          : `Documento de remessa criado; ${pending.length} objetivo(s) da missão continuam pendentes.`,
+        why: scenario.completionFeedback?.why || 'Ponto de expedição e vínculos comerciais foram devidamente estabelecidos.',
+        businessImpact: scenario.completionFeedback?.businessImpact || 'Os itens foram liberados para separação e expedição no Centro de Distribuição.'
+      };
     }
 
+    // Etapa intermediária de cenários compostos (ex: POST_GOODS_ISSUE ou FULL_O2C)
     return {
       isValid: true,
-      mentorSpeech: scenario.completionFeedback?.mentorSpeech || `Muito bem! Remessa nº ${deliveryData?.deliveryNumber} gerada com sucesso a partir da ordem ${salesOrderNumber}. O documento já consta no Fluxo de Documentos (VBFA).`,
-      whatHappened: scenario.completionFeedback?.whatHappened || `Documento de Remessa nº ${deliveryData?.deliveryNumber} criado no mandante 800.`,
-      why: scenario.completionFeedback?.why || 'Ponto de expedição 1000 e vínculos comerciais foram devidamente estabelecidos.',
-      businessImpact: scenario.completionFeedback?.businessImpact || 'Os itens foram liberados para separação e picking no Centro de Distribuição.'
+      mentorSpeech: `Muito bem! O documento de remessa nº ${deliveryData?.deliveryNumber} foi gerado com sucesso na VL01N. A etapa de criação do fornecimento está concluída. Agora prossiga para a transação VL02N para realizar o picking e registrar a Saída de Mercadorias (PGI)!`,
+      whatHappened: `Documento de Remessa nº ${deliveryData?.deliveryNumber} criado no mandante 800 para a Ordem ${salesOrderNumber}.`,
+      why: 'O documento de fornecimento (LIKP/LIPS) formaliza a solicitação de separação física dos itens no Centro de Distribuição.',
+      businessImpact: 'A carga foi autorizada para manuseio. A próxima etapa física é a conferência de picking e o registro do PGI na VL02N.'
     };
   }
 
@@ -794,36 +1155,82 @@ class ScenarioEngine {
     this.completeObjective('verify_document_flow');
     this.completeObjective('verify_stock_deduction');
 
-    // Se o cenário é de PGI/Expedição (ex: TRN-109, DSF-204)
+    // Se o cenário é de PGI/Expedição (ex: TRN-109, DSF-204, TRN-116, TRN-126, DSF-208)
     if (target.action === 'POST_GOODS_ISSUE' || target.action === 'FULL_SHIPPING' || scenario.validationRules?.actionType === 'POST_GOODS_ISSUE') {
-      if (scenario.objectives && Array.isArray(scenario.objectives)) {
-        scenario.objectives.forEach(obj => this.completeObjective(obj.id));
-      }
-
-      const xpEarned = scenario.xpReward || 300;
-      trainee.addXp(xpEarned, `Conclusão do chamado de expedição [${scenario.code}] ${scenario.title}`);
-      trainee.recordAction(true, 'Registro de PGI VL02N', `Saída de mercadorias confirmada para a remessa ${deliveryNumber}`);
-
-      if (scenario.badgeReward) {
-        trainee.unlockBadge(scenario.badgeReward);
-      }
-
       const summaryText = `PGI registrado para Remessa ${deliveryNumber} • Movimento 601 • Baixa física concluída`;
-      trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+      const completed = this.completeActiveScenarioIfReady('Registro de PGI VL02N', summaryText);
+      if (!completed) trainee.recordAction(true, 'Registro de PGI VL02N', summaryText);
+      const pending = scenario.objectives.filter(objective => !objective.done);
+
+      return {
+        isValid: true,
+        completed,
+        mentorSpeech: completed
+          ? (scenario.completionFeedback?.mentorSpeech || `Excelente trabalho! Você realizou o picking e registrou o Post Goods Issue (PGI) na transação VL02N. O estoque físico foi devidamente baixado e a remessa está concluída! +${scenario.xpReward || 300} XP.`)
+          : `PGI registrado para a remessa ${deliveryNumber}; a missão continua. Conclua também: ${pending.map(objective => objective.text).join('; ')}.`,
+        whatHappened: completed
+          ? (scenario.completionFeedback?.whatHappened || `Saída de mercadorias registrada com sucesso para a Remessa nº ${deliveryNumber}.`)
+          : `Saída de mercadorias registrada; ${pending.length} objetivo(s) da missão continuam pendentes.`,
+        why: scenario.completionFeedback?.why || 'O movimento 601 baixou o estoque físico e encerrou a reserva no CD.',
+        businessImpact: scenario.completionFeedback?.businessImpact || 'A carga foi despachada para transporte e o chamado foi finalizado com sucesso!'
+      };
     }
 
+    // Etapa intermediária de cenários de faturamento ou FULL_O2C (ex: SCN-17, SCN-25, SCN-41, SCN-55)
     return {
       isValid: true,
-      mentorSpeech: scenario.completionFeedback?.mentorSpeech || `Excelente trabalho! Você realizou o picking e registrou o Post Goods Issue (PGI) na transação VL02N. O estoque físico foi devidamente baixado e a remessa está concluída! +${scenario.xpReward || 300} XP.`,
-      whatHappened: scenario.completionFeedback?.whatHappened || `Saída de mercadorias registrada com sucesso para a Remessa nº ${deliveryNumber}.`,
-      why: scenario.completionFeedback?.why || 'O movimento 601 baixou o estoque físico e encerrou a reserva no CD.',
-      businessImpact: scenario.completionFeedback?.businessImpact || 'A carga foi despachada para transporte e o documento está liberado para o faturamento (VF01).'
+      mentorSpeech: `Excelente trabalho! O picking e a Saída de Mercadorias (PGI) foram registrados com sucesso na VL02N. O estoque físico foi baixado (Movimento 601) e a remessa ${deliveryNumber} foi liberada para faturamento. Agora acerte a emissão da Fatura Comercial na transação VF01!`,
+      whatHappened: `PGI executado para a Remessa nº ${deliveryNumber}. Estoque físico baixado no depósito.`,
+      why: 'O movimento MM 601 baixa fisicamente o inventário e encerra a etapa logística, deixando o documento pronto para escrituração fiscal.',
+      businessImpact: 'A carga física foi expedida. A próxima etapa operacional é gerar a fatura comercial e o título a receber na transação VF01.'
     };
   }
 
   /**
    * Validação interativa da criação de Fatura Comercial (Billing) na VF01
    */
+  completeInvoiceMission(scenario, billingType, invoiceData) {
+    if (!scenario || !scenario.objectives?.every(objective => objective.done)) return false;
+
+    const isRedo = trainee.isScenarioCompleted(scenario.id);
+    const xpEarned = isRedo ? 0 : (scenario.xpReward || 300);
+    if (!isRedo) trainee.addXp(xpEarned, `Conclusão do chamado de faturamento [${scenario.code}] ${scenario.title}`);
+    trainee.recordAction(true, 'Emissão de Fatura VF01', `Fatura ${invoiceData?.invoiceNumber} emitida para a ordem ${invoiceData?.salesOrderNumber}`);
+    if (!isRedo && scenario.badgeReward) trainee.unlockBadge(scenario.badgeReward);
+
+    const summaryText = `Fatura ${invoiceData?.invoiceNumber} (Tipo ${billingType}) emitida • Total R$ ${invoiceData?.totalValue?.toFixed(2)} • Ciclo Concluído`;
+    trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+    return true;
+  }
+
+  validateInvoiceVerification(invoiceNumber) {
+    const scenario = this.activeScenario;
+    if (!scenario) return { isValid: true, completed: false };
+
+    const invoice = db.getInvoice(invoiceNumber);
+    const target = scenario.targetCriteria || {};
+    if (!invoice) {
+      return { isValid: false, completed: false, mentorSpeech: `A fatura ${invoiceNumber} não foi localizada na VF03.` };
+    }
+    if (target.targetDocNumber && invoice.salesOrderNumber !== target.targetDocNumber) {
+      return { isValid: false, completed: false, mentorSpeech: `A fatura selecionada pertence à ordem ${invoice.salesOrderNumber}; a missão solicita a ordem ${target.targetDocNumber}.` };
+    }
+    if (target.billingType && invoice.billingType !== target.billingType) {
+      return { isValid: false, completed: false, mentorSpeech: `Tipo de faturamento ${invoice.billingType} divergente; a missão solicita ${target.billingType}.` };
+    }
+
+    this.completeObjective('verify_invoice');
+    this.completeObjective('verify_document_flow');
+    const completed = this.completeInvoiceMission(scenario, invoice.billingType, invoice);
+    return {
+      isValid: true,
+      completed,
+      mentorSpeech: completed
+        ? (scenario.completionFeedback?.mentorSpeech || `Fatura ${invoice.invoiceNumber} conferida na VF03. Missão concluída.`)
+        : `Fatura ${invoice.invoiceNumber} aberta na VF03. Confira o fluxo documental e conclua as etapas restantes da missão.`
+    };
+  }
+
   validateInvoiceCreation(billingType, referenceDoc, invoiceData) {
     const scenario = this.activeScenario;
     if (!scenario || !scenario.targetCriteria) {
@@ -865,32 +1272,32 @@ class ScenarioEngine {
     this.completeObjective('access_vf01');
     this.completeObjective('select_billing_type');
     this.completeObjective('create_invoice');
-    this.completeObjective('verify_invoice');
 
-    // Se o cenário é de faturamento (ex: TRN-110, TRN-111, DSF-205)
+    // Emissão da fatura só encerra a missão quando todos os objetivos já foram cumpridos.
+    let missionCompleted = false;
     if (target.action === 'CREATE_INVOICE' || target.action === 'FULL_O2C' || scenario.validationRules?.actionType === 'INVOICE_CREATION') {
-      if (scenario.objectives && Array.isArray(scenario.objectives)) {
-        scenario.objectives.forEach(obj => this.completeObjective(obj.id));
-      }
-
-      const xpEarned = scenario.xpReward || 300;
-      trainee.addXp(xpEarned, `Conclusão do chamado de faturamento [${scenario.code}] ${scenario.title}`);
-      trainee.recordAction(true, 'Emissão de Fatura VF01', `Fatura ${invoiceData?.invoiceNumber} emitida para a ordem ${invoiceData?.salesOrderNumber}`);
-
-      if (scenario.badgeReward) {
-        trainee.unlockBadge(scenario.badgeReward);
-      }
-
-      const summaryText = `Fatura ${invoiceData?.invoiceNumber} (Tipo ${billingType}) emitida • Total R$ ${invoiceData?.totalValue?.toFixed(2)} • Ciclo Concluído`;
-      trainee.completeScenario(scenario.id, scenario.title, summaryText, xpEarned);
+      missionCompleted = this.completeInvoiceMission(scenario, billingType, invoiceData);
     }
+
+    const invoiceAuditPending = scenario.objectives?.some(objective => objective.id === 'verify_invoice' && !objective.done);
+    const stepSpeech = invoiceAuditPending
+      ? `Fatura ${invoiceData?.invoiceNumber} emitida com sucesso. Abra a VF03, confira o documento e confirme a análise para concluir a missão.`
+      : `Fatura ${invoiceData?.invoiceNumber} emitida. Consulte as metas restantes no painel do Chefe Wilson para concluir a missão.`;
 
     return {
       isValid: true,
-      mentorSpeech: scenario.completionFeedback?.mentorSpeech || `Excelente trabalho! Fatura Comercial nº ${invoiceData?.invoiceNumber} gerada com sucesso! O ciclo comercial Order-to-Cash (O2C) foi integralmente concluído com êxito! +${scenario.xpReward || 300} XP.`,
-      whatHappened: scenario.completionFeedback?.whatHappened || `Fatura nº ${invoiceData?.invoiceNumber} criada e integrada ao financeiro.`,
-      why: scenario.completionFeedback?.why || 'Os impostos e valores da remessa foram devidamente escriturados.',
-      businessImpact: scenario.completionFeedback?.businessImpact || 'O título a receber foi lançado e a cobrança está programada conforme a condição de pagamento acordada.'
+      mentorSpeech: missionCompleted
+        ? (scenario.completionFeedback?.mentorSpeech || `Fatura Comercial nº ${invoiceData?.invoiceNumber} gerada com sucesso! Missão concluída. +${scenario.xpReward || 300} XP.`)
+        : stepSpeech,
+      whatHappened: missionCompleted
+        ? (scenario.completionFeedback?.whatHappened || `Fatura nº ${invoiceData?.invoiceNumber} criada e integrada ao financeiro.`)
+        : `Fatura nº ${invoiceData?.invoiceNumber} criada; a missão permanece em andamento.`,
+      why: missionCompleted
+        ? (scenario.completionFeedback?.why || 'Os impostos e valores da remessa foram devidamente escriturados.')
+        : 'A emissão da fatura é uma etapa do processo; os objetivos restantes ainda precisam ser conferidos.',
+      businessImpact: missionCompleted
+        ? (scenario.completionFeedback?.businessImpact || 'O título a receber foi lançado e a cobrança está programada conforme a condição de pagamento acordada.')
+        : 'A fatura foi registrada. Conclua a auditoria solicitada para homologar a missão.'
     };
   }
 }

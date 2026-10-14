@@ -7,34 +7,50 @@ import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
+import { MentorDockComponent } from '../mentorDock.js';
 
 export class Vf03ViewComponent {
   constructor(onNavigate, initialParams = {}) {
     this.onNavigate = onNavigate;
     this.container = document.createElement('div');
     this.container.className = 'vf03-view';
-    this.selectedInvoiceNumber = initialParams.invoiceNumber || '';
+    this.selectedInvoiceNumber = ''; // Lote D+E: não pré-preencher via initialParams
+    this.currentScenarioId = null;   // Lote D: guard de cenário
+  }
+
+  resetForm() {
+    // Lote D: limpa estado ao mudar de missão
+    this.selectedInvoiceNumber = '';
   }
 
   setParams(params = {}) {
-    if (params.invoiceNumber) {
-      this.selectedInvoiceNumber = params.invoiceNumber;
-      this.render();
+    // A inspeção contextual de uma fatura criada nesta sessão pode carregar seu documento.
+    const scenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = scenario ? scenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
     }
+    this.selectedInvoiceNumber = params.invoiceNumber || '';
   }
 
   render() {
     const scenario = scenarioEngine.getActiveScenario();
-    if (scenario) {
-      scenarioEngine.completeObjective('verify_invoice');
-      scenarioEngine.completeObjective('verify_document_flow');
+    const invoiceAuditPending = scenario?.objectives?.some(objective => objective.id === 'verify_invoice' && !objective.done);
+    const activeScenarioId = scenario ? scenario.id : null;
+
+    // Lote D: guard de cenário
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
     }
 
+    // Lote B: completeObjective('verify_invoice') e ('verify_document_flow') REMOVIDOS do render().
+    // Serão disparados no bindEvents apenas após seleção manual de uma fatura.
+
     const allInvoices = db.getAllInvoices();
-    const currentInvoice = db.getInvoice(this.selectedInvoiceNumber) || allInvoices[allInvoices.length - 1] || null;
-    if (currentInvoice && !this.selectedInvoiceNumber) {
-      this.selectedInvoiceNumber = currentInvoice.invoiceNumber;
-    }
+    // Lote C: remove auto-carregamento — exibe estado vazio enquanto trainee não localizar manualmente
+    const currentInvoice = this.selectedInvoiceNumber ? db.getInvoice(this.selectedInvoiceNumber) : null;
 
     const customer = currentInvoice ? db.getCustomer(currentInvoice.customerId) : null;
     const order = currentInvoice ? db.getSalesOrder(currentInvoice.salesOrderNumber) : null;
@@ -45,7 +61,7 @@ export class Vf03ViewComponent {
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VF03</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Exibir Documento de Faturamento (Display Billing Document)</div>
             <div class="text-xs text-muted">Auditoria de Escrituração Fiscal, Impostos & Fluxo Completo Order-to-Cash (VBFA)</div>
           </div>
@@ -64,20 +80,39 @@ export class Vf03ViewComponent {
       </div>
 
       ${currentInvoice ? `
-        <!-- Seletor de Fatura e Cabeçalho do Documento -->
-        <div class="transaction-section">
-          <div class="section-title">
-            <span>Dados da Fatura Comercial Selecionada</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="text-xs text-muted">Selecionar Fatura:</span>
-              <select class="erp-select font-mono text-xs" id="invoice-selector" style="padding: 2px 8px;">
-                ${allInvoices.map(inv => `
+        <!-- Barra de Seleção de Fatura -->
+        <div class="transaction-selection-bar">
+          <div class="transaction-selection-group">
+            <span class="transaction-selection-label">Selecionar Fatura (VBRK):</span>
+            <select class="erp-select font-mono text-xs" id="invoice-selector" style="padding: 4px 10px; max-width: 100%; min-width: 0;">
+              ${(() => {
+                // F2-A: Filtra faturas pelo cenário ativo
+                const scenario = scenarioEngine.getActiveScenario();
+                const scenarioOrderNums = (scenario?.initialDocuments || []).map(d => d.salesOrderNumber).filter(Boolean);
+                const eligible = scenarioOrderNums.length > 0
+                  ? allInvoices.filter(inv => scenarioOrderNums.includes(inv.salesOrderNumber))
+                  : allInvoices;
+                if (eligible.length === 0) {
+                  return '<option value="" disabled>Nenhuma fatura disponível</option>';
+                }
+                return eligible.map(inv => `
                   <option value="${inv.invoiceNumber}" ${inv.invoiceNumber === currentInvoice.invoiceNumber ? 'selected' : ''}>
                     Fatura ${inv.invoiceNumber} - ${inv.customerId} (${Formatters.currency(inv.totalValue)})
                   </option>
-                `).join('')}
-              </select>
-            </div>
+                `).join('');
+              })()}
+            </select>
+          </div>
+          <div class="text-xs text-muted font-mono">
+            Status Contábil: <span class="font-bold text-success">Lançado em FI</span>
+          </div>
+        </div>
+
+        <!-- Cabeçalho do Documento -->
+        <div class="transaction-section">
+          <div class="section-title">
+            <span>Dados da Fatura Comercial Selecionada</span>
+            <span class="erp-badge erp-badge-sap text-xs">Fatura Comercial (F2)</span>
           </div>
 
           <div class="form-grid-4">
@@ -258,6 +293,13 @@ export class Vf03ViewComponent {
 
           </div>
         </div>
+        ${invoiceAuditPending ? `
+          <div style="margin: 14px 0; display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary btn-sm" id="btn-confirm-invoice-audit">
+              ${Icons.check} Confirmar análise da fatura
+            </button>
+          </div>
+        ` : ''}
       ` : `
         <div class="erp-card" style="text-align: center; padding: 40px 16px;">
           <p class="text-muted" style="margin-bottom: 12px;">Nenhuma fatura comercial emitida no momento.</p>
@@ -277,6 +319,20 @@ export class Vf03ViewComponent {
     if (sel) {
       sel.addEventListener('change', (e) => {
         this.selectedInvoiceNumber = e.target.value;
+        // Selecionar carrega os dados; a trainee confirma a auditoria após inspecionar o fluxo.
+        this.render();
+      });
+    }
+
+    const btnConfirmAudit = this.container.querySelector('#btn-confirm-invoice-audit');
+    if (btnConfirmAudit) {
+      btnConfirmAudit.addEventListener('click', () => {
+        const result = scenarioEngine.validateInvoiceVerification(this.selectedInvoiceNumber);
+        if (!result.isValid) {
+          MentorDockComponent.speak(result.mentorSpeech, 'WARN');
+          return;
+        }
+        MentorDockComponent.speak(result.mentorSpeech, 'SUCCESS');
         this.render();
       });
     }

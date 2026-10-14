@@ -7,42 +7,59 @@ import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
+import { CompanyStructure } from '../../core/domain/company.js';
 
 export class Vl03nViewComponent {
   constructor(onNavigate, initialParams = {}) {
     this.onNavigate = onNavigate;
     this.container = document.createElement('div');
     this.container.className = 'vl03n-view';
-    this.selectedDeliveryNumber = initialParams.deliveryNumber || '';
+    this.selectedDeliveryNumber = ''; // Lote D+E: não pré-preencher via initialParams
+    this.loadedDelivery = null;
+    this.currentScenarioId = null;   // Lote D: guard de cenário
+  }
+
+  resetForm() {
+    // Lote D: limpa estado ao mudar de missão
+    this.selectedDeliveryNumber = '';
     this.loadedDelivery = null;
   }
 
   setParams(params = {}) {
-    if (params.deliveryNumber) {
-      this.selectedDeliveryNumber = params.deliveryNumber;
+    // A inspeção contextual de uma remessa criada nesta sessão pode carregar seu documento.
+    const scenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = scenario ? scenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
     }
-    this.render();
+    this.selectedDeliveryNumber = params.deliveryNumber || '';
   }
 
   render() {
     const scenario = scenarioEngine.getActiveScenario();
-    if (scenario) {
-      scenarioEngine.completeObjective('access_vl03n');
+    const activeScenarioId = scenario ? scenario.id : null;
+
+    // Lote D: guard de cenário
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.resetForm();
+      this.currentScenarioId = activeScenarioId;
     }
 
+    // Lote B: completeObjective('access_vl03n') REMOVIDO do render().
+    // Será disparado no bindEvents apenas após o trainee carregar manualmente a remessa.
+
     const allDeliveries = db.getAllDeliveries();
+    // Lote C: remove auto-carregamento — sem ação do trainee, loadedDelivery permanece null
     if (this.selectedDeliveryNumber) {
       this.loadedDelivery = db.getDelivery(this.selectedDeliveryNumber);
-    } else if (allDeliveries.length > 0 && !this.loadedDelivery) {
-      this.loadedDelivery = allDeliveries[allDeliveries.length - 1];
-      this.selectedDeliveryNumber = this.loadedDelivery.deliveryNumber;
     }
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VL03N</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Exibir Fornecimento: Detalhes da Remessa & Rastreabilidade</div>
             <div class="text-xs text-muted">Consulta de Expedição • Ponto de Expedição, Pesos e Fluxo de Documentos (LIKP / VBFA)</div>
           </div>
@@ -75,11 +92,22 @@ export class Vl03nViewComponent {
                 placeholder="Ex: 80000001" value="${this.selectedDeliveryNumber}" style="flex: 1;">
               <select class="erp-select font-mono text-xs" id="vl03n-delivery-quick-select" style="max-width: 260px;">
                 <option value="">-- Selecionar Remessa --</option>
-                ${allDeliveries.map(d => `
-                  <option value="${d.deliveryNumber}" ${d.deliveryNumber === this.selectedDeliveryNumber ? 'selected' : ''}>
-                    Remessa ${d.deliveryNumber} • Ordem ${d.salesOrderNumber} (${d.status})
-                  </option>
-                `).join('')}
+                ${(() => {
+                  // F2-A: Filtra remessas pelo cenário ativo
+                  const scenario = scenarioEngine.getActiveScenario();
+                  const scenarioOrderNums = (scenario?.initialDocuments || []).map(d => d.salesOrderNumber).filter(Boolean);
+                  const eligible = scenarioOrderNums.length > 0
+                    ? allDeliveries.filter(d => scenarioOrderNums.includes(d.salesOrderNumber))
+                    : allDeliveries;
+                  if (eligible.length === 0) {
+                    return '<option value="" disabled>Nenhuma remessa disponível</option>';
+                  }
+                  return eligible.map(d => `
+                    <option value="${d.deliveryNumber}" ${d.deliveryNumber === this.selectedDeliveryNumber ? 'selected' : ''}>
+                      Remessa ${d.deliveryNumber} • OR ${d.salesOrderNumber} (${d.status})
+                    </option>
+                  `).join('');
+                })()}
               </select>
             </div>
           </div>
@@ -101,7 +129,7 @@ export class Vl03nViewComponent {
               <span class="erp-badge ${this.loadedDelivery.status === 'COMPLETED' ? 'erp-badge-success' : 'erp-badge-primary'}">
                 ${this.loadedDelivery.status === 'COMPLETED' ? `${Icons.check} Expedição Concluída (PGI)` : `${Icons.clock} Em Processamento`}
               </span>
-              <span class="erp-badge erp-badge-sap text-xs">Ponto Exp. ${this.loadedDelivery.shippingPoint}</span>
+              <span class="erp-badge erp-badge-sap text-xs">${CompanyStructure.getShippingPointName(this.loadedDelivery.shippingPoint)}</span>
             </div>
           </div>
 
@@ -114,14 +142,21 @@ export class Vl03nViewComponent {
               </div>
             </div>
             <div>
-              <div class="text-xs text-muted">Ordem de Venda Precedente (VBELN):</div>
-              <div class="font-mono text-sm font-bold text-primary">
-                ${Formatters.documentNumber(this.loadedDelivery.salesOrderNumber)}
+              <div class="text-xs text-muted">Destino / Local de Entrega:</div>
+              <div class="font-mono text-sm font-semibold text-primary">
+                ${(() => {
+                  const cust = db.getCustomer(this.loadedDelivery.customerId);
+                  const city = cust?.city ? `${cust.city}/${cust.state || 'BR'}` : 'Conforme Cadastro';
+                  const shipTo = cust?.partners?.shipToParty?.name || '';
+                  return shipTo ? `${city} • ${shipTo}` : city;
+                })()}
               </div>
             </div>
             <div>
-              <div class="text-xs text-muted">Data da Remessa:</div>
-              <div class="font-mono text-sm">${new Date(this.loadedDelivery.deliveryDate).toLocaleDateString('pt-BR')}</div>
+              <div class="text-xs text-muted">Ordem Precedente / Data:</div>
+              <div class="font-mono text-sm font-bold text-primary">
+                ${Formatters.documentNumber(this.loadedDelivery.salesOrderNumber)} • ${new Date(this.loadedDelivery.deliveryDate).toLocaleDateString('pt-BR')}
+              </div>
             </div>
             <div>
               <div class="text-xs text-muted">Peso Total da Remessa:</div>
@@ -230,6 +265,16 @@ export class Vl03nViewComponent {
       btnLoad.addEventListener('click', () => {
         const delInput = this.container.querySelector('#vl03n-delivery-input');
         this.selectedDeliveryNumber = delInput ? delInput.value.trim() : '';
+        if (this.selectedDeliveryNumber) {
+          this.loadedDelivery = db.getDelivery(this.selectedDeliveryNumber);
+          if (this.loadedDelivery) {
+            // Lote B: completeObjective disparado após carga manual correta
+            const scenario = scenarioEngine.getActiveScenario();
+            if (scenario) {
+              scenarioEngine.completeObjective('access_vl03n');
+            }
+          }
+        }
         this.render();
       });
     }

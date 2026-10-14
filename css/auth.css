@@ -1,0 +1,426 @@
+/**
+ * Nexus ERP Lab • Authentication Stylesheet
+ * Arquivo: css/auth.css
+ * 
+ * Identidade Corporativa NexusTech: Navy (#08172c), Azul (#2563eb), Branco (#ffffff)
+ * Totalmente desacoplado e responsivo (1920x1080 até 375x812).
+ */
+
+.nexus-auth-wrapper,
+.nexus-auth-container {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #0f274a 0%, #08172c 60%, #040c17 100%);
+  overflow-y: auto;
+  padding: 1.5rem 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Banner de Notificação de Ambiente de Desenvolvimento Local */
+.auth-dev-badge,
+.nexus-dev-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 100%;
+}
+
+.auth-dev-badge-dot {
+  width: 7px;
+  height: 7px;
+  background: #f59e0b;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Cartão Principal de Autenticação */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho do Cartão */
+.auth-card-header {
+  background: #0b1e38;
+  color: #ffffff;
+  padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.auth-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.auth-brand-badge {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+}
+
+.auth-brand-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: #f8fafc;
+}
+
+.auth-client-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Apresentação do Chefe Wilson */
+.auth-mentor-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+}
+
+.auth-mentor-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  flex-shrink: 0;
+}
+
+.auth-mentor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-mentor-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.auth-mentor-role {
+  font-size: 0.72rem;
+  color: #93c5fd;
+}
+
+.auth-mentor-quote {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  margin-top: 0.2rem;
+  line-height: 1.3;
+}
+
+/* Corpo e Formulários */
+.auth-card-body {
+  padding: 1.75rem;
+  background: #ffffff;
+}
+
+.auth-view-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.4rem 0;
+}
+
+.auth-view-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.4;
+}
+
+/* Mensagens de Alerta e Notificação */
+.auth-alert {
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+
+.auth-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.auth-alert-info {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+/* Grupos de Formulário */
+.auth-form-group {
+  margin-bottom: 1.1rem;
+}
+
+.auth-form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.35rem;
+}
+
+.auth-form-input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.auth-form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.auth-form-help {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.3rem;
+}
+
+/* Botões de Ação */
+.auth-btn-primary {
+  width: 100%;
+  padding: 0.8rem;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+  min-height: 44px;
+}
+
+.auth-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.auth-btn-primary:active {
+  transform: scale(0.99);
+}
+
+.auth-btn-secondary {
+  width: 100%;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s ease;
+  min-height: 42px;
+  margin-top: 0.6rem;
+}
+
+.auth-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* Botão Social Google Placeholder */
+.auth-btn-google {
+  width: 100%;
+  padding: 0.75rem;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  min-height: 42px;
+}
+
+.auth-btn-google:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.auth-google-badge {
+  font-size: 0.65rem;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.25rem;
+}
+
+/* Divisor OR */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.25rem 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+}
+
+/* Links de Alternância de Tela */
+.auth-links-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.8rem;
+}
+
+.auth-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+/* Rodapé do Wrapper de Auth */
+.auth-wrapper-footer {
+  margin-top: 1.5rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Responsividade Mobile (390px, 375px) */
+@media (max-width: 480px) {
+  .nexus-auth-wrapper {
+    padding: 1rem 0.75rem;
+    justify-content: flex-start;
+  }
+
+  .auth-card {
+    border-radius: 12px;
+  }
+
+  .auth-card-header {
+    padding: 1.25rem 1.1rem 1rem 1.1rem;
+  }
+
+  .auth-card-body {
+    padding: 1.25rem 1.1rem;
+  }
+
+  .auth-mentor-spotlight {
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .auth-mentor-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .auth-links-row {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+  }
+}

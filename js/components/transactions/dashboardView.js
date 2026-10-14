@@ -40,75 +40,93 @@ export class DashboardViewComponent {
       : null;
 
     this.container.innerHTML = `
-      <!-- Hero de Boas-Vindas e Carreira -->
-      <div class="dashboard-hero">
-        <div class="dashboard-hero-content">
-          <div class="hero-profile-info">
-            <div class="hero-avatar">${levelInfo.level}</div>
-            <div>
-              <div class="hero-title">${profile.name} • ${profile.role}</div>
-              <div class="hero-subtitle">Módulo SAP SD • NexusTech Distribuidora S/A • Supervisor: Sr. Wilson</div>
+      <!-- Hero Banner com Chief Wilson (Direção de Arte Oficial) -->
+      <div class="dashboard-hero-banner">
+        <div class="hero-left-column">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            NEXUS ERP LAB • SD PRACTICE ENVIRONMENT
+          </div>
+          <h1 class="hero-main-title">Bem-vindo ao Nexus ERP Lab!</h1>
+          <p class="hero-tagline">SD Practice Environment • Aprenda na prática. Conquiste seu espaço.</p>
+          <p class="hero-description">
+            Execute processos reais de Vendas e Distribuição de ponta a ponta (Order-to-Cash).
+            Domine transações comerciais, liberação de crédito, remessas e faturamento com a mentoria contínua do Chefe Wilson.
+          </p>
+          <div class="hero-actions">
+            <button id="btn-hero-see-missions" class="btn-hero-primary" title="Explorar e atender solicitações comerciais">
+              ${Icons.target} Ver minhas missões
+            </button>
+            <div class="hero-mentor-indicator">
+              <span class="text-xs text-light">Orientação com:</span>
+              <strong style="color: #ffffff; font-size: 12.5px;">Chefe Wilson • Mentor SAP</strong>
             </div>
           </div>
-          <div style="text-align: right;">
-            <div class="text-xs text-light" style="margin-bottom: 4px;">PROGRESSO PARA O PRÓXIMO NÍVEL</div>
-            <div style="font-size: 14px; font-weight: 700; color: #38bdf8;">
-              ${profile.xp} / ${levelInfo.nextMinXp} XP (${levelInfo.progressPercent}%)
+        </div>
+
+        <div class="hero-right-column">
+          <div class="chief-wilson-hero-card">
+            <div class="chief-wilson-portrait-wrapper">
+              <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson - Mentor SAP" class="chief-wilson-portrait" />
+              <div class="chief-wilson-status-indicator" title="Chefe Wilson está online">
+                <span class="status-indicator-dot"></span> Online
+              </div>
+            </div>
+            <div class="chief-wilson-dialogue-box">
+              <div class="dialogue-header">
+                <span class="dialogue-name">Chefe Wilson</span>
+                <span class="dialogue-title">Mentor SAP</span>
+              </div>
+              <p class="dialogue-speech">
+                "Olá, <strong>${profile.name}</strong>! Nosso foco é excelência operacional. Acompanho seu progresso em cada transação no ERP. Bom trabalho!"
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Grade de KPIs Operacionais -->
+      <!-- Grade de 4 KPIs Oficiais -->
       <div class="kpi-grid">
+        <!-- 1. Missões Ativas -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Acurácia de Aprendizagem</div>
-            <div class="kpi-value ${profile.accuracy >= 80 ? 'text-success' : 'text-warning'}">
-              ${profile.totalActions === 0 ? '100%' : `${profile.accuracy}%`}
-            </div>
-            <div style="font-size: 10.5px; color: var(--erp-text-muted); margin-top: 2px;">
-              ${profile.totalActions === 0 ? 'Primeiro dia de expediente' : `${profile.successfulActions || 0} de ${profile.totalActions} ações corretas`}
-            </div>
+            <div class="kpi-label">Missões Ativas</div>
+            <div class="kpi-value text-primary">${ScenarioCatalog.length}</div>
+            <div class="kpi-subtext">Cenários de formação prática</div>
           </div>
-          <div class="kpi-icon">${Icons.award}</div>
+          <div class="kpi-icon kpi-icon-primary">${Icons.target}</div>
         </div>
 
+        <!-- 2. Concluídas -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Total de Ações Realizadas</div>
-            <div class="kpi-value">${profile.totalActions}</div>
-            <div style="font-size: 10.5px; color: var(--erp-text-muted); margin-top: 2px;">
-              ${profile.totalActions === 0 ? 'Aguardando 1º atendimento' : 'Decisões operacionais no ERP'}
+            <div class="kpi-label">Concluídas</div>
+            <div class="kpi-value text-success">${completedScenarios.length}</div>
+            <div class="kpi-subtext">
+              ${completedScenarios.length === 0 ? 'Aguardando 1ª conclusão' : `${Math.round((completedScenarios.length / ScenarioCatalog.length) * 100)}% da formação finalizada`}
             </div>
           </div>
-          <div class="kpi-icon">${Icons.fileText}</div>
+          <div class="kpi-icon kpi-icon-success">${Icons.star}</div>
         </div>
 
+        <!-- 3. XP Acumulado -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Pontualidade (SLA)</div>
-            <div class="kpi-value text-primary">
-              ${profile.slaTotalChallenges > 0 
-                ? `${Math.round((profile.slaSuccessCount / profile.slaTotalChallenges) * 100)}%` 
-                : '100%'}
-            </div>
-            <div style="font-size: 10.5px; color: var(--erp-text-muted); margin-top: 2px;">
-              ${profile.slaTotalChallenges === 0 ? 'Pronto para desafios SLA' : `${profile.slaSuccessCount} de ${profile.slaTotalChallenges} no prazo`}
-            </div>
+            <div class="kpi-label">XP Acumulado</div>
+            <div class="kpi-value text-warning">${profile.xp.toLocaleString('pt-BR')}</div>
+            <div class="kpi-subtext">Próximo nível: ${levelInfo.nextMinXp.toLocaleString('pt-BR')} XP</div>
           </div>
-          <div class="kpi-icon">${Icons.clock}</div>
+          <div class="kpi-icon kpi-icon-warning">${Icons.trophy}</div>
         </div>
 
+        <!-- 4. Nível Trainee -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Cenários Concluídos</div>
-            <div class="kpi-value text-success">${completedScenarios.length} / ${ScenarioCatalog.length}</div>
-            <div style="font-size: 10.5px; color: var(--erp-text-muted); margin-top: 2px;">
-              ${completedScenarios.length === 0 ? 'Trilha SD inicial' : `${Math.round((completedScenarios.length / ScenarioCatalog.length) * 100)}% da formação concluída`}
-            </div>
+            <div class="kpi-label">Nível Trainee</div>
+            <div class="kpi-value text-primary">Nível ${levelInfo.level}</div>
+            <div class="kpi-subtext">${profile.role}</div>
           </div>
-          <div class="kpi-icon">${Icons.check}</div>
+          <div class="kpi-icon kpi-icon-info">${Icons.crown}</div>
         </div>
       </div>
 
@@ -118,8 +136,8 @@ export class DashboardViewComponent {
       ${allCompleted ? `
         <!-- Painel de Ciclo 100% Concluído: FORMAÇÃO CONCLUÍDA COM EXCELÊNCIA -->
         <div class="erp-card" id="completion-summary-card" style="margin-bottom: 20px; border-top: 4px solid var(--erp-green-success); background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);">
-          <div class="erp-card-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="erp-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
               <span style="font-weight: 700; font-size: 14px; color: var(--erp-navy-900);">
                 Mesa de Trabalho • Encerramento da Formação
               </span>
@@ -132,14 +150,14 @@ export class DashboardViewComponent {
             </span>
           </div>
 
-          <div class="erp-card-body" style="padding: 24px;">
-            <div style="display: flex; align-items: flex-start; gap: 18px; margin-bottom: 20px;">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background-color: var(--erp-navy-900); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; border: 2px solid #38bdf8; flex-shrink: 0; box-shadow: var(--erp-shadow-sm);">
-                SW
+          <div class="erp-card-body" style="padding: 16px;">
+            <div style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+              <div style="width: 52px; height: 52px; border-radius: 50%; overflow: hidden; border: 2px solid #0070f2; flex-shrink: 0; box-shadow: var(--erp-shadow-sm);">
+                <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>
               <div style="flex: 1;">
                 <div style="font-size: 14px; font-weight: 700; color: #166534; margin-bottom: 4px;">
-                  Parecer Final do Supervisor • Sr. Wilson (Coordenador Comercial | Mentor SD)
+                  Parecer Final do Mentor • Chefe Wilson (Mentor SAP)
                 </div>
                 <div style="font-size: 13.5px; color: var(--erp-navy-900); line-height: 1.6; background-color: #ffffff; padding: 14px 16px; border-radius: 6px; border: 1px solid #bbf7d0; box-shadow: var(--erp-shadow-xs);">
                   <p style="margin: 0 0 10px 0;">
@@ -204,12 +222,12 @@ export class DashboardViewComponent {
             </div>
 
             <!-- Chamada para Ação: Continuar Praticando no Histórico -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-              <div style="font-size: 12.5px; color: var(--erp-text-muted); line-height: 1.45;">
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+              <div style="font-size: 12.5px; color: var(--erp-text-muted); line-height: 1.45; flex: 1; min-width: 240px;">
                 <strong style="color: var(--erp-navy-900);">Treinamento Contínuo Disponível.</strong><br/>
                 Todas as ${ScenarioCatalog.length} atividades permanecem arquivadas no Histórico abaixo para consulta, revisão e treino livre a qualquer momento.
               </div>
-              <button id="btn-scroll-to-history" class="btn btn-secondary" style="padding: 10px 18px; font-weight: 600; font-size: 12.5px; flex-shrink: 0;">
+              <button id="btn-scroll-to-history" class="btn btn-secondary" style="padding: 10px 18px; font-weight: 600; font-size: 12.5px;">
                 ${Icons.refresh} Continuar Praticando no Histórico
               </button>
             </div>
@@ -218,8 +236,8 @@ export class DashboardViewComponent {
       ` : currentScenario ? `
         <!-- Card Principal da Mesa de Trabalho: Solicitação Comercial -->
         <div class="erp-card" style="margin-bottom: 20px; border-top: 4px solid ${isCurrentCompleted ? 'var(--erp-green-success)' : 'var(--erp-blue-primary)'}; background: ${isCurrentCompleted ? 'linear-gradient(180deg, #f8fdf9 0%, #ffffff 100%)' : '#ffffff'};">
-          <div class="erp-card-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="erp-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
               <span style="font-weight: 700; font-size: 14px; color: var(--erp-navy-900);">
                 ${isCurrentCompleted ? 'Mesa de Trabalho • Relatório de Atividade Homologada' : 'Mesa de Trabalho • Solicitação Comercial Atual'}
               </span>
@@ -228,15 +246,15 @@ export class DashboardViewComponent {
               </span>
             </div>
             <span class="text-xs text-muted font-mono">
-              Supervisor: Sr. Wilson (Coordenador Comercial | Mentor SD)
+              Mentor: Chefe Wilson (Mentor SAP)
             </span>
           </div>
 
           <div class="erp-card-body">
             <!-- Cabeçalho do Chamado -->
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--erp-border-subtle);">
-              <div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--erp-border-subtle);">
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
                   <span class="erp-badge erp-badge-code">${currentScenario.code}</span>
                   <span class="erp-badge ${isChallenge ? 'erp-badge-danger' : 'erp-badge-primary'}">
                     ${isChallenge ? `${Icons.alertTriangle} Modo Desafio (${currentScenario.slaMinutes} min SLA)` : `${Icons.lightbulb} Treinamento Guiado`}
@@ -264,13 +282,13 @@ export class DashboardViewComponent {
 
             <!-- Parecer e Relatório Estruturado quando Concluída -->
             ${isCurrentCompleted ? `
-              <!-- Feedback do Supervisor Sr. Wilson -->
+              <!-- Feedback do Mentor Chefe Wilson -->
               <div style="background-color: var(--erp-green-bg); border-left: 4px solid var(--erp-green-success); border-radius: 6px; padding: 14px 16px; margin-bottom: 18px; border: 1px solid #bbf7d0;">
                 <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: #166534; margin-bottom: 6px;">
-                  <div style="width: 22px; height: 22px; border-radius: 50%; background-color: #15803d; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
-                    SW
+                  <div style="width: 24px; height: 24px; border-radius: 50%; overflow: hidden; border: 1px solid #15803d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson" style="width: 100%; height: 100%; object-fit: cover;" />
                   </div>
-                  Parecer do Supervisor • Sr. Wilson (Mentor SD):
+                  Parecer do Mentor • Chefe Wilson (Mentor SAP):
                 </div>
                 <div style="font-size: 13px; color: #14532d; line-height: 1.5; font-weight: 500;">
                   ${currentScenario.completionFeedback?.mentorSpeech || 'Excelente trabalho! Você concluiu a atividade com total conformidade operacional às diretrizes de Vendas e Distribuição da NexusTech.'}
@@ -335,8 +353,8 @@ export class DashboardViewComponent {
               </div>
 
               <!-- Fechamento e Chamada para Avanço -->
-              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                <div style="font-size: 12.5px; color: var(--erp-text-muted); line-height: 1.45;">
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                <div style="font-size: 12.5px; color: var(--erp-text-muted); line-height: 1.45; flex: 1; min-width: 240px;">
                   <strong style="color: var(--erp-navy-900);">Atividade Homologada no Histórico de Formação.</strong><br/>
                   Esta missão foi arquivada. Quando estiver pronto para assumir o próximo chamado comercial, clique no botão ao lado.
                 </div>
@@ -373,7 +391,7 @@ export class DashboardViewComponent {
                 </div>
               ` : ''}
 
-              <!-- Dica Inicial do Sr. Wilson (quando em andamento) -->
+              <!-- Dica Inicial do Chefe Wilson (quando em andamento) -->
               ${currentScenario.mentorInitialTip ? `
                 <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--erp-blue-primary); background-color: var(--erp-blue-bg); padding: 10px 12px; border-radius: 4px; border: 1px solid #bfdbfe;">
                   <div style="flex-shrink: 0; margin-top: 1px;">${Icons.lightbulb}</div>
@@ -390,8 +408,8 @@ export class DashboardViewComponent {
       <!-- HISTÓRICO DE ATIVIDADES CONCLUÍDAS & REVISÃO RECOLHÍVEL -->
       <!-- ======================================================== -->
       <div class="erp-card" style="margin-bottom: 20px;">
-        <div class="erp-card-header" style="cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between;" id="toggle-history-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="erp-card-header" style="cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;" id="toggle-history-header">
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
             <span style="font-weight: 700; font-size: 13.5px; color: var(--erp-navy-900);">
               Histórico de Atividades Concluídas & Revisão
             </span>
@@ -412,9 +430,9 @@ export class DashboardViewComponent {
                 const isChallenge = scenario.mode === 'CHALLENGE';
 
                 return `
-                  <div style="display: flex; align-items: center; justify-content: space-between; background-color: var(--erp-surface-subtle); border-radius: 4px; padding: 10px 14px; border: 1px solid var(--erp-border-subtle); transition: background-color 0.15s ease;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background-color: var(--erp-surface-subtle); border-radius: 4px; padding: 10px 14px; border: 1px solid var(--erp-border-subtle); transition: background-color 0.15s ease;">
                     <div style="flex: 1; min-width: 0; padding-right: 12px;">
-                      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 3px;">
                         <span class="erp-badge erp-badge-code text-xs">${scenario.code}</span>
                         <span style="font-weight: 600; font-size: 12.5px; color: var(--erp-navy-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                           ${scenario.title}
@@ -506,16 +524,37 @@ export class DashboardViewComponent {
   }
 
   bindEvents() {
+    // Botão de Hero: "Ver minhas missões"
+    const heroSeeMissionsBtn = this.container.querySelector('#btn-hero-see-missions');
+    if (heroSeeMissionsBtn) {
+      heroSeeMissionsBtn.addEventListener('click', () => {
+        const target = this.container.querySelector('#completion-summary-card') || this.container.querySelector('.erp-card');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
     // Botão: "Atender Solicitação no SAP"
     const startActiveBtn = this.container.querySelector('#start-active-scenario-btn');
     if (startActiveBtn) {
       startActiveBtn.addEventListener('click', () => {
-        const currentScenario = scenarioEngine.getActiveScenario() || scenarioEngine.getCurrentPendingScenario() || ScenarioCatalog[0];
-        if (currentScenario) {
-          const targetRoute = currentScenario.initialTcode || 'VA01';
-          scenarioEngine.startScenario(currentScenario.id);
-          this.onNavigate(targetRoute);
-        }
+        // F2-C: Loading state — evita duplo clique e dá feedback visual imediato
+        startActiveBtn.disabled = true;
+        startActiveBtn.innerHTML = `<span class="erp-spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:erp-spin 0.6s linear infinite;margin-right:6px;"></span> Abrindo Transação...`;
+
+        // Pequeno delay para garantir que o browser renderize o loading antes de navegar
+        setTimeout(() => {
+          const currentScenario = scenarioEngine.getActiveScenario() || scenarioEngine.getCurrentPendingScenario() || ScenarioCatalog[0];
+          if (currentScenario) {
+            const targetRoute = currentScenario.initialTcode || 'VA01';
+            scenarioEngine.startScenario(currentScenario.id);
+            this.onNavigate(targetRoute);
+          } else {
+            startActiveBtn.disabled = false;
+            startActiveBtn.innerHTML = `${Icons.play} Atender Solicitação no SAP`;
+          }
+        }, 80);
       });
     }
 

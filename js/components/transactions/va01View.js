@@ -38,6 +38,7 @@ export class Va01ViewComponent {
     this.activeTab = 'HEADER'; // HEADER, ITEMS, PARTNERS, CONDITIONS
     this.fieldErrors = {}; // Mapeia campos com inconsistência
     this.currentScenarioId = null;
+    this.savedDocNumber = null; // Número da OR gravada nesta instância (null = ainda não gravada)
   }
 
   resetForm() {
@@ -55,6 +56,7 @@ export class Va01ViewComponent {
     ];
     this.activeTab = 'HEADER';
     this.fieldErrors = {};
+    this.savedDocNumber = null; // Nova missão: nenhuma OR ainda gravada
   }
 
   render() {
@@ -65,6 +67,15 @@ export class Va01ViewComponent {
       this.currentScenarioId = activeScenarioId;
     }
 
+    // ── Guard pós-gravação ──────────────────────────────────────────────────
+    // Quando savedDocNumber está preenchido, a OR já foi criada nesta
+    // instância/missão. Renderiza tela de confirmação e retorna antes de
+    // qualquer exibição do formulário ou do botão Gravar.
+    if (this.savedDocNumber !== null) {
+      return this._renderOrderConfirmed();
+    }
+    // ── Fim do guard pós-gravação ───────────────────────────────────────────
+
     const customers = db.getAllCustomers();
     const materials = db.getAllMaterials();
     const orderCalculation = PricingEngine.calculateOrderTotals(this.items, this.salesOrg || '1000', this.distChannel || '10');
@@ -74,7 +85,7 @@ export class Va01ViewComponent {
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VA01</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Criar Ordem do Cliente: Acesso Inicial & Dados Comerciais</div>
             <div class="text-xs text-muted">Estrutura Org: ${CompanyStructure.companyCode.id} • ${CompanyStructure.companyCode.name}</div>
           </div>
@@ -170,7 +181,7 @@ export class Va01ViewComponent {
           </div>
         </div>
 
-        <div class="form-grid-3" style="margin-top: 8px;">
+        <div class="form-grid-3">
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Emissor da Ordem (Sold-to Party / KUNNR) *</span>
@@ -217,7 +228,7 @@ export class Va01ViewComponent {
           </div>
         </div>
 
-        <div class="form-grid-2" style="margin-top: 8px;">
+        <div class="form-grid-2">
           <div class="erp-form-group">
             <label class="erp-form-label">
               <span>Incoterms (Modalidade de Frete) *</span>
@@ -651,6 +662,10 @@ export class Va01ViewComponent {
         if (totals.hasPricingError) {
           MentorDockComponent.speak('Atenção: uma ou mais posições não possuem condição de preço PR00 ativa. Verifique o material selecionado.', 'WARN');
         } else {
+          const activeScenario = scenarioEngine.getActiveScenario();
+          if (activeScenario?.objectives?.some(objective => objective.id === 'simulate_pricing')) {
+            scenarioEngine.completeObjective('simulate_pricing');
+          }
           MentorDockComponent.speak('Cálculo comercial simulado. O esquema de preços apurou os valores brutos, descontos e tributos. Confira a aba Condições.', 'SUCCESS');
         }
       });
@@ -670,6 +685,10 @@ export class Va01ViewComponent {
 
     // Validação de Determinação de Preço (Pricing / Condição PR00)
     if (totals.hasPricingError) {
+      const activeScenario = scenarioEngine.getActiveScenario();
+      if (activeScenario?.objectives?.some(objective => objective.id === 'check_pricing_error')) {
+        scenarioEngine.completeObjective('check_pricing_error');
+      }
       this.fieldErrors.items = true;
       diagnosticModal.show({
         isValid: false,
@@ -706,16 +725,42 @@ export class Va01ViewComponent {
     if (result.isValid) {
       this.fieldErrors = {};
       const createdOrder = db.createSalesOrder(orderData);
+      const activeScenario = scenarioEngine.getActiveScenario();
+      if (
+        activeScenario?.targetCriteria?.action === 'CREDIT_RELEASE' &&
+        createdOrder.overallStatus === 'CREDIT_BLOCKED' &&
+        activeScenario.objectives?.some(objective => objective.id === 'create_blocked_order')
+      ) {
+        scenarioEngine.completeObjective('create_blocked_order');
+      }
+      this.savedDocNumber = createdOrder.docNumber; // Persiste no componente — protege contra dupla gravação
 
       MentorDockComponent.speak(`Ordem de Venda nº ${Formatters.documentNumber(createdOrder.docNumber)} gravada com sucesso no sistema.`, 'SUCCESS');
 
+      const customerData = db.getCustomer(createdOrder.customerId);
+      const customerDisplayName = customerData ? `${createdOrder.customerId} - ${customerData.name}` : createdOrder.customerId;
+
       diagnosticModal.show({
         isValid: true,
+        operationSummary: {
+          title: 'Ordem de Venda Gravada com Sucesso',
+          docTypeBadge: `VBAK • Tipo ${createdOrder.orderType || 'OR'}`,
+          primaryLabel: 'Nº Ordem de Venda (VBELN):',
+          primaryNumber: Formatters.documentNumber(createdOrder.docNumber),
+          statusText: createdOrder.overallStatus === 'CREDIT_BLOCKED' ? 'Bloqueada por Crédito (VKM1)' : 'Aberta para Fornecimento (OPEN)',
+          partnerLabel: 'Emissor da Ordem:',
+          partnerOrOrigin: customerDisplayName,
+          referenceDoc: `Pedido do Cliente: ${createdOrder.customerPoNumber || 'Não informado'}`,
+          inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(createdOrder.docNumber)}] em VA03`
+        },
         mentorSpeech: result.mentorSpeech,
         whatHappened: `Ordem de Venda nº ${Formatters.documentNumber(createdOrder.docNumber)} gravada com status [${createdOrder.overallStatus}].`,
         why: result.why,
         businessImpact: result.businessImpact,
         onConfirm: () => {
+          this.onNavigate('VA03', { docNumber: createdOrder.docNumber });
+        },
+        onInspect: () => {
           this.onNavigate('VA03', { docNumber: createdOrder.docNumber });
         }
       });
@@ -738,6 +783,107 @@ export class Va01ViewComponent {
         }
       });
     }
+  }
+
+  /**
+   * Renderiza a tela de confirmação quando a OR já foi gravada nesta instância.
+   * Mantém o header-bar padrão da VA01 mas substitui o formulário por um painel
+   * de sucesso com os dados da OR criada. Nenhum botão de gravação está presente.
+   */
+  _renderOrderConfirmed() {
+    const savedOrder = db.getSalesOrder(this.savedDocNumber);
+
+    this.container.innerHTML = `
+      <!-- Cabeçalho da Transação (layout idêntico ao padrão) -->
+      <div class="transaction-header-bar">
+        <div class="transaction-title-group">
+          <span class="transaction-tcode-badge">VA01</span>
+          <div class="transaction-title-text-block">
+            <div class="transaction-title">Criar Ordem do Cliente: Acesso Inicial &amp; Dados Comerciais</div>
+            <div class="text-xs text-muted">Estrutura Org: ${CompanyStructure.companyCode.id} &bull; ${CompanyStructure.companyCode.name}</div>
+          </div>
+        </div>
+        <div class="transaction-actions">
+          <span class="erp-badge erp-badge-success" style="font-size: 13px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+            ${Icons.check} Ordem Gravada
+          </span>
+        </div>
+      </div>
+
+      <!-- Painel de confirmação -->
+      <div class="transaction-section" style="margin-top: 16px;">
+        <div class="section-title">
+          <span>Ordem de Venda Registrada com Sucesso</span>
+          <span class="erp-badge erp-badge-sap text-xs">Tabela VBAK</span>
+        </div>
+
+        <div style="background: var(--erp-green-light, #f0fdf4); border: 1.5px solid var(--erp-green-success, #16a34a); border-radius: 8px; padding: 24px 28px; margin-top: 12px;">
+          <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px;">
+            <span style="font-size: 26px; color: var(--erp-green-success, #16a34a); margin-top: 2px;">${Icons.check}</span>
+            <div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--erp-green-success, #16a34a); margin-bottom: 4px;">
+                Ordem de Venda Gravada
+              </div>
+              <div class="text-sm text-muted">
+                A OR foi registrada no sistema ERP. Para criar uma nova missão, retorne ao painel e inicie um novo chamado.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-3" style="gap: 12px; margin-bottom: 20px;">
+            <div class="erp-form-group">
+              <label class="erp-form-label"><span>Número do Documento (VBELN)</span></label>
+              <div class="erp-input font-mono" style="background: #fff; font-weight: 700; font-size: 15px; color: var(--erp-primary, #1d4ed8);">
+                ${Formatters.documentNumber(this.savedDocNumber)}
+              </div>
+            </div>
+            <div class="erp-form-group">
+              <label class="erp-form-label"><span>Status Geral (GBSTK)</span></label>
+              <div class="erp-input font-mono" style="background: #fff;">
+                ${savedOrder ? savedOrder.overallStatus : 'OPEN'}
+              </div>
+            </div>
+            <div class="erp-form-group">
+              <label class="erp-form-label"><span>Emissor da Ordem (KUNNR)</span></label>
+              <div class="erp-input font-mono" style="background: #fff;">
+                ${savedOrder ? savedOrder.customerId : this.customerId}
+              </div>
+            </div>
+          </div>
+
+          <div style="padding-top: 16px; border-top: 1px solid rgba(22,163,74,0.25);">
+            <p class="text-sm text-muted" style="margin-bottom: 12px;">
+              <strong>Pr&oacute;ximas etapas do processo SD:</strong> Consulte a OR em VA03, crie a remessa via VL01N
+              ou retorne ao painel para continuar a trilha de aprendizado.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="btn-confirmed-goto-va03">
+                ${Icons.fileText} Consultar OR em VA03
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-confirmed-goto-dashboard">
+                ${Icons.check} Voltar ao Painel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Navegação da tela de confirmação (sem lógica de gravação)
+    const toVa03 = this.container.querySelector('#btn-confirmed-goto-va03');
+    if (toVa03) {
+      toVa03.addEventListener('click', () => {
+        this.onNavigate('VA03', { docNumber: this.savedDocNumber });
+      });
+    }
+    const toDash = this.container.querySelector('#btn-confirmed-goto-dashboard');
+    if (toDash) {
+      toDash.addEventListener('click', () => {
+        this.onNavigate('DASHBOARD');
+      });
+    }
+
+    return this.container;
   }
 
   getElement() {

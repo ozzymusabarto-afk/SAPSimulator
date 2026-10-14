@@ -17,12 +17,13 @@ export class Vf01ViewComponent {
     this.container = document.createElement('div');
     this.container.className = 'vf01-view';
     this.selectedBillingType = 'F2';
-    this.selectedDeliveryNumber = initialParams.deliveryNumber || '';
-    this.selectedSalesOrderNumber = initialParams.salesOrderNumber || initialParams.docNumber || '';
+    this.selectedDeliveryNumber = '';   // Lote A + E: não pré-preencher via initialParams
+    this.selectedSalesOrderNumber = ''; // Lote A + E: não pré-preencher via initialParams
     this.billingDate = new Date().toISOString().split('T')[0];
     this.loadedDelivery = null;
     this.loadedOrder = null;
     this.currentScenarioId = null;
+    this.savedInvoiceNumber = null; // Lote A: número da fatura criada nesta instância (null = ainda não criada)
   }
 
   resetForm() {
@@ -32,15 +33,12 @@ export class Vf01ViewComponent {
     this.billingDate = new Date().toISOString().split('T')[0];
     this.loadedDelivery = null;
     this.loadedOrder = null;
+    this.savedInvoiceNumber = null; // Nova missão: nenhuma fatura ainda criada
   }
 
   setParams(params = {}) {
-    if (params.deliveryNumber) {
-      this.selectedDeliveryNumber = params.deliveryNumber;
-    }
-    if (params.salesOrderNumber || params.docNumber) {
-      this.selectedSalesOrderNumber = params.salesOrderNumber || params.docNumber;
-    }
+    // Lote E: setParams não pré-preenche campos — o trainee deve localizar o documento manualmente.
+    // DADO FORNECIDO NO CHAMADO ≠ DADO PREENCHIDO NA TELA.
     this.render();
   }
 
@@ -52,9 +50,16 @@ export class Vf01ViewComponent {
       this.currentScenarioId = activeScenarioId;
     }
 
-    if (scenario) {
-      scenarioEngine.completeObjective('access_vf01');
+    // ── Guard pós-criação ───────────────────────────────────────────────────
+    // Quando savedInvoiceNumber está preenchido, a fatura já foi criada nesta
+    // instância/missão. Renderiza tela de confirmação antes do formulário.
+    if (this.savedInvoiceNumber !== null) {
+      return this._renderInvoiceConfirmed();
     }
+    // ── Fim do guard pós-criação ────────────────────────────────────────────
+
+    // Lote B: completeObjective('access_vf01') removido do render() —
+    // será disparado apenas após a remessa ser localizada manualmente (no handler do btn-load-billing-doc).
 
     const allDeliveries = db.getAllDeliveries();
     const allOrders = db.getAllSalesOrders();
@@ -74,7 +79,7 @@ export class Vf01ViewComponent {
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VF01</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Criar Documento de Faturamento (Billing Document)</div>
             <div class="text-xs text-muted">Faturamento Comercial de Vendas (SD-BIL) & Integração com Contas a Receber (FI-AR) • Tabela VBRK / VBRP</div>
           </div>
@@ -117,14 +122,31 @@ export class Vf01ViewComponent {
             <label class="form-label">Nº da Remessa Precedente (LIKP):</label>
             <div style="display: flex; gap: 6px;">
               <input type="text" class="erp-input font-mono font-bold" id="vf01-delivery-input" 
-                placeholder="Ex: 80000001" value="${this.selectedDeliveryNumber}" style="flex: 1;">
+                placeholder="Ex: 80000001" value="${this.selectedDeliveryNumber}" style="flex: 1; min-width: 0;">
               <select class="erp-select font-mono text-xs" id="vf01-delivery-quick-select" style="max-width: 140px;">
                 <option value="">-- Remessas --</option>
-                ${allDeliveries.map(d => `
-                  <option value="${d.deliveryNumber}" ${d.deliveryNumber === this.selectedDeliveryNumber ? 'selected' : ''}>
-                    ${d.deliveryNumber} (${d.status === 'COMPLETED' ? 'PGI OK' : 'Sem PGI'})
-                  </option>
-                `).join('')}
+                ${(() => {
+                  // F2-A+B: Filtra por PGI realizado (status COMPLETED) e, se possível, pela OR do cenário ativo
+                  const scenario = scenarioEngine.getActiveScenario();
+                  const scenarioOrderNums = (scenario?.initialDocuments || []).map(d => d.salesOrderNumber).filter(Boolean);
+                  const eligibleDeliveries = allDeliveries.filter(d => {
+                    const hasPgi = d.status === 'COMPLETED' || d.goodsIssueStatus === 'COMPLETED';
+                    if (!hasPgi) return false;
+                    // Se o cenário tem ordens específicas, filtra por elas; senão exibe todas com PGI
+                    if (scenarioOrderNums.length > 0) {
+                      return scenarioOrderNums.includes(d.salesOrderNumber);
+                    }
+                    return true;
+                  });
+                  if (eligibleDeliveries.length === 0) {
+                    return '<option value="" disabled>Nenhuma remessa com PGI disponível</option>';
+                  }
+                  return eligibleDeliveries.map(d => `
+                    <option value="${d.deliveryNumber}" ${d.deliveryNumber === this.selectedDeliveryNumber ? 'selected' : ''}>
+                      ${d.deliveryNumber} (PGI OK)
+                    </option>
+                  `).join('');
+                })()}
               </select>
             </div>
           </div>
@@ -249,21 +271,21 @@ export class Vf01ViewComponent {
           </div>
 
           <!-- Totais da Fatura e Ações -->
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <div style="flex: 1 1 300px; min-width: 0; max-width: 100%;">
               <div class="text-xs text-muted" style="margin-bottom: 4px;">OBSERVAÇÕES FISCAIS / CONTÁBEIS:</div>
               <input type="text" class="erp-input font-mono text-xs" id="vf01-fiscal-notes" 
-                value="Fatura Comercial F2 emitida com integração contábil e fiscal automática." style="width: 420px;">
+                value="Fatura Comercial F2 emitida com integração contábil e fiscal automática." style="width: 100%; max-width: 500px; box-sizing: border-box;">
             </div>
 
-            <div style="text-align: right;">
+            <div style="text-align: right; flex: 1 1 280px; min-width: 0;">
               <div class="text-xs text-muted" style="margin-bottom: 2px;">
                 Base Líquida: <strong>${Formatters.currency(this.loadedOrder.netValue)}</strong> • Impostos (27.25%): <strong>${Formatters.currency(this.loadedOrder.taxValue)}</strong>
               </div>
-              <div style="font-size: 18px; font-weight: 800; color: var(--erp-navy-900); margin-bottom: 12px;">
+              <div style="font-size: 18px; font-weight: 800; color: var(--erp-navy-900); margin-bottom: 12px; word-break: break-word;">
                 VALOR TOTAL DA FATURA: <span style="color: var(--erp-green-success);">${Formatters.currency(this.loadedOrder.totalValue)}</span>
               </div>
-              <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
                 <button class="btn btn-secondary" id="btn-cancel-billing">Cancelar</button>
                 <button class="btn btn-primary" id="btn-save-invoice" style="padding: 8px 24px; font-weight: 700;">
                   ${Icons.check} Gravar Fatura Comercial (Post)
@@ -299,6 +321,16 @@ export class Vf01ViewComponent {
   }
 
   bindEvents() {
+    // Botões da tela de confirmação pós-criação
+    const btnVf03C = this.container.querySelector('#btn-goto-vf03-confirmed');
+    if (btnVf03C) {
+      btnVf03C.addEventListener('click', () => this.onNavigate('VF03', { invoiceNumber: this.savedInvoiceNumber }));
+    }
+    const btnDashC = this.container.querySelector('#btn-goto-dashboard-confirmed');
+    if (btnDashC) {
+      btnDashC.addEventListener('click', () => this.onNavigate('DASHBOARD'));
+    }
+
     // 1. Carregar Documento
     const btnLoad = this.container.querySelector('#btn-load-billing-doc');
     if (btnLoad) {
@@ -336,6 +368,13 @@ export class Vf01ViewComponent {
 
         this.loadedDelivery = del;
         this.loadedOrder = db.getSalesOrder(del.salesOrderNumber);
+
+        // Lote B: completeObjective disparado apenas após carga manual correta
+        const scenario = scenarioEngine.getActiveScenario();
+        if (scenario) {
+          scenarioEngine.completeObjective('access_vf01');
+        }
+
         this.render();
       });
     }
@@ -367,9 +406,31 @@ export class Vf01ViewComponent {
     const btnSave = this.container.querySelector('#btn-save-invoice');
     if (btnSave && this.loadedOrder) {
       btnSave.addEventListener('click', () => {
+        // Guard contra dupla criação no nível de lógica
+        if (this.savedInvoiceNumber !== null) return;
+
         const notesInput = this.container.querySelector('#vf01-fiscal-notes');
         const notes = notesInput ? notesInput.value : '';
 
+        const activeScenario = scenarioEngine.getActiveScenario();
+        const invoiceTarget = activeScenario?.targetCriteria;
+        const wrongBillingType = invoiceTarget?.billingType && this.selectedBillingType !== invoiceTarget.billingType;
+        const wrongOrder = invoiceTarget?.targetDocNumber && this.loadedOrder.docNumber !== invoiceTarget.targetDocNumber;
+        if (activeScenario && (wrongBillingType || wrongOrder)) {
+          const validation = scenarioEngine.validateInvoiceCreation(
+            this.selectedBillingType,
+            this.selectedDeliveryNumber || this.loadedOrder.docNumber,
+            { salesOrderNumber: this.loadedOrder.docNumber }
+          );
+          diagnosticModal.show({
+            isValid: false,
+            mentorSpeech: validation.mentorSpeech,
+            whatHappened: validation.whatHappened,
+            why: validation.why,
+            businessImpact: validation.businessImpact
+          });
+          return;
+        }
         // Tenta criar fatura no erpDatabase
         const result = db.createInvoice({
           deliveryNumber: this.loadedDelivery ? this.loadedDelivery.deliveryNumber : null,
@@ -390,6 +451,9 @@ export class Vf01ViewComponent {
           return;
         }
 
+        // Persiste o número da fatura criada — impede nova criação
+        this.savedInvoiceNumber = result.invoice.invoiceNumber;
+
         // Validação no ScenarioEngine
         const validation = scenarioEngine.validateInvoiceCreation(this.selectedBillingType, this.selectedDeliveryNumber || this.loadedOrder.docNumber, result.invoice);
 
@@ -397,13 +461,31 @@ export class Vf01ViewComponent {
           MentorDockComponent.speak(`Fatura comercial ${result.invoice.invoiceNumber} emitida com sucesso. Ciclo Order-to-Cash concluído em conformidade fiscal.`, 'SUCCESS');
         }
 
+        const refText = this.loadedDelivery
+          ? `Remessa: ${this.loadedDelivery.deliveryNumber} • Ordem: ${Formatters.documentNumber(this.loadedOrder.docNumber)}`
+          : `Ordem de Origem: ${Formatters.documentNumber(this.loadedOrder.docNumber)}`;
+
         diagnosticModal.show({
           isValid: validation.isValid,
+          operationSummary: validation.isValid ? {
+            title: 'Fatura Comercial Emitida com Sucesso',
+            docTypeBadge: `VBRK / VBRP • Tipo ${this.selectedBillingType || 'F2'}`,
+            primaryLabel: 'Nº da Fatura (Billing Document):',
+            primaryNumber: result.invoice.invoiceNumber,
+            statusText: 'Contabilizada e Liberada para FI (POSTED)',
+            partnerLabel: 'Pagador / Destinatário:',
+            partnerOrOrigin: `${this.loadedOrder.customerId} - ${db.getCustomer(this.loadedOrder.customerId)?.name || ''}`,
+            referenceDoc: refText,
+            inspectLabel: `Inspecionar Fatura [${result.invoice.invoiceNumber}] em VF03`
+          } : null,
           mentorSpeech: validation.mentorSpeech,
           whatHappened: validation.whatHappened,
           why: validation.why,
           businessImpact: validation.businessImpact,
           onConfirm: () => {
+            this.onNavigate('VF03', { invoiceNumber: result.invoice.invoiceNumber });
+          },
+          onInspect: () => {
             this.onNavigate('VF03', { invoiceNumber: result.invoice.invoiceNumber });
           }
         });
@@ -426,6 +508,44 @@ export class Vf01ViewComponent {
         this.render();
       });
     }
+  }
+
+  _renderInvoiceConfirmed() {
+    const scenario = scenarioEngine.getActiveScenario();
+    const scenarioCode = scenario ? scenario.code : '';
+    this.container.innerHTML = `
+      <div class="transaction-header-bar">
+        <div class="transaction-title-group">
+          <span class="transaction-tcode-badge">VF01</span>
+          <div class="transaction-title-text-block">
+            <div class="transaction-title">Criar Documento de Faturamento (Billing Document)</div>
+            <div class="text-xs text-muted">Faturamento Comercial de Vendas (SD-BIL) &amp; Integração com Contas a Receber (FI-AR)</div>
+          </div>
+        </div>
+      </div>
+      <div class="erp-card" style="margin-top: 20px; padding: 28px 24px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; text-align: center;">
+        <div style="color: #15803d; font-size: 32px; margin-bottom: 12px;">${Icons.check}</div>
+        <h3 style="color: #14532d; font-size: 16px; font-weight: 700; margin: 0 0 6px 0;">
+          Fatura Comercial emitida com sucesso!
+        </h3>
+        <div style="font-size: 22px; font-weight: 800; color: #15803d; margin: 10px 0; font-family: monospace;">
+          Fatura nº ${this.savedInvoiceNumber}
+        </div>
+        <p class="text-xs text-muted" style="max-width: 480px; margin: 0 auto 20px auto; line-height: 1.5;">
+          ${scenarioCode ? `[${scenarioCode}] ` : ''}O ciclo Order-to-Cash foi encerrado com sucesso. Consulte o fluxo completo de documentos na <strong>VF03</strong>.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btn-goto-vf03-confirmed">
+            ${Icons.search} Consultar Fatura (VF03)
+          </button>
+          <button class="btn btn-secondary" id="btn-goto-dashboard-confirmed">
+            ${Icons.layers} Voltar ao Painel
+          </button>
+        </div>
+      </div>
+    `;
+    this.bindEvents();
+    return this.container;
   }
 
   getElement() {

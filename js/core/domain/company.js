@@ -68,5 +68,16 @@ export const CompanyStructure = {
     { id: 'CIF', name: 'CIF - Custo, Seguro e Frete (Por conta do vendedor)' },
     { id: 'FOB', name: 'FOB - Livre a Bordo (Por conta do comprador)' },
     { id: 'EXW', name: 'EXW - Na Origem (Retira no CD NexusTech)' }
-  ]
+  ],
+
+  // Pontos de Expedição Padrão SD/LE (Shipping Points / TVST)
+  shippingPoints: [
+    { id: '1000', name: '1000 - CD Central Matriz (São Paulo/SP)', city: 'São Paulo', state: 'SP' },
+    { id: '2000', name: '2000 - CD Regional Sul (Itajaí/SC - Polo Sul)', city: 'Itajaí', state: 'SC' }
+  ],
+
+  getShippingPointName(id) {
+    const pt = this.shippingPoints.find(p => p.id === String(id));
+    return pt ? pt.name : `${id} - CD Operacional`;
+  }
 };

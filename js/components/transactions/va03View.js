@@ -7,20 +7,27 @@ import { Icons } from '../../utils/icons.js';
 import { Formatters } from '../../utils/formatters.js';
 import { db } from '../../core/engine/erpDatabase.js';
 import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
+import { MentorDockComponent } from '../mentorDock.js';
 
 export class Va03ViewComponent {
   constructor(onNavigate, initialParams = {}) {
     this.onNavigate = onNavigate;
     this.container = document.createElement('div');
     this.container.className = 'va03-view';
-    this.selectedDocNumber = initialParams.docNumber || '10000001';
+    this.selectedDocNumber = initialParams.docNumber || '';
+    this.searchError = '';
   }
 
   setParams(params = {}) {
-    if (params.docNumber) {
-      this.selectedDocNumber = params.docNumber;
-      this.render();
+    const activeScenario = scenarioEngine.getActiveScenario();
+    const activeScenarioId = activeScenario ? activeScenario.id : null;
+    if (this.currentScenarioId !== activeScenarioId) {
+      this.selectedDocNumber = '';
+      this.searchError = '';
+      this.currentScenarioId = activeScenarioId;
     }
+    this.selectedDocNumber = params.docNumber || '';
+    this.searchError = '';
   }
 
   render() {
@@ -28,20 +35,11 @@ export class Va03ViewComponent {
     const activeScenarioId = scenario ? scenario.id : null;
     if (this.currentScenarioId !== activeScenarioId) {
       this.currentScenarioId = activeScenarioId;
-      if (scenario?.targetCriteria?.targetDocNumber) {
-        this.selectedDocNumber = scenario.targetCriteria.targetDocNumber;
-      }
+      this.selectedDocNumber = '';
+      this.searchError = '';
     }
 
-    if (scenario) {
-      scenarioEngine.completeObjective('check_order_va03');
-      scenarioEngine.completeObjective('analyze_order');
-      scenarioEngine.completeObjective('diagnose_situation');
-      scenarioEngine.completeObjective('verify_document_flow');
-    }
-
-    const orders = db.getAllSalesOrders();
-    const currentOrder = db.getSalesOrder(this.selectedDocNumber) || orders[orders.length - 1] || null;
+    const currentOrder = this.selectedDocNumber ? db.getSalesOrder(this.selectedDocNumber) : null;
 
     const deliveryFlow = currentOrder?.documentFlow?.find(f => f.type === 'DELIVERY');
     const matDocFlow = currentOrder?.documentFlow?.find(f => f.type === 'MATERIAL_DOC');
@@ -51,7 +49,7 @@ export class Va03ViewComponent {
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VA03</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Exibir Ordem do Cliente: Fluxo de Documentos & Status</div>
             <div class="text-xs text-muted">Acompanhamento do Processo de Ponta a Ponta (Document Flow • Tabela VBFA)</div>
           </div>
@@ -68,21 +66,42 @@ export class Va03ViewComponent {
         </div>
       </div>
 
-      ${currentOrder ? `
-        <!-- Seletor de Ordem e Resumo do Documento -->
+      <!-- Barra de Seleção de Ordem -->
+      <div class="transaction-selection-bar">
+        <div class="transaction-selection-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span class="transaction-selection-label">Ordem de Venda (VBELN):</span>
+          <input type="text" id="va03-order-input" class="erp-input font-mono font-bold text-xs" placeholder="Ex: 10000007" value="${this.selectedDocNumber || ''}" style="width: 150px; text-transform: uppercase;" />
+          <button class="btn btn-primary btn-sm" id="btn-search-order">
+            ${Icons.search} Exibir
+          </button>
+        </div>
+        <div class="text-xs text-muted font-mono">
+          ${currentOrder ? `Status: <span class="font-bold text-primary">${currentOrder.overallStatus}</span>` : 'Acesso Inicial de Exibição'}
+        </div>
+      </div>
+
+      ${this.searchError ? `
+        <div class="erp-alert erp-alert-danger" style="margin: 12px 0; padding: 10px 14px; border-radius: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+          ${Icons.alertTriangle}
+          <span>${this.searchError}</span>
+        </div>
+      ` : ''}
+
+      ${!currentOrder ? `
+        <div class="erp-card" style="text-align: center; padding: 48px 16px; background: #ffffff; margin-top: 16px; border: 1px dashed #cbd5e1; border-radius: 8px;">
+          <div style="color: var(--erp-blue-primary); margin-bottom: 12px; font-size: 28px;">${Icons.fileText}</div>
+          <h4 class="font-semibold" style="color: var(--erp-navy-900); font-size: 16px; margin-bottom: 6px;">Nenhuma ordem de venda carregada para exibição</h4>
+          <p class="text-xs text-muted" style="max-width: 520px; margin: 0 auto; line-height: 1.5;">
+            Informe o número da ordem de venda (VBELN) no campo acima e clique em <strong>Exibir</strong> (ou pressione Enter) para visualizar o status do documento e o fluxo de documentos completo (Tabela VBFA).
+          </p>
+        </div>
+      ` : `
+
+        <!-- Resumo do Documento -->
         <div class="transaction-section">
           <div class="section-title">
             <span>Dados da Ordem de Venda Selecionada</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="text-xs text-muted">Selecionar Ordem:</span>
-              <select class="erp-select font-mono text-xs" id="order-selector" style="padding: 2px 8px;">
-                ${orders.map(o => `
-                  <option value="${o.docNumber}" ${o.docNumber === currentOrder.docNumber ? 'selected' : ''}>
-                    Ordem ${Formatters.documentNumber(o.docNumber)} - ${o.customerId} (${Formatters.currency(o.totalValue)})
-                  </option>
-                `).join('')}
-              </select>
-            </div>
+            <span class="erp-badge erp-badge-sap text-xs">Documento de Vendas (VBAK)</span>
           </div>
 
           <div class="form-grid-4">
@@ -205,13 +224,6 @@ export class Va03ViewComponent {
 
           </div>
         </div>
-      ` : `
-        <div class="erp-card" style="text-align: center; padding: 32px;">
-          <p class="text-muted" style="margin-bottom: 12px;">Nenhuma ordem de venda emitida no momento.</p>
-          <button class="btn btn-primary btn-sm" id="btn-goto-va01-empty">
-            ${Icons.play} Ir para VA01 Criar Ordem
-          </button>
-        </div>
       `}
     `;
 
@@ -220,19 +232,54 @@ export class Va03ViewComponent {
   }
 
   bindEvents() {
-    const sel = this.container.querySelector('#order-selector');
-    if (sel) {
-      sel.addEventListener('change', (e) => {
-        this.selectedDocNumber = e.target.value;
+    const searchInput = this.container.querySelector('#va03-order-input');
+    const searchBtn = this.container.querySelector('#btn-search-order');
+
+    const executeDisplayOrder = () => {
+      const val = searchInput ? searchInput.value.trim() : '';
+      if (!val) {
+        this.searchError = 'Informe o número da ordem de venda (VBELN) para exibição.';
+        this.selectedDocNumber = '';
         this.render();
+        return;
+      }
+
+      const foundOrder = db.getSalesOrder(val);
+      if (!foundOrder) {
+        this.searchError = `Ordem de venda "${val}" não cadastrada no mandante 800.`;
+        this.selectedDocNumber = '';
+        this.render();
+        return;
+      }
+
+      this.selectedDocNumber = foundOrder.docNumber;
+      this.searchError = '';
+      this.render();
+
+      // Validação do objetivo da missão após a consulta bem-sucedida do trainee
+      const scenario = scenarioEngine.getActiveScenario();
+      if (scenario) {
+        const result = scenarioEngine.validateSalesOrderInspection(foundOrder.docNumber);
+        if (result?.mentorSpeech) {
+          MentorDockComponent.speak(result.mentorSpeech, result.isValid ? 'SUCCESS' : 'WARN');
+        }
+      }
+    };
+
+    if (searchBtn) {
+      searchBtn.addEventListener('click', executeDisplayOrder);
+    }
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          executeDisplayOrder();
+        }
       });
     }
 
     const btn1 = this.container.querySelector('#btn-goto-va01');
     if (btn1) btn1.addEventListener('click', () => this.onNavigate('VA01'));
-
-    const btn2 = this.container.querySelector('#btn-goto-va01-empty');
-    if (btn2) btn2.addEventListener('click', () => this.onNavigate('VA01'));
 
     const btnTopVl01n = this.container.querySelector('#btn-goto-vl01n-top');
     if (btnTopVl01n) {

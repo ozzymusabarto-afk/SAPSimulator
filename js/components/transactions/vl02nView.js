@@ -10,13 +10,14 @@ import { scenarioEngine } from '../../core/engine/scenarioEngine.js';
 import { trainee } from '../../core/engine/traineeEngine.js';
 import { diagnosticModal } from '../diagnosticModal.js';
 import { MentorDockComponent } from '../mentorDock.js';
+import { CompanyStructure } from '../../core/domain/company.js';
 
 export class Vl02nViewComponent {
   constructor(onNavigate, initialParams = {}) {
     this.onNavigate = onNavigate;
     this.container = document.createElement('div');
     this.container.className = 'vl02n-view';
-    this.selectedDeliveryNumber = initialParams.deliveryNumber || '';
+    this.selectedDeliveryNumber = '';
     this.loadedDelivery = null;
     this.currentScenarioId = null;
   }
@@ -27,9 +28,8 @@ export class Vl02nViewComponent {
   }
 
   setParams(params = {}) {
-    if (params.deliveryNumber) {
-      this.selectedDeliveryNumber = params.deliveryNumber;
-    }
+    // Não pré-preenche automaticamente a remessa por navegação, cumprindo o princípio
+    // DADO FORNECIDO NO CHAMADO ≠ DADO PREENCHIDO NA TELA.
     this.render();
   }
 
@@ -41,23 +41,17 @@ export class Vl02nViewComponent {
       this.currentScenarioId = activeScenarioId;
     }
 
-    if (scenario) {
-      scenarioEngine.completeObjective('access_vl02n');
-    }
-
-    const allDeliveries = db.getAllDeliveries();
     if (this.selectedDeliveryNumber) {
       this.loadedDelivery = db.getDelivery(this.selectedDeliveryNumber);
-    } else if (allDeliveries.length > 0 && !this.loadedDelivery) {
-      this.loadedDelivery = allDeliveries[allDeliveries.length - 1];
-      this.selectedDeliveryNumber = this.loadedDelivery.deliveryNumber;
+    } else {
+      this.loadedDelivery = null;
     }
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
         <div class="transaction-title-group">
           <span class="transaction-tcode-badge">VL02N</span>
-          <div>
+          <div class="transaction-title-text-block">
             <div class="transaction-title">Modificar Fornecimento: Picking & Saída de Mercadorias (PGI)</div>
             <div class="text-xs text-muted">Separação Física, Movimento MM 601 e Baixa Contábil de Estoque • Tabela LIKP / LIPS</div>
           </div>
@@ -86,16 +80,7 @@ export class Vl02nViewComponent {
           <div style="grid-column: span 2;">
             <label class="form-label">Número da Remessa / Fornecimento (Outbound Delivery):</label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" class="erp-input font-mono font-bold" id="vl02n-delivery-input" 
-                placeholder="Ex: 80000001" value="${this.selectedDeliveryNumber}" style="flex: 1;">
-              <select class="erp-select font-mono text-xs" id="vl02n-delivery-quick-select" style="max-width: 260px;">
-                <option value="">-- Selecionar Remessa --</option>
-                ${allDeliveries.map(d => `
-                  <option value="${d.deliveryNumber}" ${d.deliveryNumber === this.selectedDeliveryNumber ? 'selected' : ''}>
-                    Remessa ${d.deliveryNumber} • Ordem ${d.salesOrderNumber} (${d.status})
-                  </option>
-                `).join('')}
-              </select>
+              <input type="text" class="erp-input font-mono font-bold" id="vl02n-delivery-input" placeholder="Ex: 80000001" value="${this.selectedDeliveryNumber || ''}" style="flex: 1; text-transform: uppercase;">
             </div>
           </div>
 
@@ -131,16 +116,25 @@ export class Vl02nViewComponent {
               </div>
             </div>
             <div>
-              <div class="text-xs text-muted">Ponto de Expedição:</div>
-              <div class="font-mono text-sm font-bold">${this.loadedDelivery.shippingPoint} - CD Central SP</div>
+              <div class="text-xs text-muted">Destino / Local de Entrega:</div>
+              <div class="font-mono text-sm font-semibold text-primary">
+                ${(() => {
+                  const cust = db.getCustomer(this.loadedDelivery.customerId);
+                  const city = cust?.city ? `${cust.city}/${cust.state || 'BR'}` : 'Conforme Cadastro';
+                  const shipTo = cust?.partners?.shipToParty?.name || '';
+                  return shipTo ? `${city} • ${shipTo}` : city;
+                })()}
+              </div>
             </div>
             <div>
-              <div class="text-xs text-muted">Data Planejada de Saída:</div>
-              <div class="font-mono text-sm">${new Date(this.loadedDelivery.deliveryDate).toLocaleDateString('pt-BR')}</div>
+              <div class="text-xs text-muted">Ponto de Expedição (Origem):</div>
+              <div class="font-mono text-sm font-bold">${CompanyStructure.getShippingPointName(this.loadedDelivery.shippingPoint)}</div>
             </div>
             <div>
-              <div class="text-xs text-muted">Peso Total da Carga:</div>
-              <div class="font-mono text-sm font-bold text-primary">${this.loadedDelivery.totalWeightKg.toFixed(1)} Kg</div>
+              <div class="text-xs text-muted">Data Planejada / Peso Total:</div>
+              <div class="font-mono text-sm font-bold text-primary">
+                ${new Date(this.loadedDelivery.deliveryDate).toLocaleDateString('pt-BR')} • ${this.loadedDelivery.totalWeightKg.toFixed(1)} Kg
+              </div>
             </div>
           </div>
 
@@ -204,11 +198,11 @@ export class Vl02nViewComponent {
           </div>
 
           <!-- Barra de Ações: PGI (Post Goods Issue) -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <div class="text-xs text-muted">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; padding: 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <div class="text-xs text-muted" style="flex: 1 1 260px; min-width: 0;">
               Ao registrar a Saída de Mercadorias (PGI), o estoque físico é baixado no depósito (Mov. 601) e a remessa é concluída.
             </div>
-            <div style="display: flex; gap: 12px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
               <button class="btn btn-primary" id="btn-post-goods-issue" 
                 style="padding: 10px 24px; font-weight: 700; background: ${this.loadedDelivery.status === 'COMPLETED' ? '#64748b' : 'var(--erp-green-success)'}; border-color: ${this.loadedDelivery.status === 'COMPLETED' ? '#64748b' : 'var(--erp-green-success)'};"
                 ${this.loadedDelivery.status === 'COMPLETED' ? 'disabled' : ''}>
@@ -244,52 +238,80 @@ export class Vl02nViewComponent {
   }
 
   bindEvents() {
-    // 1. Carregar Remessa
+    // 1. Carregar Remessa & Tecla Enter
     const btnLoad = this.container.querySelector('#btn-load-delivery');
+    const delInput = this.container.querySelector('#vl02n-delivery-input');
+
+    const executeLoadDelivery = () => {
+      this.selectedDeliveryNumber = delInput ? delInput.value.trim() : '';
+
+      if (!this.selectedDeliveryNumber) {
+        diagnosticModal.show({
+          isValid: false,
+          mentorSpeech: 'Atenção: Informe o número da Remessa (Outbound Delivery) para carregar o documento.',
+          whatHappened: 'Nenhum número de remessa digitado.',
+          why: 'A transação VL02N necessita do identificador do fornecimento.',
+          businessImpact: 'Impossível localizar os itens para conferência de picking.'
+        });
+        return;
+      }
+
+      const del = db.getDelivery(this.selectedDeliveryNumber);
+      if (!del) {
+        diagnosticModal.show({
+          isValid: false,
+          mentorSpeech: `Atenção: A Remessa nº ${this.selectedDeliveryNumber} não foi encontrada. Crie o fornecimento na VL01N antes de tentar modificá-lo.`,
+          whatHappened: `Remessa ${this.selectedDeliveryNumber} inexistente.`,
+          why: 'O documento precisa ter sido criado previamente a partir de uma ordem de venda.',
+          businessImpact: 'Sem documento de remessa, não há expedição autorizada.'
+        });
+        return;
+      }
+
+      this.loadedDelivery = del;
+
+      // Validação de objetivo somente após ação de carga bem-sucedida do documento correto
+      const scenario = scenarioEngine.getActiveScenario();
+      if (scenario) {
+        const targetDoc = scenario.targetCriteria?.targetDocNumber;
+        if (!targetDoc || del.salesOrderNumber === targetDoc || del.deliveryNumber === targetDoc) {
+          scenarioEngine.completeObjective('access_vl02n');
+        }
+      }
+
+      this.render();
+    };
+
     if (btnLoad) {
-      btnLoad.addEventListener('click', () => {
-        const delInput = this.container.querySelector('#vl02n-delivery-input');
-        this.selectedDeliveryNumber = delInput ? delInput.value.trim() : '';
-
-        if (!this.selectedDeliveryNumber) {
-          diagnosticModal.show({
-            isValid: false,
-            mentorSpeech: 'Atenção: Informe o número da Remessa (Outbound Delivery) para carregar o documento.',
-            whatHappened: 'Nenhum número de remessa digitado.',
-            why: 'A transação VL02N necessita do identificador do fornecimento.',
-            businessImpact: 'Impossível localizar os itens para conferência de picking.'
-          });
-          return;
+      btnLoad.addEventListener('click', executeLoadDelivery);
+    }
+    if (delInput) {
+      delInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          executeLoadDelivery();
         }
+      });
+    }
 
-        const del = db.getDelivery(this.selectedDeliveryNumber);
-        if (!del) {
-          diagnosticModal.show({
-            isValid: false,
-            mentorSpeech: `Atenção: A Remessa nº ${this.selectedDeliveryNumber} não foi encontrada. Crie o fornecimento na VL01N antes de tentar modificá-lo.`,
-            whatHappened: `Remessa ${this.selectedDeliveryNumber} inexistente.`,
-            why: 'O documento precisa ter sido criado previamente a partir de uma ordem de venda.',
-            businessImpact: 'Sem documento de remessa, não há expedição autorizada.'
-          });
-          return;
+    // 2. Edição Manual de Quantidade no Picking
+    this.container.querySelectorAll('.input-pick-qty').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        const val = parseFloat(e.target.value) || 0;
+        if (this.loadedDelivery && this.loadedDelivery.items[idx]) {
+          this.loadedDelivery.items[idx].pickedQuantity = Math.max(0, Math.min(this.loadedDelivery.items[idx].deliveryQuantity, val));
+          const allDone = this.loadedDelivery.items.every(it => (it.pickedQuantity || 0) >= it.deliveryQuantity);
+          this.loadedDelivery.pickingStatus = allDone ? 'COMPLETED' : 'PENDING';
+          if (allDone) {
+            scenarioEngine.completeObjective('confirm_picking');
+          }
         }
-
-        this.loadedDelivery = del;
+      });
+      inp.addEventListener('change', () => {
         this.render();
       });
-    }
-
-    // 2. Quick select de remessas
-    const quickSel = this.container.querySelector('#vl02n-delivery-quick-select');
-    if (quickSel) {
-      quickSel.addEventListener('change', (e) => {
-        if (e.target.value) {
-          this.selectedDeliveryNumber = e.target.value;
-          this.loadedDelivery = db.getDelivery(e.target.value);
-          this.render();
-        }
-      });
-    }
+    });
 
     // 3. Botão Auto-Pick (Copiar Qtd)
     const btnAutoPick = this.container.querySelector('#btn-auto-pick');
@@ -309,16 +331,36 @@ export class Vl02nViewComponent {
     const btnPgi = this.container.querySelector('#btn-post-goods-issue');
     if (btnPgi && this.loadedDelivery) {
       btnPgi.addEventListener('click', () => {
+        // P2: Desabilita imediatamente para evitar duplo-clique enquanto modal está aberto
+        btnPgi.disabled = true;
+
+        const activeScenario = scenarioEngine.getActiveScenario();
+        const pgiTargetDoc = activeScenario?.targetCriteria?.targetDocNumber;
+        if (pgiTargetDoc && this.loadedDelivery.salesOrderNumber !== pgiTargetDoc) {
+          btnPgi.disabled = false;
+          const validation = scenarioEngine.validatePostGoodsIssue(this.loadedDelivery.deliveryNumber, this.loadedDelivery);
+          diagnosticModal.show({
+            isValid: false,
+            mentorSpeech: validation.mentorSpeech,
+            whatHappened: validation.whatHappened,
+            why: validation.why,
+            businessImpact: validation.businessImpact,
+            onConfirm: () => this.render()
+          });
+          return;
+        }
         // Executa PGI no banco
         const result = db.postGoodsIssue(this.loadedDelivery.deliveryNumber);
 
         if (!result.success) {
+          btnPgi.disabled = false;
           diagnosticModal.show({
             isValid: false,
             mentorSpeech: `Atenção: Falha ao registrar Saída de Mercadorias. Motivo: ${result.error}`,
             whatHappened: result.error,
             why: 'O sistema bloqueou a baixa por duplicidade ou inconsistência no documento.',
-            businessImpact: 'A baixa de estoque não foi processada.'
+            businessImpact: 'A baixa de estoque não foi processada.',
+            onConfirm: () => { this.render(); }
           });
           return;
         }
@@ -332,12 +374,32 @@ export class Vl02nViewComponent {
 
         diagnosticModal.show({
           isValid: validation.isValid,
+          operationSummary: validation.isValid ? {
+            title: 'Saída de Mercadorias (PGI) Contabilizada',
+            docTypeBadge: 'LIKP / MKPF • Movimento MM 601',
+            primaryLabel: 'Nº da Remessa Atualizada:',
+            primaryNumber: this.loadedDelivery.deliveryNumber,
+            secondaryLabel: 'Doc. Material MM (Mov. 601):',
+            secondaryNumber: result.materialDocNumber || 'Contabilizado',
+            statusText: 'Baixa de Estoque Concluída (COMPLETED)',
+            referenceDoc: `Ordem Vinculada: ${Formatters.documentNumber(this.loadedDelivery.salesOrderNumber)}`,
+            inspectLabel: `Inspecionar Remessa [${this.loadedDelivery.deliveryNumber}] em VL03N`
+          } : null,
           mentorSpeech: validation.mentorSpeech,
           whatHappened: validation.whatHappened,
           why: validation.why,
           businessImpact: validation.businessImpact,
           onConfirm: () => {
-            this.render();
+            const scenario = scenarioEngine.getActiveScenario();
+            const action = scenario?.targetCriteria?.action;
+            if (action === 'CREATE_INVOICE' || action === 'FULL_O2C') {
+              this.onNavigate('VF01', { deliveryNumber: this.loadedDelivery.deliveryNumber });
+            } else {
+              this.render();
+            }
+          },
+          onInspect: () => {
+            this.onNavigate('VL03N', { deliveryNumber: this.loadedDelivery.deliveryNumber });
           }
         });
       });

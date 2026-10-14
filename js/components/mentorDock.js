@@ -141,16 +141,16 @@ export class MentorDockComponent {
     else if (remainingSeconds < 300) slaClass = 'sla-warning';
 
     this.container.innerHTML = `
-      <!-- Cabeçalho do Mentor Sr. Wilson -->
+      <!-- Cabeçalho do Mentor Chefe Wilson -->
       <div class="mentor-dock-header">
         <div class="mentor-profile">
-          <div class="mentor-avatar" style="background: linear-gradient(135deg, #0265dc 0%, #1e40af 100%);">
-            SW
-            <span class="mentor-status-online" title="Sr. Wilson está online"></span>
+          <div class="mentor-avatar">
+            <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson" class="mentor-avatar-img" />
+            <span class="mentor-status-online" title="Chefe Wilson está online"></span>
           </div>
           <div class="mentor-info">
-            <span class="mentor-name">Sr. Wilson</span>
-            <span class="mentor-role">Coordenador Comercial | Mentor SD</span>
+            <span class="mentor-name">Chefe Wilson</span>
+            <span class="mentor-role">Mentor SAP</span>
           </div>
         </div>
         <button id="mentor-collapse-btn" class="mentor-toggle-btn" title="Recolher Painel">
@@ -238,6 +238,12 @@ export class MentorDockComponent {
           </div>
         ` : ''}
 
+        ${doc && scenario.objectives.some(objective => ['analyze_po', 'process_demand'].includes(objective.id) && !objective.done) ? `
+          <button id="btn-confirm-po-analysis" class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 8px;">
+            Confirmar análise do pedido de compra
+          </button>
+        ` : ''}
+
         <!-- Orientação e Fala do Supervisor Sr. Wilson -->
         <div class="mentor-speech-bubble ${
           this.speechType === 'HELP' ? 'speech-help' :
@@ -252,7 +258,7 @@ export class MentorDockComponent {
                 this.speechType === 'WARN' ? Icons.alertTriangle :
                 this.speechType === 'HELP' ? Icons.info :
                 Icons.lightbulb
-              } Fala do Sr. Wilson (Supervisor):
+              } Orientação do Chefe Wilson:
             </span>
             ${
               this.speechType === 'HELP' ? `<span class="erp-badge erp-badge-primary text-xs font-mono">AJUDA ATIVA</span>` :
@@ -267,7 +273,7 @@ export class MentorDockComponent {
 
           <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--erp-border-subtle); padding-top: 8px; margin-top: 6px;">
             <button id="btn-request-mentor-help" class="btn btn-secondary btn-xs" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600;" title="Consultar orientação do supervisor sem penalidade de XP">
-              ${Icons.lightbulb} Pedir Ajuda ao Sr. Wilson
+              ${Icons.lightbulb} Pedir Ajuda ao Chefe Wilson
             </button>
             ${this.speechType !== 'DEFAULT' ? `
               <button id="btn-reset-mentor-speech" class="btn btn-secondary btn-xs" style="width: 100%; font-size: 11px; color: var(--erp-text-muted); background: transparent; border: none;" title="Retornar à dica inicial da atividade">
@@ -376,6 +382,21 @@ export class MentorDockComponent {
         if (scenario) {
           const helpText = `Olá, trainee! Estou acompanhando sua atividade.\n\n${scenario.mentorInitialTip}\n\n💡 Dica do Supervisor: Você também pode consultar a aba "Guia SAP" no topo deste painel para entender os conceitos de negócio e tabelas envolvidas nesta transação.`;
           this.setMentorSpeech(helpText, 'HELP');
+        }
+      });
+    }
+
+    const poAnalysisBtn = this.container.querySelector('#btn-confirm-po-analysis');
+    if (poAnalysisBtn) {
+      poAnalysisBtn.addEventListener('click', () => {
+        const scenario = scenarioEngine.getActiveScenario();
+        const poNumber = scenario?.purchaseOrderDocument?.poNumber;
+        const result = scenarioEngine.validatePurchaseOrderAnalysis(poNumber);
+        if (result.isValid) {
+          this.setMentorSpeech(`Pedido de compra ${poNumber} analisado. Confira as metas restantes para seguir.`, 'SUCCESS');
+          this.render();
+        } else {
+          this.setMentorSpeech(result.mentorSpeech, 'WARN');
         }
       });
     }

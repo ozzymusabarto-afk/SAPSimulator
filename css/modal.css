@@ -201,3 +201,92 @@
   border-color: var(--erp-blue-primary);
   transform: scale(1.1);
 }
+
+/* ==========================================================================
+   Ficha de Retorno Operacional do Sistema ERP (Mandante 800)
+   ========================================================================== */
+.erp-operation-summary-card {
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-left: 5px solid #16a34a;
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.operation-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.operation-summary-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.operation-summary-icon {
+  color: #16a34a;
+  font-size: 16px;
+  display: inline-flex;
+}
+
+.operation-summary-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.operation-summary-primary-box {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 14px;
+  min-width: 150px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.operation-summary-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d4ed8;
+  letter-spacing: 0.5px;
+}
+
+.operation-summary-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.operation-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.detail-label {
+  color: #64748b;
+  font-weight: 500;
+  min-width: 90px;
+}
+
+.detail-value {
+  color: #0f172a;
+}

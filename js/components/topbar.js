@@ -5,6 +5,7 @@
 
 import { Icons } from '../utils/icons.js';
 import { trainee } from '../core/engine/traineeEngine.js';
+import { authService } from '../core/auth/authService.js';
 
 export class TopbarComponent {
   constructor(onNavigate) {
@@ -12,81 +13,72 @@ export class TopbarComponent {
     this.container = document.createElement('header');
     this.container.className = 'erp-topbar';
     
-    // Inscreve para atualizações de XP e Nível
+    // Inscreve para atualizações de XP, Nível e Autenticação
     trainee.subscribe(() => this.render());
+    authService.onAuthStateChanged(() => this.render());
   }
 
   render() {
     const profile = trainee.getProfile();
     const levelInfo = trainee.getCurrentLevelInfo();
+    const currentUser = authService.getCurrentUser();
+    const displayName = currentUser ? currentUser.name : profile.name;
+    const displayInitial = (displayName || 'T').charAt(0).toUpperCase();
 
     this.container.innerHTML = `
-      <!-- Brand & Identidade Corporativa -->
-      <div class="erp-brand-container">
-        <div class="erp-brand-logo">N</div>
-        <div class="erp-brand-info">
-          <div class="erp-brand-title">
-            NexusTech ERP
-            <span class="erp-badge erp-badge-sap text-xs">Simulador SD</span>
-          </div>
-          <div class="erp-brand-subtitle">Ambiente Educacional de Treinamento Comercial</div>
-        </div>
+      <!-- Left: Contexto do Sistema e Retorno ao Início em Modo Missão -->
+      <div class="erp-topbar-left">
+        <button class="topbar-mobile-menu-btn" id="topbar-mobile-menu-btn" title="Abrir Menu de Navegação" aria-label="Abrir Menu">
+          ${Icons.menu}
+        </button>
+        <button class="topbar-home-btn" id="topbar-home-btn" title="Voltar ao Início / Dashboard">
+          ${Icons.home} <span class="topbar-home-btn-text">Início</span>
+        </button>
+        <span class="erp-badge erp-badge-sap text-xs font-mono">PRD-SD01 • Mandante 800</span>
+        <span class="topbar-context-title" id="topbar-brand-title" title="Ir para o Início">Nexus ERP Lab • SD Practice Environment</span>
       </div>
 
-      <!-- Barra de Comandos / T-Codes (OK-Code) -->
+      <!-- Center: Barra de Comandos / T-Codes (OK-Code) -->
       <div class="erp-command-bar">
         <span class="erp-tcode-prefix">/n</span>
         <input 
           type="text" 
           id="tcode-input" 
           class="erp-tcode-input" 
-          placeholder="Digitar transação (ex: VA01, XD03, MM03, VKM1)" 
+          placeholder="Digitar transação ou buscar (ex: VA01, XD03, MM03, VKM1)"
           autocomplete="off" 
           spellcheck="false"
         />
         <button id="tcode-submit-btn" class="erp-tcode-btn" title="Executar Transação (Enter)">
-          ${Icons.play} Executar
+          ${Icons.play} <span class="tcode-btn-text">Executar</span>
         </button>
       </div>
 
-      <!-- Atalhos Rápidos & Trainee HUD -->
-      <div class="erp-trainee-hud">
-        <!-- Botões de Navegação Rápida -->
-        <div class="erp-quick-nav">
-          <button class="erp-nav-btn" data-route="DASHBOARD" title="Visão Geral & Central de Chamados">
-            ${Icons.layers} Início
-          </button>
-          <button class="erp-nav-btn" data-route="VA01" title="Criar Ordem de Venda">
-            ${Icons.fileText} VA01
-          </button>
-          <button class="erp-nav-btn" data-route="XD03" title="Consultar Clientes">
-            ${Icons.users} XD03
-          </button>
-          <button class="erp-nav-btn" data-route="MM03" title="Consultar Materiais & Estoque">
-            ${Icons.package} MM03
-          </button>
-          <button class="erp-nav-btn" data-route="VKM1" title="Liberação de Crédito Comercial">
-            ${Icons.shieldAlert} VKM1
-          </button>
+      <!-- Right: Notificações, Chip do Trainee & Logout -->
+      <div class="erp-topbar-right">
+        <!-- Ícone de Notificações -->
+        <button class="topbar-icon-btn" id="topbar-notif-btn" title="Notificações do Sistema">
+          ${Icons.bell}
+          <span class="topbar-notif-badge"></span>
+        </button>
+
+        <!-- Chip de Perfil do Trainee -->
+        <div class="topbar-trainee-chip" id="trainee-profile-trigger" title="Ir para Painel Principal">
+          <div class="topbar-trainee-avatar">${displayInitial}</div>
+          <div class="topbar-trainee-info">
+            <span class="topbar-trainee-name">${displayName}</span>
+            <span class="topbar-trainee-status">Nível ${levelInfo.level} • Trainee</span>
+          </div>
         </div>
 
-        <!-- Perfil do Trainee & Barra de XP -->
-        <div class="erp-trainee-level-badge" id="trainee-profile-trigger" title="Clique para ver o Painel de Carreira">
-          <div class="erp-trainee-avatar">${levelInfo.level}</div>
-          <div class="erp-trainee-meta">
-            <span class="erp-trainee-name">${profile.name}</span>
-            <span class="erp-trainee-role">${profile.role}</span>
-          </div>
-          <div class="erp-xp-bar-container">
-            <div class="erp-xp-label">
-              <span>XP</span>
-              <span>${profile.xp} / ${levelInfo.nextMinXp}</span>
-            </div>
-            <div class="erp-xp-track">
-              <div class="erp-xp-fill" style="width: ${levelInfo.progressPercent}%;"></div>
-            </div>
-          </div>
-        </div>
+        <!-- Botão de Logout -->
+        <button class="topbar-icon-btn" id="topbar-logout-btn" title="Encerrar Sessão / Logout" aria-label="Sair">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
       </div>
     `;
 
@@ -119,32 +111,62 @@ export class TopbarComponent {
       submitBtn.addEventListener('click', handleExecuteTCode);
     }
 
-    // Atalhos de botões rápidos
-    this.container.querySelectorAll('.erp-nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const route = btn.getAttribute('data-route');
-        if (route) this.onNavigate(route);
+    // Botão de Menu Hambúrguer Mobile (Drawer)
+    const mobileMenuBtn = this.container.querySelector('#topbar-mobile-menu-btn');
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        if (window.app && window.app.sidebar && typeof window.app.sidebar.toggleMobileDrawer === 'function') {
+          window.app.sidebar.toggleMobileDrawer();
+        }
       });
-    });
+    }
 
-    // Clique no perfil para ir ao Dashboard de Carreira
+    // Clique para voltar ao Dashboard no modo missão
+    const homeBtn = this.container.querySelector('#topbar-home-btn');
+    if (homeBtn) {
+      homeBtn.addEventListener('click', () => {
+        this.onNavigate('DASHBOARD');
+      });
+    }
+
+    const brandTitle = this.container.querySelector('#topbar-brand-title');
+    if (brandTitle) {
+      brandTitle.addEventListener('click', () => {
+        this.onNavigate('DASHBOARD');
+      });
+    }
+
+    // Clique no perfil para ir ao Dashboard
     const profileBadge = this.container.querySelector('#trainee-profile-trigger');
     if (profileBadge) {
       profileBadge.addEventListener('click', () => {
         this.onNavigate('DASHBOARD');
       });
     }
+
+    // Notificações
+    const notifBtn = this.container.querySelector('#topbar-notif-btn');
+    if (notifBtn) {
+      notifBtn.addEventListener('click', () => {
+        const profile = trainee.getProfile();
+        const lastAction = profile.auditLog[0];
+        const msg = lastAction ? `Última ação: ${lastAction.action} (${lastAction.description})` : 'Nenhuma notificação recente pendente.';
+        alert(`Central de Notificações:\n\n${msg}`);
+      });
+    }
+
+    // Botão de Logout
+    const logoutBtn = this.container.querySelector('#topbar-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.onNavigate('LOGOUT');
+      });
+    }
   }
 
   setActiveRoute(tcode) {
-    this.container.querySelectorAll('.erp-nav-btn').forEach(btn => {
-      const r = btn.getAttribute('data-route');
-      if (r === tcode) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
+    // Topbar agora é focada em comando e perfil; estado é gerenciado centralmente
   }
 
   getElement() {
