@@ -2,6 +2,8 @@
 
 O Nexus ERP Lab é um **simulador independente de rotina profissional** para quem já fez academia, treinamento ou teve contato inicial com SAP SD e precisa colocar o conhecimento em prática. A pessoa entra como trainee em uma empresa fictícia, recebe solicitações comerciais, consulta dados, toma decisões, lida com exceções e observa o impacto operacional das suas ações.
 
+**Referência de reciclagem:** o laboratório adota **SAP S/4HANA como linha principal**, com uma experiência inspirada em aplicações empresariais modernas e no padrão de trabalho do Fiori. ECC/ERP clássico aparece como comparação histórica, não como referência principal. Consulte [docs/S4HANA-REFERENCE.md](docs/S4HANA-REFERENCE.md).
+
 > **Não é uma academia nem um curso de SAP.** É um ambiente de prática para construir repertório e confiança antes da primeira oportunidade — sem prometer experiência profissional real, certificação ou aprovação em processo seletivo.
 
 > **Aviso importante:** o Nexus ERP Lab não é produzido, patrocinado, administrado, afiliado ou endossado pela SAP SE ou pelo grupo SAP. SAP, SAP S/4HANA, SAP SD, nomes de transações e terminologia relacionada são referências nominativas de contexto. Leia [LEGAL-NOTICE.md](LEGAL-NOTICE.md).
@@ -28,7 +30,7 @@ As 50 missões atuais são a base homologada do Trainee. O catálogo já possui 
 
 - Receber e interpretar uma solicitação comercial.
 - Consultar dados de cliente, material, preço, disponibilidade e crédito.
-- Executar decisões nos fluxos simulados `XD03 → VA01/VA02/VA03 → MM03/VK11/VKM1 → VL01N/VL02N → VF01/VF03`.
+- Executar decisões nos fluxos simulados S/4HANA de parceiro, ordem, preço, disponibilidade, crédito, entrega e faturamento. Os caminhos ECC clássicos, como `XD03`, `VKM1` e `MM03`, aparecem como comparação quando forem úteis.
 - Investigar bloqueios e exceções.
 - Trabalhar com prioridade e SLA em desafios.
 - Registrar o impacto de uma decisão no atendimento, estoque, expedição, margem ou faturamento.

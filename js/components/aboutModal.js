@@ -64,7 +64,7 @@ export class AboutModalComponent {
               O Nexus possui identidade visual própria, mas algumas telas, campos e sequências operacionais são deliberadamente próximas da lógica encontrada em ambientes ERP profissionais.
             </p>
             <p style="margin: 0 0 8px 0;">
-              Isso acontece porque o objetivo é praticar o processo, e não apenas responder perguntas. A experiência não pretende reproduzir visualmente o SAP Fiori nem representar o software SAP real.
+              Isso acontece porque o objetivo é praticar o processo, e não apenas responder perguntas. A experiência tem uma direção visual inspirada em aplicações empresariais modernas e no padrão Fiori-like, mas não reproduz o SAP Fiori nem representa o software SAP real.
             </p>
             <p style="margin: 0;">
               O que deve ser aprendido é o processo, o raciocínio e a identificação das informações necessárias — não a memorização da posição exata de cada botão.

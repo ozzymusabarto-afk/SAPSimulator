@@ -8,6 +8,10 @@ O **Trainee** é a porta de entrada gratuita. O produto evolui por competência,
 - Júnior Pro: preço, ATP, crédito, remessa, PGI, faturamento e desafios com SLA.
 - Pleno Pro: casos O2C completos, exceções, análise de causa-raiz, decisões de alçada, relatórios e trilhas avançadas.
 
+### Linha de referência funcional
+
+O conteúdo novo será revisado prioritariamente sob a ótica de **SAP S/4HANA**, com experiência visual inspirada em Fiori-like e comparação explícita com ECC/ERP clássico quando isso ajudar na reciclagem. Os códigos e regras da NexusTech serão tratados como customizing fictício, não como padrão universal. A matriz completa está em `docs/S4HANA-REFERENCE.md`.
+
 ## Arquitetura necessária para venda
 
 ### Frontend

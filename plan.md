@@ -6,6 +6,8 @@ O Nexus ERP Lab não é uma academia, curso ou material oficial SAP. É um **lab
 
 A promessa passa a ser: **“Você estudou. Agora pratique como se estivesse no expediente.”** O simulador ajuda a transformar conhecimento teórico em repertório operacional, sem prometer certificação, experiência profissional real ou equivalência a um emprego.
 
+A referência tecnológica principal será **SAP S/4HANA**, com interface inspirada em aplicações Fiori-like e uma nota comparativa para ECC/ERP clássico. Isso atende à necessidade de reciclagem do criador e evita perpetuar uma experiência baseada apenas na academia de 2013. A simulação sempre separará conceito S/4HANA, customizing fictício da NexusTech e simplificação pedagógica. A decisão está detalhada em `docs/S4HANA-REFERENCE.md`.
+
 ## Carreira simulada
 
 A jornada é uma experiência narrativa de contratação e evolução:
@@ -39,3 +41,4 @@ A comunicação deve declarar que o produto é independente, não é produzido, 
 - `js/components/welcomeModal.js`: onboarding do primeiro expediente.
 - `js/components/transactions/dashboardView.js`: painel de expediente e próxima ação.
 - `README.md`, `SECURITY.md`, `docs/SAAS-ROADMAP.md`: escopo, avisos e evolução futura.
+- `docs/S4HANA-REFERENCE.md`: linha de referência S/4HANA e comparação com ECC/ERP clássico.
