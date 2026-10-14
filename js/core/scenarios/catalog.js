@@ -3665,3 +3665,14 @@ export const ScenarioCatalog = [
   }
 ];
 
+// Metadados de catálogo ficam separados do conteúdo narrativo para permitir
+// adicionar blocos Júnior/Pleno sem reescrever o motor de execução.
+ScenarioCatalog.forEach((scenario, index) => {
+  scenario.stageId ||= 'TRAINEE';
+  scenario.careerTrack ||= 'PRÁTICA OPERACIONAL';
+  scenario.difficulty ||= scenario.mode === 'CHALLENGE'
+    ? 'EXCEÇÃO'
+    : (index < 5 ? 'INTRODUTÓRIA' : 'OPERACIONAL');
+  scenario.sequenceGroup ||= scenario.targetCriteria?.action || 'PROCESSO_SD';
+  scenario.isOfficialCycleMission ??= true;
+});

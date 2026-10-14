@@ -1,29 +1,38 @@
-# Nexus ERP Lab • Simulador Educacional SAP SD
+# Nexus ERP Lab • Laboratório de Prática Profissional SAP SD
 
-O Nexus ERP Lab é um simulador web de treinamento prático em **Vendas e Distribuição (SAP SD)**. Ele usa cenários de negócio, transações, feedback do Chefe Wilson, competências, tentativas e progresso para ensinar o fluxo Order-to-Cash.
+O Nexus ERP Lab é um **simulador independente de rotina profissional** para quem já fez academia, treinamento ou teve contato inicial com SAP SD e precisa colocar o conhecimento em prática. A pessoa entra como trainee em uma empresa fictícia, recebe solicitações comerciais, consulta dados, toma decisões, lida com exceções e observa o impacto operacional das suas ações.
 
-> **Estado atual:** protótipo/MVP educacional com autenticação mock local. Não usar para dados reais, cobrança, informações de clientes ou controle de acesso comercial.
+> **Não é uma academia nem um curso de SAP.** É um ambiente de prática para construir repertório e confiança antes da primeira oportunidade — sem prometer experiência profissional real, certificação ou aprovação em processo seletivo.
 
-## Produto e progressão
+> **Aviso importante:** o Nexus ERP Lab não é produzido, patrocinado, administrado, afiliado ou endossado pela SAP SE ou pelo grupo SAP. SAP, SAP S/4HANA, SAP SD, nomes de transações e terminologia relacionada são referências nominativas de contexto. Leia [LEGAL-NOTICE.md](LEGAL-NOTICE.md).
 
-O **Trainee** é a experiência gratuita de entrada. A evolução planejada é:
+## A experiência simulada
 
-| Nível | Proposta |
-|---|---|
-| Trainee | Fundamentos, primeiro ciclo guiado e missões introdutórias gratuitas |
-| Júnior Pro | Preço, ATP, crédito, remessa, PGI, faturamento e desafios com SLA |
-| Pleno Pro | Ciclos O2C completos, exceções, análise de causa-raiz, alçada e relatórios |
+O usuário começa no primeiro expediente como **Trainee de Operações SD**. O Chefe Wilson apresenta a empresa, entrega chamados e acompanha a evolução. Depois da avaliação de prontidão, pode ocorrer uma promoção narrativa para **Analista SAP SD Júnior**; mais adiante, a jornada pode evoluir para **Analista SAP SD Pleno**.
 
-A versão atual contém **50 missões** distribuídas em pilares de dados mestres, ordens, preço, ATP, crédito, expedição e faturamento. O catálogo e o script `npm run audit:missions` são a fonte operacional da contagem.
+Aqui usamos “analista” para representar a rotina interna de operação, suporte e melhoria contínua da empresa fictícia. “Consultor” não é tratado como sinônimo: uma futura trilha de consultoria envolveria implantação, levantamento com cliente, configuração e projetos.
 
-## Diferenciais
+## Ciclo Trainee
 
-- Processo comercial ponta a ponta: `XD03 → VA01 → MM03 → VK11 → VKM1 → VL01N/VL02N → VF01/VF03`.
-- Modo treinamento com orientação e Modo Desafio com SLA.
-- Diagnóstico estruturado: o que ocorreu, por que ocorreu e qual impacto no negócio.
-- Hub de prática para repetir cenários sem conceder XP vitalício novamente.
-- Mapa de competências, jornada, ranking, bônus, progresso e histórico.
-- Interface corporativa com command bar, stepper, sidebar, PWA e deploy para GitHub Pages.
+O primeiro ciclo tem **50 missões oficiais**. Esse número é adequado como ciclo de entrada porque cobre o fluxo Order-to-Cash sem obrigar o usuário a repetir uma sequência fixa. As missões são selecionadas por um motor pseudoaleatório determinístico, que evita repetir a mesma ação ou dificuldade em sequência e permite retomar o expediente após recarregar a página.
+
+As 50 missões atuais são a base homologada do Trainee. O catálogo já possui metadados de estágio, dificuldade, grupo de processo e trilha de carreira para receber novos blocos sem reescrever o motor. A expansão deve acontecer por qualidade e variedade, não por cópias superficiais:
+
+| Fase | Foco | Estado |
+|---|---|---|
+| Trainee | Rotina assistida, consultas, pedidos, preço, ATP, crédito, remessa e faturamento | 50 missões oficiais |
+| Analista Júnior | Autonomia parcial, priorização, exceções e comunicação operacional | Motor preparado; conteúdo em expansão |
+| Analista Pleno | Causa-raiz, governança, alçada, incidentes O2C e apoio ao time | Motor preparado; conteúdo futuro |
+
+## O que o simulador pratica
+
+- Receber e interpretar uma solicitação comercial.
+- Consultar dados de cliente, material, preço, disponibilidade e crédito.
+- Executar decisões nos fluxos simulados `XD03 → VA01/VA02/VA03 → MM03/VK11/VKM1 → VL01N/VL02N → VF01/VF03`.
+- Investigar bloqueios e exceções.
+- Trabalhar com prioridade e SLA em desafios.
+- Registrar o impacto de uma decisão no atendimento, estoque, expedição, margem ou faturamento.
+- Refazer uma atividade em ambiente seguro, sem alterar uma empresa real.
 
 ## Como executar
 
@@ -34,36 +43,21 @@ npm ci
 npm run dev
 ```
 
-Abra o endereço informado pelo Vite. Para validar uma build de produção:
+Para validar a build e o catálogo:
 
 ```bash
 npm run build
-npm run preview
-```
-
-Para validar a integridade das missões:
-
-```bash
 npm run audit:missions
 ```
 
-O acesso rápido de desenvolvimento existe somente durante `npm run dev`. Em uma build pública, ele não é renderizado.
+O resultado esperado do catálogo atual é `50/50 aprovadas`. O acesso rápido de desenvolvimento só aparece durante `npm run dev` e nunca deve ser usado como autenticação de produção.
 
-## Segurança
+## Escopo e segurança
 
-A autenticação atual é um **mock de desenvolvimento baseado em armazenamento local**. Hash local, role no navegador e entitlement local não constituem segurança. O projeto ainda não está pronto para vender planos ou guardar dados de usuários reais.
+A autenticação atual é um **mock local** baseado em armazenamento do navegador. Isso é suficiente para protótipo e prática individual, mas não é segurança de produção. Não use dados reais de clientes, contratos, preços, documentos fiscais, credenciais corporativas ou informações pessoais.
 
-Antes de liberar Júnior/Pleno pagos, é obrigatório implementar backend de autenticação, sessão segura, autorização server-side, banco isolado por usuário/tenant, cobrança por webhook idempotente, recuperação de senha real, MFA para equipe, rate limiting, logs, backups e requisitos de LGPD.
-
-Leia [SECURITY.md](SECURITY.md) e [docs/SAAS-ROADMAP.md](docs/SAAS-ROADMAP.md) para o plano detalhado.
+Antes de vender ou abrir para múltiplos usuários, será necessário implementar autenticação real, banco isolado por usuário/tenant, autorização server-side, progresso sincronizado, recuperação de senha, rate limiting, logs, backups, LGPD e cobrança segura. Consulte [SECURITY.md](SECURITY.md) e [docs/SAAS-ROADMAP.md](docs/SAAS-ROADMAP.md).
 
 ## Empresa fictícia
 
-- Empresa contábil: `BR10 - NexusTech Brasil Distribuidora S/A`
-- Organização de vendas: `1000 - NexusTech Vendas Nacionais`
-- Canais: `10 - Venda Direta / Corporativo` e `20 - Revenda / Atacado`
-- Centro principal: `1000 - CD Matriz São Paulo`
-
-## Licença e escopo
-
-Este repositório é uma demonstração educacional. SAP, nomes de transações e tabelas são referências de treinamento; o comportamento do simulador é simplificado e não substitui um sistema SAP real nem uma homologação profissional.
+A NexusTech Distribuidora S/A, seus clientes, documentos, valores, pessoas, endereços e ambientes são fictícios. O simulador não representa um sistema SAP produtivo e não substitui treinamento oficial, certificação, experiência real ou homologação profissional.

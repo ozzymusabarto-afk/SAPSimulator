@@ -47,11 +47,11 @@ export class DashboardViewComponent {
             <span class="hero-badge-dot"></span>
             NEXUS ERP LAB • SD PRACTICE ENVIRONMENT
           </div>
-          <h1 class="hero-main-title">Bem-vindo ao Nexus ERP Lab!</h1>
-          <p class="hero-tagline">SD Practice Environment • Aprenda na prática. Conquiste seu espaço.</p>
+          <h1 class="hero-main-title">Seu expediente começa aqui</h1>
+          <p class="hero-tagline">Laboratório de prática profissional • Estudei. Agora vou executar.</p>
           <p class="hero-description">
-            Execute processos reais de Vendas e Distribuição de ponta a ponta (Order-to-Cash).
-            Domine transações comerciais, liberação de crédito, remessas e faturamento com a mentoria contínua do Chefe Wilson.
+            Você já estudou SAP SD. Agora receba solicitações de uma empresa fictícia, consulte os dados disponíveis,
+            tome decisões e pratique o fluxo Order-to-Cash como parte da equipe de Operações SD.
           </p>
           <div class="hero-actions">
             <button id="btn-hero-see-missions" class="btn-hero-primary" title="Explorar e atender solicitações comerciais">
@@ -59,7 +59,7 @@ export class DashboardViewComponent {
             </button>
             <div class="hero-mentor-indicator">
               <span class="text-xs text-light">Orientação com:</span>
-              <strong style="color: #ffffff; font-size: 12.5px;">Chefe Wilson • Mentor SAP</strong>
+              <strong style="color: #ffffff; font-size: 12.5px;">Chefe Wilson • Gestor de Operações SD</strong>
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@ export class DashboardViewComponent {
         <div class="hero-right-column">
           <div class="chief-wilson-hero-card">
             <div class="chief-wilson-portrait-wrapper">
-              <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson - Mentor SAP" class="chief-wilson-portrait" />
+              <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson - Gestor de Operações SD" class="chief-wilson-portrait" />
               <div class="chief-wilson-status-indicator" title="Chefe Wilson está online">
                 <span class="status-indicator-dot"></span> Online
               </div>
@@ -75,7 +75,7 @@ export class DashboardViewComponent {
             <div class="chief-wilson-dialogue-box">
               <div class="dialogue-header">
                 <span class="dialogue-name">Chefe Wilson</span>
-                <span class="dialogue-title">Mentor SAP</span>
+                <span class="dialogue-title">Gestor de Operações SD</span>
               </div>
               <p class="dialogue-speech">
                 "Olá, <strong>${profile.name}</strong>! Nosso foco é excelência operacional. Acompanho seu progresso em cada transação no ERP. Bom trabalho!"
@@ -90,9 +90,9 @@ export class DashboardViewComponent {
         <!-- 1. Missões Ativas -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Missões Ativas</div>
+                <div class="kpi-label">Casos no ciclo</div>
             <div class="kpi-value text-primary">${ScenarioCatalog.length}</div>
-            <div class="kpi-subtext">Cenários de formação prática</div>
+                <div class="kpi-subtext">Solicitações do ciclo Trainee</div>
           </div>
           <div class="kpi-icon kpi-icon-primary">${Icons.target}</div>
         </div>
@@ -122,7 +122,7 @@ export class DashboardViewComponent {
         <!-- 4. Nível Trainee -->
         <div class="kpi-card">
           <div>
-            <div class="kpi-label">Nível Trainee</div>
+                <div class="kpi-label">Cargo atual</div>
             <div class="kpi-value text-primary">Nível ${levelInfo.level}</div>
             <div class="kpi-subtext">${profile.role}</div>
           </div>
@@ -157,7 +157,7 @@ export class DashboardViewComponent {
               </div>
               <div style="flex: 1;">
                 <div style="font-size: 14px; font-weight: 700; color: #166534; margin-bottom: 4px;">
-                  Parecer Final do Mentor • Chefe Wilson (Mentor SAP)
+                  Parecer Final do Mentor • Chefe Wilson (Gestor de Operações SD)
                 </div>
                 <div style="font-size: 13.5px; color: var(--erp-navy-900); line-height: 1.6; background-color: #ffffff; padding: 14px 16px; border-radius: 6px; border: 1px solid #bbf7d0; box-shadow: var(--erp-shadow-xs);">
                   <p style="margin: 0 0 10px 0;">
@@ -239,14 +239,14 @@ export class DashboardViewComponent {
           <div class="erp-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
               <span style="font-weight: 700; font-size: 14px; color: var(--erp-navy-900);">
-                ${isCurrentCompleted ? 'Mesa de Trabalho • Relatório de Atividade Homologada' : 'Mesa de Trabalho • Solicitação Comercial Atual'}
+                ${isCurrentCompleted ? 'Mesa de Trabalho • Relatório de Atividade Homologada' : 'Mesa de Trabalho • Solicitação do Expediente'}
               </span>
               <span class="erp-badge ${isCurrentCompleted ? 'erp-badge-success' : 'erp-badge-primary'}" style="font-weight: 700;">
                 ${isCurrentCompleted ? `${Icons.check} MISSÃO CONCLUÍDA` : 'Em Atendimento'}
               </span>
             </div>
             <span class="text-xs text-muted font-mono">
-              Mentor: Chefe Wilson (Mentor SAP)
+              Mentor: Chefe Wilson (Gestor de Operações SD)
             </span>
           </div>
 
@@ -288,7 +288,7 @@ export class DashboardViewComponent {
                   <div style="width: 24px; height: 24px; border-radius: 50%; overflow: hidden; border: 1px solid #15803d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson" style="width: 100%; height: 100%; object-fit: cover;" />
                   </div>
-                  Parecer do Mentor • Chefe Wilson (Mentor SAP):
+                  Parecer do Mentor • Chefe Wilson (Gestor de Operações SD):
                 </div>
                 <div style="font-size: 13px; color: #14532d; line-height: 1.5; font-weight: 500;">
                   ${currentScenario.completionFeedback?.mentorSpeech || 'Excelente trabalho! Você concluiu a atividade com total conformidade operacional às diretrizes de Vendas e Distribuição da NexusTech.'}

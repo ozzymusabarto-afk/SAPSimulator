@@ -150,7 +150,7 @@ export class MentorDockComponent {
           </div>
           <div class="mentor-info">
             <span class="mentor-name">Chefe Wilson</span>
-            <span class="mentor-role">Mentor SAP</span>
+            <span class="mentor-role">Gestor de Operações SD</span>
           </div>
         </div>
         <button id="mentor-collapse-btn" class="mentor-toggle-btn" title="Recolher Painel">

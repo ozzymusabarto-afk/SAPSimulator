@@ -104,7 +104,7 @@ export class AboutModalComponent {
             </div>
             <div>
               <div style="font-size: 13px; font-weight: 700; color: var(--erp-navy-900);">
-                Chefe Wilson • Mentor SAP
+                Chefe Wilson • Gestor de Operações SD
               </div>
               <div style="font-size: 12px; color: var(--erp-navy-700); line-height: 1.4;">
                 Supervisiona as atividades práticas comerciais no fluxo Order-to-Cash, oferecendo orientações, dicas operacionais e feedback contínuo a cada decisão.

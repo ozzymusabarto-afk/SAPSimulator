@@ -135,18 +135,18 @@ export class BonusViewComponent {
           </div>
         </div>
 
-        <!-- BÔNUS 4: EVENTUAL CERTIFICAÇÃO (EM DELIBERAÇÃO) -->
+        <!-- BÔNUS 4: EVENTUAL REGISTRO DE PRÁTICA (EM DELIBERAÇÃO) -->
         <div class="bonus-card locked" style="background: #fafafa; border-style: dashed;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <span class="bonus-badge pending-decision">
                 ${Icons.alertTriangle} Em Deliberação
               </span>
-              <span class="tcode-pill">CERTIFICAÇÃO</span>
+              <span class="tcode-pill">REGISTRO DE PRÁTICA</span>
             </div>
-            <div class="bonus-card-title">Certificado Digital de Formação Trainee</div>
+            <div class="bonus-card-title">Registro Digital de Prática Trainee</div>
             <div class="bonus-card-desc">
-              Possibilidade futura de emissão de certificado digital após conclusão e homologação no Diagnóstico.
+              Possibilidade futura de emitir um registro pessoal de prática concluída. Isso não é certificação SAP nem comprovação de experiência profissional.
               <em>Item sujeito à decisão posterior da proprietária do projeto. Não constitui promessa de concessão obrigatória nesta fase.</em>
             </div>
           </div>

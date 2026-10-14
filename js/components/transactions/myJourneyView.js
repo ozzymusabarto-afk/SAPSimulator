@@ -122,7 +122,7 @@ export class MyJourneyViewComponent {
       <div class="diagnostic-panel-card">
         <div class="diagnostic-panel-header">
           <div class="diagnostic-mentor-profile">
-            <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson - Mentor SAP" class="diagnostic-mentor-avatar" />
+            <img src="./assets/images/chief_wilson.jpg" alt="Chefe Wilson - Gestor de Operações SD" class="diagnostic-mentor-avatar" />
             <div class="diagnostic-mentor-info">
               <h4>Parecer Diagnóstico do Chefe Wilson</h4>
               <span>Orientação Pedagógica Oficial</span>

@@ -1,7 +1,7 @@
 /**
  * Nexus ERP Lab • SD Practice Environment
  * Motor de Carreira & Gamificação do Trainee (Trainee Engine)
- * Mentor: Chefe Wilson (Mentor SAP)
+ * Mentor: Chefe Wilson (Gestor de Operações SD)
  * Módulo: js/core/engine/traineeEngine.js
  * 
  * Arquitetura de Progressão:

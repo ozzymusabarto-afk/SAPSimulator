@@ -120,7 +120,7 @@ export class DiagnosticModalComponent {
           ${data.mentorSpeech ? `
             <div class="mentor-speech-bubble" style="border-left-color: ${isSuccess ? '#15803d' : '#0265dc'};">
               <div class="mentor-speech-title" style="color: ${isSuccess ? '#15803d' : '#0265dc'};">
-                ${isSuccess ? Icons.award : Icons.lightbulb} Chefe Wilson (Mentor SAP):
+                ${isSuccess ? Icons.award : Icons.lightbulb} Chefe Wilson (Gestor de Operações SD):
               </div>
               <p style="font-size: 12.5px; font-weight: 500;">${data.mentorSpeech}</p>
             </div>
@@ -164,7 +164,7 @@ export class DiagnosticModalComponent {
           ${isMissionCompleted ? `
             <div class="mentor-speech-bubble" style="border-left-color: ${allCompleted ? '#d97706' : '#15803d'}; background-color: ${allCompleted ? '#fffbeb' : '#f0fdf4'}; margin-top: 14px;">
               <div class="mentor-speech-title" style="color: ${allCompleted ? '#d97706' : '#15803d'};">
-                ${allCompleted ? Icons.award : Icons.check} Chefe Wilson (Mentor SAP):
+                ${allCompleted ? Icons.award : Icons.check} Chefe Wilson (Gestor de Operações SD):
               </div>
               <p style="font-size: 13px; font-weight: 600; color: ${allCompleted ? '#78350f' : '#14532d'}; margin: 4px 0 0 0;">
                 ${allCompleted

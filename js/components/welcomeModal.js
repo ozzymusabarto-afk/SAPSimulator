@@ -9,6 +9,15 @@ import { trainee } from '../core/engine/traineeEngine.js';
 
 export const ONBOARDING_STORAGE_KEY = 'nexustech_onboarding_completed';
 
+function onboardingKey() {
+  try {
+    const userId = trainee.getProfile()?.journey?.userId || 'local';
+    return `${ONBOARDING_STORAGE_KEY}_${userId}`;
+  } catch {
+    return `${ONBOARDING_STORAGE_KEY}_local`;
+  }
+}
+
 export class WelcomeModalComponent {
   constructor() {
     this.overlay = document.createElement('div');
@@ -23,7 +32,7 @@ export class WelcomeModalComponent {
    */
   shouldShowOnboarding() {
     try {
-      const isCompleted = localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true';
+      const isCompleted = localStorage.getItem(onboardingKey()) === 'true';
       if (isCompleted) return false;
 
       const profile = trainee.getProfile();
@@ -51,7 +60,7 @@ export class WelcomeModalComponent {
             <span style="background: var(--erp-blue-primary); color: #fff; width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">
               N
             </span>
-            <span>Seu Primeiro Dia no Nexus ERP Lab</span>
+              <span>Seu Primeiro Dia de Expediente</span>
           </div>
           <button class="erp-modal-close" id="welcome-close-btn" title="Fechar (Esc)">
             ${Icons.x}
@@ -71,7 +80,7 @@ export class WelcomeModalComponent {
                 Chefe Wilson
               </div>
               <div style="font-size: 11.5px; color: var(--erp-text-muted);">
-                Mentor SAP • Nexus ERP Lab (SD Practice Environment)
+                Chefe de Operações SD • Nexus ERP Lab
               </div>
             </div>
           </div>
@@ -79,13 +88,13 @@ export class WelcomeModalComponent {
           <!-- Mensagem Humana e Profissional -->
           <div style="font-size: 13px; color: var(--erp-navy-900); line-height: 1.6; display: flex; flex-direction: column; gap: 10px;">
             <p style="margin: 0;">
-              Olá, <strong>${traineeName}</strong>! Seja muito bem-vindo ao <strong>Nexus ERP Lab</strong>.
+              Olá, <strong>${traineeName}</strong>! Seu processo de contratação como <strong>Trainee de Operações SD</strong> foi concluído.
             </p>
             <p style="margin: 0;">
-              Eu sou o Chefe Wilson e vou acompanhar seu desenvolvimento durante esta jornada prática. Aqui você vai trabalhar com processos reais da rotina de Vendas e Distribuição (SD): clientes, ordens de venda, estoque ATP, condições de preço, análise de crédito, remessa e faturamento.
+              Eu sou o Chefe Wilson, seu gestor nesta empresa fictícia. Você já estudou SAP SD; aqui não vamos dar uma aula. Você vai receber solicitações de uma rotina comercial e colocar em prática o que aprendeu, consultando dados, tomando decisões e lidando com exceções.
             </p>
             <p style="margin: 0;">
-              Nosso princípio aqui é a fidelidade operacional ao processo. O objetivo não é correr nem decorar telas, mas sim aprender a identificar os dados necessários e tomar decisões comerciais com total segurança.
+              Nosso princípio é a fidelidade operacional. O objetivo é construir segurança para uma primeira oportunidade profissional — sem fingir que o simulador substitui experiência real, certificação ou treinamento oficial.
             </p>
           </div>
 
@@ -95,13 +104,13 @@ export class WelcomeModalComponent {
               💡 Seus Recursos Durante o Expediente:
             </div>
             <div style="font-size: 11.5px; color: var(--erp-text-muted); display: flex; align-items: center; gap: 6px;">
-              <span style="color: var(--erp-blue-primary); font-weight: 700;">• Tecla F1 ou [?]</span> Documentação técnica dos campos no SAP a qualquer momento.
+              <span style="color: var(--erp-blue-primary); font-weight: 700;">• Tecla F1 ou [?]</span> Ajuda contextual para você consultar durante a prática.
             </div>
             <div style="font-size: 11.5px; color: var(--erp-text-muted); display: flex; align-items: center; gap: 6px;">
-              <span style="color: var(--erp-blue-primary); font-weight: 700;">• Painel do Mentor:</span> Orientação do chamado e botão para tirar dúvidas comigo.
+              <span style="color: var(--erp-blue-primary); font-weight: 700;">• Painel do gestor:</span> Contexto do chamado e pistas graduais, sem entregar a resposta de imediato.
             </div>
             <div style="font-size: 11.5px; color: var(--erp-text-muted); display: flex; align-items: center; gap: 6px;">
-              <span style="color: var(--erp-green-success); font-weight: 700;">• Segurança:</span> Você pode errar, ajustar dados e refazer atividades para praticar.
+              <span style="color: var(--erp-green-success); font-weight: 700;">• Ambiente seguro:</span> Você pode errar, analisar o impacto e refazer atividades sem risco para uma empresa real.
             </div>
           </div>
 
@@ -110,7 +119,7 @@ export class WelcomeModalComponent {
         <!-- Footer com Botão de Ação -->
         <div class="erp-modal-footer" style="padding: 12px 20px; background-color: #f8fafc; border-top: 1px solid var(--erp-border-subtle); display: flex; align-items: center; justify-content: flex-end;">
           <button class="btn btn-primary" id="welcome-start-btn" style="padding: 9px 22px; font-weight: 600; font-size: 13px; box-shadow: var(--erp-shadow-sm);">
-            ${Icons.play} Começar Meu Primeiro Dia
+            ${Icons.play} Iniciar expediente
           </button>
         </div>
       </div>
@@ -151,7 +160,7 @@ export class WelcomeModalComponent {
 
   markAsCompleted() {
     try {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+      localStorage.setItem(onboardingKey(), 'true');
     } catch (e) {
       // Ignora erro se localStorage indisponível
     }
@@ -159,7 +168,7 @@ export class WelcomeModalComponent {
 
   resetOnboarding() {
     try {
-      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+      localStorage.removeItem(onboardingKey());
     } catch (e) {
       // Ignora erro
     }

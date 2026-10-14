@@ -44,10 +44,20 @@ class ScenarioEngine {
    */
   getCurrentPendingScenario() {
     const completed = trainee.getCompletedScenarios();
-    const pending = ScenarioCatalog.filter(s => !completed.includes(s.id));
+    const currentStage = trainee.getProfile()?.stageId || 'TRAINEE';
+    const pending = ScenarioCatalog.filter(s => {
+      if (completed.includes(s.id)) return false;
+      const stage = s.stageId || (s.levelRequired <= 1 ? 'TRAINEE' : 'ANALISTA_JUNIOR_SD');
+      return stage === currentStage;
+    });
 
     if (pending.length === 0) {
-      return ScenarioCatalog[ScenarioCatalog.length - 1];
+      // O ciclo Trainee mantém o comportamento legado de exibir o último
+      // caso para prática livre; fases futuras não devem receber conteúdo de
+      // outra carreira por engano.
+      return currentStage === 'TRAINEE'
+        ? ScenarioCatalog[ScenarioCatalog.length - 1]
+        : null;
     }
 
     // Regra 1: FULL_O2C só disponível quando >= 80% do catálogo concluído
@@ -70,7 +80,13 @@ class ScenarioEngine {
     const diverseCandidates = lastAction
       ? candidates.filter(s => s.targetCriteria?.action !== lastAction)
       : candidates;
-    const pool = diverseCandidates.length > 0 ? diverseCandidates : candidates;
+    const lastDifficulty = lastCompleted?.difficulty || null;
+    const difficultyCandidates = lastDifficulty
+      ? diverseCandidates.filter(s => (s.difficulty || 'OPERACIONAL') !== lastDifficulty)
+      : diverseCandidates;
+    const pool = difficultyCandidates.length > 0
+      ? difficultyCandidates
+      : (diverseCandidates.length > 0 ? diverseCandidates : candidates);
 
     // Regra 3: Seed determinística userId + progresso para pseudo-aleatoriedade controlada
     const userId = trainee.getProfile()?.journey?.userId || 'default';

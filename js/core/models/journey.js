@@ -21,6 +21,13 @@ export const PhaseLabels = Object.freeze({
   [PhaseId.AVANCADO_SD]: 'Níveis Avançados / Futuros'
 });
 
+export const ScenarioDifficulty = Object.freeze({
+  INTRODUTORIA: 'INTRODUTÓRIA',
+  OPERACIONAL: 'OPERACIONAL',
+  EXCECAO: 'EXCEÇÃO',
+  INTEGRADA: 'INTEGRADA'
+});
+
 export const JourneyState = Object.freeze({
   NOT_STARTED: 'NOT_STARTED',
   IN_PROGRESS: 'IN_PROGRESS',

@@ -67,7 +67,7 @@ export class AuthViewComponent {
             />
             <div class="auth-mentor-info">
               <span class="auth-mentor-name">Chefe Wilson</span>
-              <span class="auth-mentor-role">Mentor SAP • SD Practice</span>
+              <span class="auth-mentor-role">Gestor de Operações SD • SD Practice</span>
               <span class="auth-mentor-quote">"Excelência se constrói na prática. Identifique-se para iniciar o expediente."</span>
             </div>
           </div>

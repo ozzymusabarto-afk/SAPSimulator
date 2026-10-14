@@ -154,7 +154,7 @@ class CompetencyEngine {
       evaluatedAt: now,
       overallStatus,
       totalCompletedMissions: completedScenarios.length,
-      mentor: 'Chefe Wilson • Mentor SAP',
+      mentor: 'Chefe Wilson • Gestor de Operações SD',
       summaryStatement: overallStatus === 'PASSED'
         ? 'Desempenho operacional consistente demonstrado em todos os pilares essenciais de SD. O Trainee demonstrou autonomia e precisão processual no Order-to-Cash.'
         : `Identificamos ${reinforcementAreas.length} área(s) que requerem atenção antes da transição formal de nível. Recomenda-se prática cirúrgica nas transações indicadas.`,
