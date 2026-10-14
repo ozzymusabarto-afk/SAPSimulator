@@ -18,7 +18,7 @@ export const ScenarioCatalog = [
     
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra Recebida: Varejo Eletro Brasil (PO-2026-EB01)',
-    briefing: 'Olá! O departamento de compras do nosso cliente corporativo Varejo Eletro Brasil acaba de enviar o pedido de compra formal nº PO-2026-EB01 para aquisição de 2 unidades do Servidor Enterprise Nexus Pro X. Como é uma venda comercial padrão no mercado nacional com entrega em São Paulo, precisamos montar a Ordem de Venda correspondente. Antes de preencher a VA01, consulte o cadastro do cliente na transação XD03 para checar a Área de Vendas (Org. Vendas, Canal e Setor), a Condição de Pagamento e os termos de frete (Incoterms). Observe atentamente as alternativas no formulário e tome as decisões comerciais corretas!',
+    briefing: 'Olá! O departamento de compras do nosso cliente corporativo Varejo Eletro Brasil acaba de enviar o pedido de compra formal nº PO-2026-EB01 para aquisição de 2 unidades do Servidor Enterprise Nexus Pro X. Como é uma venda comercial padrão no mercado nacional com entrega em São Paulo, precisamos montar a Ordem de Venda correspondente. Antes de registrar a ordem, reconcilie a PO com o Business Partner da conta, o ship-to, a data solicitada, o material e a disponibilidade no centro 1000. A área de vendas, a condição de pagamento e o termo logístico são dados da configuração fictícia da NexusTech; não presuma que a PO possa ser aceita sem conferência.',
     
     // Detalhes do Documento Comercial Recebido
     purchaseOrderDocument: {
@@ -29,12 +29,12 @@ export const ScenarioCatalog = [
       itemsRequested: [
         { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB)', quantity: 2, unit: 'UN' }
       ],
-      deliveryAddress: 'Av. das Nações Unidas, 14200 - São Paulo/SP',
-      freightResponsibility: 'Frete e seguro inclusos no fornecimento por conta da NexusTech (Entrega no Destino)',
+      deliveryAddress: 'CD SP - Lapa - São Paulo/SP',
+      freightResponsibility: 'Conforme contrato da NexusTech: transporte rodoviário contratado pelo vendedor até o ship-to nomeado',
       paymentInstructions: 'Faturamento comercial conforme cadastro aprovado em conta corrente (30 dias)'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro abra a transação XD03 para consultar o mestre do cliente Varejo Eletro Brasil (100045). Na aba de Vendas, observe a Organização de Vendas, o Canal de Distribuição, o Setor de Atividade, a Condição de Pagamento e o Incoterms. Depois vá até a VA01 e selecione cada campo com base nessa análise!',
+    mentorInitialTip: 'Pista do Chefe Wilson: comece pelo cadastro do parceiro e pela PO. Registre as evidências que justificam aceitar o pedido; se houver divergência de parceiro, prazo, disponibilidade ou condição logística, coloque a solicitação em análise e não invente um dado.',
     
     sapKnowledgeBridge: {
       tcode: 'VA01 / XD03',
@@ -43,7 +43,9 @@ export const ScenarioCatalog = [
     },
 
     objectives: [
-      { id: 'check_customer', text: 'Consultar cadastro do cliente na transação XD03 e analisar a Área de Vendas', done: false },
+      { id: 'check_customer', text: 'Consultar o Business Partner/cliente e conferir área de vendas, parceiros e condições', done: false },
+      { id: 'analyze_po', text: 'Reconciliar PO, ship-to, material, quantidade e condição logística', done: false },
+      { id: 'check_material', text: 'Conferir material, unidade, centro 1000 e disponibilidade antes da ordem', done: false },
       { id: 'set_org_structure', text: 'Definir Tipo de Ordem (OR), Org. Vendas (1000), Canal (10) e Setor (01)', done: false },
       { id: 'select_customer', text: 'Selecionar o cliente Varejo Eletro Brasil e informar o Nº do Pedido', done: false },
       { id: 'fill_terms', text: 'Selecionar Condição de Pagamento Z030 e Incoterms CIF', done: false },
@@ -59,17 +61,22 @@ export const ScenarioCatalog = [
       division: '01',
       customerId: '100045',
       customerPoNumber: 'PO-2026-EB01',
+      requiresCustomerAnalysis: true,
+      requiresPoAnalysis: true,
+      requiresMaterialAnalysis: true,
+      targetNetValue: 17000.00,
       paymentTerms: 'Z030',
-      incoterms: 'CIF',
+      incoterms: 'DAP',
+      incotermsLocation: 'CD SP - Lapa - São Paulo/SP',
       items: [
         { materialId: 'MAT-1001', quantity: 2, discountPercent: 0 }
       ]
     },
     completionFeedback: {
-      mentorSpeech: 'Excelente trabalho! Você conferiu os dados do cliente 100045 na XD03 e emitiu a primeira ordem padrão com a Área de Vendas e os termos comerciais corretos. +250 XP.',
-      whatHappened: 'Ordem para 2 unidades do MAT-1001 gravada para a PO-2026-EB01.',
+      mentorSpeech: 'A entrada da solicitação foi registrada com rastreabilidade. A ordem está OPEN; confirmação, entrega, saída de mercadoria e faturamento continuam como etapas posteriores.',
+      whatHappened: 'Ordem para 2 unidades do MAT-1001 gravada para a PO-2026-EB01 após reconciliação dos dados.',
       why: 'Validar a área de vendas e replicar os termos do cadastro do cliente evita divergências no atendimento e no faturamento.',
-      businessImpact: 'A Varejo Eletro Brasil recebe o pedido com prazo e responsabilidade de frete alinhados ao contrato.'
+      businessImpact: 'A equipe de atendimento recebeu uma ordem rastreável para prosseguir com confirmação e entrega conforme o contrato.'
     }
   },
   {
@@ -85,7 +92,7 @@ export const ScenarioCatalog = [
     
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Negociação Atacado - TechLog Soluções (Desconto Comercial de 5%)',
-    briefing: 'Excelente trabalho na emissão anterior! Agora temos uma negociação no canal de atacado. A distribuidora TechLog Soluções fechou a compra de 10 unidades do Switch Gigabit Managed (MAT-2004). Como é uma compra de volume atacadista, a gerência autorizou 5% de desconto comercial sobre a tabela. Abra a VA01, configure a área de vendas correspondente ao cliente TechLog e monte o pedido aplicando exatamente 5% de desconto na condição comercial RB00.',
+    briefing: 'Excelente trabalho na emissão anterior! Agora temos uma negociação no canal de atacado. A distribuidora TechLog Soluções fechou a compra de 10 unidades do Switch Gigabit Managed (MAT-2004). A PO traz uma solicitação de 5% de desconto, mas a entrada precisa ser reconciliada com a condição de preço vigente e com a autorização comercial. Verifique a determinação de preço na ordem, confirme a chave, vigência, moeda e unidade e só aplique um desconto manual se houver autorização registrada.',
     
     purchaseOrderDocument: {
       buyerName: 'TechLog Soluções em TI e Distribuição (Curitiba/PR)',
@@ -96,11 +103,11 @@ export const ScenarioCatalog = [
         { description: 'Switch Gigabit 24 Portas Managed Layer 3', quantity: 10, unit: 'UN' }
       ],
       deliveryAddress: 'Rua das Indústrias, 500 - Curitiba/PR',
-      freightResponsibility: 'CIF - Entrega no Centro de Distribuição do comprador',
+      freightResponsibility: 'DAP - Centro de Distribuição Curitiba, conforme contrato da NexusTech',
       paymentInstructions: '15 dias líquido (Z015) com desconto comercial acordado de 5%'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o cliente TechLog (100120) na XD03 para ver o canal de distribuição (20 - Revenda / Atacado). Na VA01, selecione a Área de Vendas correta, informe a condição de pagamento Z015 e, na grade de itens, coloque o material MAT-2004 com 10 unidades e 5% de desconto.',
+    mentorInitialTip: 'Pista do Chefe Wilson: compare a PO, o Business Partner e as condições encontradas na ordem. A porcentagem solicitada não substitui a aprovação de pricing; registre a origem da condição antes de salvar.',
     
     sapKnowledgeBridge: {
       tcode: 'VA01 / VK11',
@@ -109,7 +116,9 @@ export const ScenarioCatalog = [
     },
 
     objectives: [
-      { id: 'create_order_techlog', text: 'Configurar Área de Vendas e selecionar cliente TechLog (100120)', done: false },
+      { id: 'create_order_techlog', text: 'Conferir a área de vendas e os parceiros do cliente TechLog (100120)', done: false },
+      { id: 'analyze_po', text: 'Conferir a PO, a autorização do desconto e a condição logística', done: false },
+      { id: 'simulate_pricing', text: 'Analisar a condição de preço aplicável ao canal atacadista', done: false },
       { id: 'add_switch_items', text: 'Inserir 10 unidades do material MAT-2004 (Switch Gigabit)', done: false },
       { id: 'apply_discount', text: 'Aplicar 5% de desconto comercial na condição RB00', done: false },
       { id: 'verify_pricing', text: 'Confirmar condição Z015 e gravar a ordem', done: false }
@@ -123,8 +132,15 @@ export const ScenarioCatalog = [
       division: '01',
       customerId: '100120',
       customerPoNumber: 'PO-TL-2026-042',
+      requiresCustomerAnalysis: true,
+      requiresPoAnalysis: true,
+      requiresPricingEvidence: true,
+      conditionCode: 'PR00',
+      targetAmount: 1250.00,
+      targetNetValue: 11875.00,
       paymentTerms: 'Z015',
-      incoterms: 'CIF',
+      incoterms: 'DAP',
+      incotermsLocation: 'CD TechLog - Curitiba/PR',
       items: [
         { materialId: 'MAT-2004', quantity: 10, discountPercent: 5 }
       ]
@@ -132,72 +148,56 @@ export const ScenarioCatalog = [
     completionFeedback: {
       mentorSpeech: 'Muito bem! Você configurou o canal de atacado da TechLog, aplicou os 5% autorizados na condição RB00 e gravou o pedido com pagamento em 15 dias. +350 XP.',
       whatHappened: 'Ordem de 10 unidades do MAT-2004 gravada para a TechLog com desconto comercial de 5%.',
-      why: 'A condição RB00 deve respeitar a alçada aprovada e a Z015 mantém o prazo financeiro acordado.',
-      businessImpact: 'A venda por atacado segue com margem controlada e cobrança alinhada ao contrato.'
+      why: 'A condição de preço deve corresponder ao registro vigente e qualquer desconto manual precisa de autorização; Z015 é uma condição fictícia da NexusTech.',
+      businessImpact: 'A ordem fica registrada com preço e desconto rastreáveis; confirmação, entrega e faturamento ainda dependem das etapas seguintes.'
     }
   },
   {
     id: 'SCN-03',
     code: 'DSF-201',
-    title: 'Chamado Crítico #1047: Diagnóstico de Bloqueio de Crédito',
+    title: 'Decisão Documentada de Crédito: Ordem Retida',
     mode: 'CHALLENGE',
     levelRequired: 1,
     slaMinutes: 8,
     xpReward: 600,
     badgeReward: 'credit_guardian',
-    initialTcode: 'XD03',
-    
-    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
-    emailSubject: 'DESAFIO COM SLA: Pedido retido da Indústria Metalúrgica Paulista S/A',
-    briefing: 'Atenção, trainee! Chegou um chamado urgente da diretoria. A Metalúrgica Paulista tentou faturar um pedido de 3 Servidores Enterprise (MAT-1001), mas o sistema gerou um bloqueio comercial. Você precisa investigar a causa-raiz no cadastro do cliente (XD03), testar a emissão na VA01 para entender o bloqueio e utilizar a transação de análise de crédito VKM1 para realizar a liberação supervisionada com parecer comercial.',
-    
+    initialTcode: 'VA01',
+    sender: 'Chefe Wilson (Gestor de Operações SD)',
+    emailSubject: 'Chamado de crédito: PO-MP-9011 aguardando decisão',
+    briefing: 'A Metalúrgica Paulista enviou a PO-MP-9011 para 3 servidores MAT-1001. A solicitação precisa ser registrada para análise, mas a exposição de crédito deve ser tratada por uma decisão documentada. Consulte o Business Partner e os dados de crédito do cliente 100088, registre a ordem na VA01, confirme o bloqueio e recomende HOLD/ESCALATE. Não libere a ordem sem aprovação formal e alçada de crédito verificável.',
     purchaseOrderDocument: {
       buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
       buyerCnpj: '98.765.432/0001-11',
       poNumber: 'PO-MP-9011',
-      operationType: 'Venda de Hardware Corporativo com Exposição Financeira',
-      itemsRequested: [
-        { description: 'Servidor Enterprise Nexus Pro X', quantity: 3, unit: 'UN' }
-      ],
+      operationType: 'Venda de Hardware Corporativo sujeita à análise de crédito',
+      itemsRequested: [{ description: 'Servidor Enterprise Nexus Pro X', quantity: 3, unit: 'UN' }],
       deliveryAddress: 'Fábrica Campinas - Portão 3 Logística',
-      freightResponsibility: 'FOB - Retirada na origem (CD NexusTech SP)',
+      freightResponsibility: 'FOB - CD NexusTech SP, conforme contrato da NexusTech',
       paymentInstructions: '60 dias líquido (Z060)'
     },
-
-    mentorInitialTip: 'Orientação do Chefe Wilson (Modo Desafio): Você está no comando! Consulte a aba de Crédito do cliente 100088 na XD03 para ver o limite e os títulos em aberto. Depois crie o pedido na VA01 para constatar a retenção automática e acesse a transação VKM1 para liberar com justificativa. Mantenha a calma, você tem 8 minutos no SLA!',
-    
+    mentorInitialTip: 'Pista do Chefe Wilson: não confunda urgência comercial com autorização financeira. Compare limite, utilizado, risco, atrasos e exposição projetada; registre o motivo e encaminhe a decisão para o responsável.',
     sapKnowledgeBridge: {
-      tcode: 'VKM1 / FD32',
-      tables: 'KNKK (Controle de Crédito do Cliente), VBUK / VBAK (Status de Bloqueio da Ordem)',
-      concept: 'O SAP SD possui integração profunda com FI-AR (Contas a Receber). Quando o valor do pedido somado aos títulos em aberto ultrapassa o Limite de Crédito estipulado na área de controle (BR01), a ordem é gravada com bloqueio global de fornecimento (Credit Block) e só pode ser liberada na VKM1 por alguém com alçada.'
+      tcode: 'Manage Credit Accounts / Manage Documented Credit Decisions',
+      legacyComparison: 'Em ECC clássico, fluxos equivalentes podem usar FD32/VKM1/VKM3 conforme o customizing.',
+      concept: 'No S/4HANA, a decisão de crédito deve ser analisada e documentada conforme o Credit Management configurado. O simulador representa a decisão e a alçada; não reproduz uma instalação FSCM real.'
     },
-
     objectives: [
-      { id: 'investigate_credit', text: 'Investigar limite e histórico de crédito do cliente 100088 na XD03', done: false },
-      { id: 'create_blocked_order', text: 'Emitir o pedido de 3 unidades do MAT-1001 na VA01 e constatar o bloqueio', done: false },
-      { id: 'access_vkm1', text: 'Acessar a transação VKM1 e analisar o risco financeiro da ordem', done: false },
-      { id: 'release_with_notes', text: 'Executar liberação supervisionada com parecer comercial na VKM1', done: false }
+      { id: 'investigate_credit', text: 'Conferir limite, utilização, risco e pendências do cliente 100088', done: false },
+      { id: 'create_blocked_order', text: 'Registrar a ordem da PO-MP-9011 e confirmar o bloqueio', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisões de crédito e localizar a ordem', done: false },
+      { id: 'release_with_notes', text: 'Registrar recomendação HOLD/ESCALATE com justificativa', done: false }
     ],
-
     targetCriteria: {
-      action: 'CREDIT_RELEASE',
-      orderType: 'OR',
-      salesOrg: '1000',
-      distChannel: '10',
-      division: '01',
-      customerId: '100088',
-      paymentTerms: 'Z060',
-      incoterms: 'FOB',
-      requiresVkm1Release: true,
-      items: [
-        { materialId: 'MAT-1001', quantity: 3 }
-      ]
+      action: 'CREDIT_RELEASE', orderType: 'OR', salesOrg: '1000', distChannel: '10', division: '01',
+      customerId: '100088', customerPoNumber: 'PO-MP-9011', paymentTerms: 'Z060', incoterms: 'FOB',
+      creditDecision: 'ESCALATE', requiresApproval: true, requiresCustomerAnalysis: true,
+      items: [{ materialId: 'MAT-1001', quantity: 3 }]
     },
     completionFeedback: {
-      mentorSpeech: 'Excelente atuação sob pressão! Você analisou o risco do cliente 100088, constatou o bloqueio automático da ordem de 3 servidores e liberou o documento na VKM1 com parecer comercial. +600 XP.',
-      whatHappened: 'Ordem bloqueada por crédito e liberada de forma supervisionada na VKM1.',
-      why: 'A retenção protege a empresa quando a exposição de crédito excede o limite aprovado; a liberação exige análise e justificativa.',
-      businessImpact: 'A Metalúrgica Paulista poderá seguir com o pedido após uma decisão de crédito registrada e rastreável.'
+      mentorSpeech: 'Você registrou a exposição e encaminhou a decisão sem ultrapassar sua alçada. A ordem permanece retida até uma aprovação formal de crédito.',
+      whatHappened: 'A ordem foi registrada com bloqueio e a recomendação ESCALATE foi documentada.',
+      why: 'Risco elevado, pendências e exposição acima do limite exigem decisão formal; urgência não substitui governança.',
+      businessImpact: 'A equipe de crédito recebeu um caso rastreável. A próxima etapa possível, após aprovação, será a confirmação e a entrega.'
     }
   },
   {
@@ -213,12 +213,12 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Comercial Urgente: Aumento de Volume TechLog (PO-TL-2026-042)',
-    briefing: 'Olá, trainee! O cliente corporativo TechLog Soluções em TI enviou uma solicitação de aditivo para o pedido que acabamos de registrar. Devido a uma nova demanda contratual no projeto de Curitiba, eles precisam aumentar a quantidade do Switch Gigabit Managed de 10 para 25 unidades. Eles solicitam a manutenção da condição comercial acordada (desconto de 5%, faturamento em 15 dias e frete CIF). Em vez de cancelarmos o pedido ou gerarmos duplicidade, localize a ordem de venda existente no sistema e utilize a transação VA02 para ajustar o volume. Não se esqueça de conferir a disponibilidade de estoque ATP e simular o recálculo dos impostos antes de gravar!',
+    briefing: 'Olá, trainee! O cliente corporativo TechLog Soluções em TI enviou uma solicitação de aditivo para o pedido que acabamos de registrar. Devido a uma nova demanda contratual no projeto de Curitiba, eles precisam aumentar a quantidade do Switch Gigabit Managed de 10 para 25 unidades. O aditivo AD01 mantém a condição de preço autorizada e solicita aumento de volume. Antes de alterar, confira a aprovação do aditivo, a disponibilidade por centro e a confirmação de data; não trate o saldo físico como ATP universal. Em vez de cancelarmos o pedido ou gerarmos duplicidade, localize a ordem de venda existente no sistema e utilize a transação VA02 para ajustar o volume. Não se esqueça de conferir a disponibilidade de estoque ATP e simular o recálculo dos impostos antes de gravar!',
 
     purchaseOrderDocument: {
       buyerName: 'TechLog Soluções em TI e Distribuição (Curitiba/PR)',
       buyerCnpj: '45.112.890/0002-34',
-      poNumber: 'PO-TL-2026-042 (Aditivo 01)',
+      poNumber: 'PO-TL-2026-042-AD01',
       operationType: 'Aditivo de Quantidade em Venda Comercial de Distribuição (Atacado)',
       itemsRequested: [
         { description: 'Switch Gigabit 24 Portas Managed Layer 3', quantity: 25, unit: 'UN' }
@@ -228,7 +228,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias líquido (Z015) com manutenção do desconto comercial de 5%'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: No dia a dia de SD, alterações de pedidos são frequentes. Abra a transação VA02 e carregue a Ordem nº 10000042 da TechLog. Verifique se o estoque disponível (ATP de 120 UN) suporta o novo volume de 25 unidades. Em seguida, altere a quantidade na grade de posições mantendo o desconto de 5% e simule o recálculo antes de gravar!',
+    mentorInitialTip: 'Pista do Chefe Wilson: carregue a ordem, confira a revisão AD01 e execute a verificação de disponibilidade. Registre a quantidade/data confirmadas e o impacto no valor antes de salvar.',
 
     sapKnowledgeBridge: {
       tcode: 'VA02 / VA03 / MM03',
@@ -245,9 +245,10 @@ export const ScenarioCatalog = [
         distChannel: '20',
         division: '01',
         customerId: '100120',
-        customerPoNumber: 'PO-TL-2026-042',
+        customerPoNumber: 'PO-TL-2026-042-AD01',
         paymentTerms: 'Z015',
-        incoterms: 'CIF',
+        incoterms: 'DAP',
+        incotermsLocation: 'CD TechLog - Curitiba/PR',
         incotermsLocation: 'Curitiba',
         items: [
           { materialId: 'MAT-2004', quantity: 10, manualDiscountPercent: 5 }
@@ -257,7 +258,7 @@ export const ScenarioCatalog = [
 
     objectives: [
       { id: 'access_va02', text: 'Localizar e abrir a Ordem de Venda 10000042 na transação VA02', done: false },
-      { id: 'check_stock_atp', text: 'Verificar se o estoque disponível (ATP) atende ao novo volume de 25 unidades', done: false },
+      { id: 'check_stock_atp', text: 'Executar a verificação de disponibilidade por centro e data', done: false },
       { id: 'update_order_quantity', text: 'Alterar a quantidade da posição 10 para 25 unidades mantendo o desconto de 5%', done: false },
       { id: 'save_modified_order', text: 'Simular o recálculo comercial de preços/impostos e gravar a alteração na VA02', done: false }
     ],
@@ -265,6 +266,7 @@ export const ScenarioCatalog = [
     targetCriteria: {
       action: 'SALES_ORDER_MODIFICATION',
       targetDocNumber: '10000042',
+      targetNetValue: 29687.50,
       paymentTerms: 'Z015',
       incoterms: 'CIF',
       items: [
@@ -291,7 +293,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Novo Pedido de Infraestrutura: Expansão Óptica DataCore (PO-DC-2026-088)',
-    briefing: 'Olá, trainee! O cliente corporativo DataCore Cloud & Datacenters Brasil enviou uma Ordem de Compra para aquisição de 50 unidades do Cabo de Fibra Óptica 10m Duplex LC-LC (MAT-4099), com objetivo de interconectar novos racks no data center de Barueri/SP. Trata-se de uma operação de venda direta faturada em 15 dias líquido (Z015) com frete CIF. Inicie a criação da ordem de venda na transação VA01. Caso o sistema acuse alguma inconsistência comercial durante a determinação de valores ou impeça a gravação por falta de preço, investigue a situação cadastral do produto e execute a manutenção da tabela de condições de preço antes de finalizar a emissão!',
+    briefing: 'Olá, trainee! O cliente corporativo DataCore Cloud & Datacenters Brasil enviou uma Ordem de Compra para aquisição de 50 unidades do Cabo de Fibra Óptica 10m Duplex LC-LC (MAT-4099), com objetivo de interconectar novos racks no data center de Barueri/SP. Trata-se de uma operação de venda direta faturada em 15 dias líquido (Z015) com termo logístico DAP para o ship-to de Barueri. Inicie a criação da ordem de venda na transação VA01. Caso o sistema acuse alguma inconsistência comercial durante a determinação de valores ou impeça a gravação por falta de preço, investigue a situação cadastral do produto e execute a manutenção da tabela de condições de preço antes de finalizar a emissão!',
 
     purchaseOrderDocument: {
       buyerName: 'DataCore Cloud & Datacenters Brasil Ltda (Barueri/SP)',
@@ -306,7 +308,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '15 dias direto (Z015) - Preço de tabela corporativa acordado de R$ 65,00 por unidade'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o cliente DataCore (100180) na XD03 para conferir os dados comerciais. Na VA01, informe a Área de Vendas 1000 / 10 / 01 e insira o material MAT-4099 com 50 unidades. Se o sistema acusar erro de determinação de preço, lembre-se do conceito de Esquema de Cálculo (Pricing Procedure): o SAP precisa de um registro de condição PR00 ativo. Você pode consultar a situação do item na MM03 e criar o registro de preço de R$ 65,00 na transação VK11 antes de retornar à VA01 para gravar!',
+    mentorInitialTip: 'Dica do Chefe Wilson: Consulte o cliente DataCore (100180) na XD03 para conferir os dados comerciais. Na VA01, informe a Área de Vendas 1000 / 10 / 01 e insira o material MAT-4099 com 50 unidades. Se o sistema acusar erro de determinação de preço, lembre-se do conceito de Esquema de Cálculo (Pricing Procedure): o SAP precisa de um registro de condição PR00 ativo. Você deve analisar a condição na ordem. Se não houver autorização de Pricing para manutenção, registre a pendência e escale; não crie um preço por conta própria.',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / VK11 / MM03 / VA03',
@@ -316,7 +318,7 @@ export const ScenarioCatalog = [
 
     objectives: [
       { id: 'check_pricing_error', text: 'Identificar a ausência da condição de preço do material MAT-4099 na VA01 ou MM03', done: false },
-      { id: 'create_pricing_record', text: 'Cadastrar o registro de condição PR00 no valor de R$ 65,00 na transação VK11', done: false },
+      { id: 'create_pricing_record', text: 'Registrar a solicitação de Pricing ou cadastrar condição somente com aprovação válida', done: false },
       { id: 'create_sales_order', text: 'Emitir a Ordem de Venda de 50 unidades do MAT-4099 com preço determinado na VA01', done: false },
       { id: 'verify_created_order', text: 'Consultar o documento gerado e confirmar o valor líquido de R$ 3.250,00 na VA03', done: false }
     ],
@@ -330,7 +332,8 @@ export const ScenarioCatalog = [
       customerId: '100180',
       customerPoNumber: 'PO-DC-2026-088',
       paymentTerms: 'Z015',
-      incoterms: 'CIF',
+      incoterms: 'DAP',
+      incotermsLocation: 'DataCore DC1 - Alphaville Barueri',
       conditionCode: 'PR00',
       targetMaterialId: 'MAT-4099',
       targetAmount: 65.00,
@@ -359,7 +362,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra: AutoPeças Guanabara (5x Firewall UTM MAT-2050)',
-    briefing: 'Olá, trainee! O cliente AutoPeças Guanabara enviou a Ordem de Compra PO-AG-2026-ATP1 solicitando 5 unidades do Firewall UTM Next-Gen 1Gbps (MAT-2050). Inicie a criação da ordem de venda na transação VA01. Durante o preenchimento, observe atentamente a coluna de disponibilidade do item. Se o sistema indicar inconsistência ou ruptura de estoque (Ruptura ATP), investigue a situação física e reservada do produto na transação MM03 para identificar o saldo livre disponível para entrega imediata (ATP). Ajuste a quantidade da ordem para o volume que pode ser atendido agora antes de efetuar a gravação!',
+    briefing: 'Olá, trainee! O cliente AutoPeças Guanabara enviou a Ordem de Compra PO-AG-2026-ATP1 solicitando 5 unidades do Firewall UTM Next-Gen 1Gbps (MAT-2050). Inicie a criação da ordem de venda na transação VA01. Durante o preenchimento, observe atentamente a coluna de disponibilidade do item. Se o sistema indicar inconsistência ou ruptura de estoque (Ruptura ATP), investigue a situação física e reservada do produto na transação MM03 para identificar o saldo livre disponível para entrega imediata (ATP). Não reduza a PO unilateralmente. Registre a quantidade solicitada, interprete a confirmação disponível e escolha entre confirmação parcial, data futura, PO revisada ou escalada.',
 
     purchaseOrderDocument: {
       buyerName: 'AutoPeças e Motores Guanabara S/A (Rio de Janeiro/RJ)',
@@ -374,7 +377,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias direto (Z030) - Preço de tabela corporativa sem desconto adicional'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Ao preencher a VA01 com as 5 unidades solicitadas no PO, note o aviso de [Ruptura ATP] na grade. Abra a transação MM03, consulte o material MAT-2050 e examine a aba de Verificação de Disponibilidade. Veja quanto temos de Estoque Físico, quanto já está Reservado e qual é o saldo Disponível (ATP). Retorne à VA01 e ajuste a quantidade da posição exatamente para o saldo disponível!',
+    mentorInitialTip: 'Pista do Chefe Wilson: compare quantidade solicitada, confirmação disponível, centro e data. Se o cliente não autorizou revisão da PO, preserve a demanda e registre o saldo pendente.',
 
     sapKnowledgeBridge: {
       tcode: 'VA01 / MM03 / CO09',
@@ -385,7 +388,7 @@ export const ScenarioCatalog = [
     objectives: [
       { id: 'check_atp_error', text: 'Identificar a ruptura de disponibilidade do material MAT-2050 na VA01', done: false },
       { id: 'check_stock_mm03', text: 'Consultar a transação MM03 e identificar o saldo disponível ATP de 3 unidades', done: false },
-      { id: 'create_adjusted_order', text: 'Emitir a Ordem de Venda na VA01 com a quantidade ajustada de 3 unidades', done: false },
+      { id: 'create_adjusted_order', text: 'Registrar a decisão de confirmação parcial ou PO revisada antes de salvar', done: false },
       { id: 'verify_order', text: 'Consultar a Ordem de Venda emitida na transação VA03', done: false }
     ],
 
@@ -435,11 +438,11 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra: UltraLink Provedor (4x Fonte Redundante MAT-3090)',
-    briefing: 'Olá! O provedor UltraLink nos enviou o pedido de compra PO-UL-2026-ATP2 para aquisição de 4 unidades da Fonte Redundante Hot-Plug 800W (MAT-3090). Analise as informações comerciais recebidas, certifique-se da viabilidade de atendimento de ponta a ponta e proceda com a emissão da ordem de venda na transação VA01. Ajuste a ordem de acordo com a capacidade real de atendimento imediato da nossa operação.',
+    briefing: 'Olá! O provedor UltraLink nos enviou o pedido de compra PO-UL-2026-ATP2 para aquisição de 4 unidades da Fonte Redundante Hot-Plug 800W (MAT-3090). Analise as informações comerciais recebidas, certifique-se da viabilidade de atendimento de ponta a ponta e proceda com a emissão da ordem de venda na transação VA01. Não reduza a PO sem aceite. Analise a confirmação por planta/data e registre se o saldo será atendido depois ou se será necessário um aditivo.',
 
     purchaseOrderDocument: {
       buyerName: 'UltraLink Provedor de Internet Banda Larga S/A (Fortaleza/CE)',
-      buyerCnpj: '78.901.234/0001-56',
+      buyerCnpj: '88.990.011/0001-66',
       poNumber: 'PO-UL-2026-ATP2',
       operationType: 'Venda de Componentes Críticos / Infraestrutura de Telecom',
       itemsRequested: [
@@ -461,7 +464,7 @@ export const ScenarioCatalog = [
     objectives: [
       { id: 'analyze_po', text: 'Analisar a solicitação de compra da UltraLink no pedido PO-UL-2026-ATP2', done: false },
       { id: 'investigate_availability', text: 'Investigar a capacidade de entrega e estoque do componente MAT-3090', done: false },
-      { id: 'create_order', text: 'Emitir a Ordem de Venda na VA01 com a quantidade de fornecimento viável (2 UN)', done: false },
+      { id: 'create_order', text: 'Registrar a PO e a decisão de confirmação parcial/pendência', done: false },
       { id: 'verify_order', text: 'Consultar a ordem emitida na transação VA03', done: false }
     ],
 
@@ -479,6 +482,8 @@ export const ScenarioCatalog = [
         {
           materialId: 'MAT-3090',
           requestedQuantity: 4,
+          confirmedQuantity: 2,
+          remainingQuantity: 2,
           quantity: 2,
           discountPercent: 0,
           atpFeedback: {
@@ -511,11 +516,11 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO URGENTE: Upgrade Servidores Banco Horizonte (PO-BH-2026-D02)',
-    briefing: 'Chamado prioritário! O departamento de compras do Banco Horizonte enviou a Ordem de Compra PO-BH-2026-D02 solicitando 10 unidades do Módulo de Memória ECC 64GB DDR5 (MAT-3050). Como analista responsável pela conta, processe este pedido com total autonomia técnica e comercial, garantindo que o documento seja gravado com 100% de conformidade operacional dentro do SLA estabelecido.',
+    briefing: 'Chamado prioritário! O departamento de compras do Banco Horizonte enviou a Ordem de Compra PO-BH-2026-D02 solicitando 10 unidades do Módulo de Memória ECC 64GB DDR5 (MAT-3050). Como analista responsável pela conta, processe este pedido com total autonomia técnica e comercial, registre a PO de 10 unidades, avalie a confirmação parcial e documente como tratar as 6 unidades não confirmadas. O SLA mede atendimento do chamado, não autoriza reduzir a demanda sem aceite.',
 
     purchaseOrderDocument: {
       buyerName: 'Banco Horizonte de Investimentos S/A (São Paulo/SP)',
-      buyerCnpj: '56.789.012/0001-34',
+      buyerCnpj: '78.901.234/0001-56',
       poNumber: 'PO-BH-2026-D02',
       operationType: 'Fornecimento Corporativo Crítico / Mercado Interno',
       itemsRequested: [
@@ -536,7 +541,7 @@ export const ScenarioCatalog = [
 
     objectives: [
       { id: 'process_demand', text: 'Processar a Ordem de Compra do Banco Horizonte com total autonomia', done: false },
-      { id: 'emit_sales_order', text: 'Emitir a Ordem de Venda na VA01 em conformidade com as regras operacionais (4 UN)', done: false },
+      { id: 'emit_sales_order', text: 'Registrar a ordem com decisão de confirmação parcial e saldo pendente', done: false },
       { id: 'audit_flow', text: 'Auditar a ordem finalizada na transação VA03', done: false }
     ],
 
@@ -586,22 +591,22 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem Retida por Crédito: UltraLink Provedor (Doc 10000006)',
-    briefing: 'Olá, trainee! O cliente corporativo UltraLink Provedor de Internet Banda Larga abriu um chamado informando que a Ordem de Venda nº 10000006 (6x Switch 48 Portas PoE+ MAT-2080) está retida pelo sistema e não avançou para a expedição física. Consulte a ordem na transação VA03 para confirmar a situação no Fluxo de Documentos (VBFA). Em seguida, investigue o perfil financeiro do cliente na transação XD03 e acesse a transação VKM1 para analisar a exposição comercial e realizar a liberação supervisionada com parecer comercial, concluindo sua etapa de alçada.',
+    briefing: 'Olá, trainee! O cliente corporativo UltraLink Provedor de Internet Banda Larga abriu um chamado informando que a Ordem de Venda nº 10000006 (6x Switch 48 Portas PoE+ MAT-2080) está retida pelo sistema e não avançou para a expedição física. Consulte a ordem, o parceiro e a decisão de crédito. Calcule a exposição projetada e recomende RELEASE, REJECT, HOLD ou ESCALATE. Só libere se houver aprovação formal e alçada verificável; caso contrário, documente ESCALATE.',
 
     purchaseOrderDocument: {
       buyerName: 'UltraLink Provedor de Internet Banda Larga S/A (Fortaleza/CE)',
-      buyerCnpj: '78.901.234/0001-56',
+      buyerCnpj: '88.990.011/0001-66',
       poNumber: 'PO-UL-2026-055',
       operationType: 'Venda de Equipamentos de Conectividade / Redes (Venda Direta)',
       itemsRequested: [
         { description: 'Switch 48 Portas Gigabit PoE+ com 4x 10G SFP+ (MAT-2080)', quantity: 6, unit: 'UN' }
       ],
       deliveryAddress: 'Av. Santos Dumont, 2800 - Fortaleza/CE',
-      freightResponsibility: 'CIF - Entrega no Centro Operacional por conta da NexusTech',
+      freightResponsibility: 'DAP - Centro Operacional Fortaleza, conforme contrato da NexusTech',
       paymentInstructions: '15 dias líquido (Z015) - Limite de Crédito Corporativo BR01'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro abra a VA03 e carregue a Ordem 10000006 para ver o status [Bloqueado por Crédito (VKM1)]. Depois abra a XD03 no cliente 100800 para checar o limite (R$ 250.000,00) e o saldo utilizado (R$ 240.000,00). Na VKM1, localize a ordem e execute a liberação comercial. Retorne à VA03 para confirmar que a remessa está pronta para expedição!',
+    mentorInitialTip: 'Pista do Chefe Wilson: valide a ordem e os dados do Business Partner antes de decidir. O número exibido na fila não é autorização; registre o motivo, a decisão e a evidência de alçada.',
 
     sapKnowledgeBridge: {
       tcode: 'VA03 / XD03 / VKM1',
@@ -613,11 +618,13 @@ export const ScenarioCatalog = [
       { id: 'check_order_va03', text: 'Localizar a Ordem de Venda 10000006 na VA03 e verificar o bloqueio no fluxo', done: false },
       { id: 'investigate_credit', text: 'Consultar dados de crédito do cliente UltraLink (100800) na transação XD03', done: false },
       { id: 'access_vkm1', text: 'Acessar a transação VKM1 e analisar o motivo do bloqueio por excesso de limite', done: false },
-      { id: 'release_credit_order', text: 'Executar a liberação de crédito da Ordem 10000006 com parecer supervisionado', done: false }
+      { id: 'release_credit_order', text: 'Registrar decisão de crédito e parecer; liberar somente com aprovação', done: false }
     ],
 
     targetCriteria: {
       targetDocNumber: '10000006',
+      salesOrg: '1000', distChannel: '10', division: '01', paymentTerms: 'Z015', incoterms: 'DAP',
+      creditDecision: 'ESCALATE', requiresApproval: true, expectedCreditLimit: 110000, expectedCreditUsed: 108500, targetNetValue: 17100.00,
       customerId: '100800',
       action: 'CREDIT_RELEASE',
       requiresVkm1Release: true
@@ -626,28 +633,26 @@ export const ScenarioCatalog = [
     completionFeedback: {
       mentorSpeech: 'Excelente condução! Você verificou o bloqueio na VA03, investigou a exposição financeira do cliente UltraLink na XD03 e efetuou a liberação com alçada comercial na VKM1. Esse é o fluxo padrão de integração entre SD e FI-AR no SAP! Parabéns! +300 XP.',
       whatHappened: 'Ordem de Venda nº 10000006 liberada do bloqueio de crédito e status atualizado para OPEN.',
-      why: 'O cliente UltraLink excedeu a linha de crédito (R$ 261.759,75 > R$ 250.000,00), exigindo parecer e aprovação comercial.',
-      businessImpact: 'A remessa foi destravada na VL01N, permitindo a separação e o envio dos switches para Fortaleza/CE.'
+      why: 'A exposição projetada supera o limite configurado da conta; a decisão deve ser documentada e encaminhada ao responsável de crédito.',
+      businessImpact: 'A ordem permanece retida até decisão autorizada; somente depois será possível avaliar a criação da remessa.'
     }
   },
   {
     id: 'SCN-10',
     code: 'TRN-107',
-    title: 'Diagnóstico de Restrição Cadastral',
+    title: 'Diagnóstico de Crédito: Manter, Rejeitar ou Escalar',
     mode: 'TRAINING',
     levelRequired: 1,
     slaMinutes: null,
     xpReward: 300,
     badgeReward: 'credit_analyst',
     initialTcode: 'VA03',
-
-    sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
-    emailSubject: 'Bloqueio de Expedição: AutoPeças Guanabara (Doc 10000005)',
-    briefing: 'Olá, trainee! O cliente AutoPeças e Motores Guanabara entrou em contato para saber por que o fornecimento de componentes da Ordem nº 10000005 está paralisado. Investigue a situação comercial do documento e do parceiro de negócios na VA03 e XD03. Identifique a causa-raiz da retenção no sistema e realize a liberação formal do bloqueio de crédito na transação VKM1 com parecer de alçada, regularizando a ordem para as etapas logísticas subsequentes.',
-
+    sender: 'Chefe Wilson (Gestor de Operações SD)',
+    emailSubject: 'Chamado: ordem 10000005 retida — causa e encaminhamento',
+    briefing: 'A AutoPeças e Motores Guanabara pergunta por que a Ordem 10000005 está parada. Analise o documento e o parceiro de negócios no fluxo S/4HANA de crédito. Identifique se a retenção decorre de exposição, risco ou pendência cadastral e registre HOLD/ESCALATE. Não libere uma ordem com títulos vencidos sem aprovação e evidência de mitigação.',
     purchaseOrderDocument: {
       buyerName: 'AutoPeças e Motores Guanabara S/A (Rio de Janeiro/RJ)',
-      buyerCnpj: '67.890.123/0001-45',
+      buyerCnpj: '77.889.900/0001-55',
       poNumber: 'PO-AG-2026-041',
       operationType: 'Fornecimento de Componentes de Rede e Energia',
       itemsRequested: [
@@ -658,34 +663,29 @@ export const ScenarioCatalog = [
       freightResponsibility: 'FOB - Retirada pelo transportador do comprador',
       paymentInstructions: '30 dias direto (Z030)'
     },
-
-    mentorInitialTip: 'Dica do Chefe Wilson: Observe que o valor total desta ordem (R$ 5.166,15) é relativamente baixo e está dentro do limite financeiro. Consulte a ficha do cliente na XD03 e o motivo na VKM1 para descobrir por que a ordem foi retida. Após entender que se trata de uma restrição cadastral prévia, execute a liberação supervisionada na VKM1!',
-
+    mentorInitialTip: 'Pista do Chefe Wilson: calcule o valor líquido e a exposição com os dados encontrados. Escolha HOLD/ESCALATE se não houver aprovação de crédito ou mitigação documentada; não trate um botão de liberação como decisão automática.',
     sapKnowledgeBridge: {
-      tcode: 'VA03 / XD03 / VKM1',
-      tables: 'KNKK / KNVV / VBAK',
-      concept: 'Nem todo bloqueio de crédito decorre de insuficiência de limite. Clientes com restrições jurídicas, protestos fiscais ou pendências contratuais podem ser marcados com creditStatus = BLOCKED no mestre, acionando a retenção preventiva obrigatória de todas as novas ordens.'
+      tcode: 'Manage Credit Accounts / Manage Documented Credit Decisions',
+      legacyComparison: 'Em ECC clássico, a comparação pode usar VA03/XD03/VKM1 conforme o customizing.',
+      concept: 'No S/4HANA, uma decisão de crédito precisa considerar exposição, risco, pendências e alçada. O laboratório simula a governança; não afirma que o status local reproduz um sistema SAP real.'
     },
-
     objectives: [
-      { id: 'analyze_order', text: 'Consultar a Ordem de Venda 10000005 e constatar a retenção na VA03', done: false },
-      { id: 'investigate_credit', text: 'Investigar a restrição cadastral do cliente AutoPeças Guanabara (100750) na XD03', done: false },
-      { id: 'access_vkm1', text: 'Acessar a transação VKM1 e analisar o motivo de bloqueio cadastral', done: false },
-      { id: 'release_credit_order', text: 'Executar a liberação de crédito da Ordem 10000005 na VKM1', done: false }
+      { id: 'analyze_order', text: 'Consultar a Ordem 10000005 e confirmar o bloqueio', done: false },
+      { id: 'investigate_credit', text: 'Conferir limite, utilização, risco e pendências do cliente 100750', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisões de crédito e localizar o documento', done: false },
+      { id: 'release_credit_order', text: 'Registrar HOLD/ESCALATE com parecer e motivo verificável', done: false }
     ],
-
     targetCriteria: {
-      targetDocNumber: '10000005',
-      customerId: '100750',
-      action: 'CREDIT_RELEASE',
-      requiresVkm1Release: true
+      targetDocNumber: '10000005', customerId: '100750', action: 'CREDIT_RELEASE',
+      salesOrg: '1000', distChannel: '10', division: '02', paymentTerms: 'Z030', incoterms: 'FOB',
+      customerPoNumber: 'PO-AG-2026-041', targetNetValue: 4060.00, creditDecision: 'ESCALATE', requiresApproval: true,
+      expectedCreditLimit: 70000, expectedCreditUsed: 68900
     },
-
     completionFeedback: {
-      mentorSpeech: 'Diagnóstico perfeito! Você percebeu que o bloqueio não era por falta de limite numérico, mas sim por uma trava cadastral no mestre do cliente. Liberou a ordem na VKM1 com parecer supervisionado e restabeleceu o fluxo comercial! Parabéns! +300 XP.',
-      whatHappened: 'Ordem de Venda nº 10000005 liberada do bloqueio cadastral de crédito.',
-      why: 'O cliente AutoPeças Guanabara possuía status cadastral de risco (BLOCKED), exigindo validação manual da alçada.',
-      businessImpact: 'A expedição de placas e fontes foi autorizada para o cliente no Rio de Janeiro.'
+      mentorSpeech: 'Diagnóstico correto: você identificou exposição acima do limite e não liberou sem governança. A recomendação foi encaminhada ao responsável.',
+      whatHappened: 'A ordem permanece bloqueada e a recomendação ESCALATE foi registrada.',
+      why: 'Exposição projetada, risco e pendências exigem aprovação ou mitigação antes da continuidade logística.',
+      businessImpact: 'O caso foi encaminhado com evidências, evitando uma autorização financeira sem alçada.'
     }
   },
   {

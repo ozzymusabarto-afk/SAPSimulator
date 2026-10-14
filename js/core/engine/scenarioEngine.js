@@ -388,7 +388,7 @@ class ScenarioEngine {
 
     this.completeObjectives([
       'check_order_va03', 'check_flow_va03', 'analyze_order', 'diagnose_situation',
-      'verify_document_flow', 'verify_created_order', 'verify_order'
+      'verify_document_flow', 'verify_created_order', 'verify_order', 'audit_flow'
     ]);
     const completed = this.completeActiveScenarioIfReady(
       'Inspeção de Ordem VA03',
@@ -426,6 +426,28 @@ class ScenarioEngine {
       scenario.validationRules?.actionType === 'SALES_ORDER_SUBMISSION';
     const isCreditReleaseMission = target.action === 'CREDIT_RELEASE' ||
       scenario.validationRules?.actionType === 'CREDIT_RELEASE';
+
+    const prerequisiteGroups = [
+      { enabled: target.requiresCustomerAnalysis, ids: ['check_customer', 'check_customer_xd03', 'investigate_credit'], label: 'consulta e reconciliação do Business Partner' },
+      { enabled: target.requiresPoAnalysis, ids: ['analyze_po', 'process_demand'], label: 'análise da PO e dos parceiros' },
+      { enabled: target.requiresMaterialAnalysis, ids: ['check_material', 'check_stock_mm03', 'check_stock_atp', 'investigate_availability'], label: 'análise do material e da disponibilidade' },
+      { enabled: target.requiresPricingEvidence, ids: ['check_pricing_error', 'simulate_pricing'], label: 'evidência de pricing' }
+    ];
+    for (const group of prerequisiteGroups) {
+      if (!group.enabled) continue;
+      const objective = scenario.objectives.find(item => group.ids.includes(item.id));
+      if (objective && !objective.done) {
+        return {
+          isValid: false,
+          fieldError: 'prerequisite',
+          activeTabHint: 'HEADER',
+          mentorSpeech: `Antes de gravar, conclua a ${group.label}. A ordem não deve ser criada com dados não reconciliados.`,
+          whatHappened: `A etapa de ${group.label} ainda não foi registrada na missão.`,
+          why: 'No fluxo S/4HANA, a decisão comercial precisa estar baseada em dados de parceiro, produto, preço e disponibilidade conferidos.',
+          businessImpact: 'Evita criar uma ordem com parceiro, preço, quantidade, prazo ou risco incorretos.'
+        };
+      }
+    }
 
     if (!isSalesOrderSubmissionMission && !isCreditReleaseMission) {
       return {
@@ -669,7 +691,8 @@ class ScenarioEngine {
         target.conditionCode || 'PR00'
       );
       const material = db.getMaterial(targetItem.materialId);
-      const unitPrice = Number(pricingRecord?.amount ?? material?.basePrice ?? 0);
+      const useLegacyBasePriceFallback = !target.requiresPricingEvidence && !target.requiresPricingApproval;
+      const unitPrice = Number(pricingRecord?.amount ?? (useLegacyBasePriceFallback ? material?.basePrice : 0) ?? 0);
       if (!(unitPrice > 0)) {
         this.completeObjective('check_pricing_error');
         return {
@@ -789,6 +812,20 @@ class ScenarioEngine {
             };
           }
         }
+      }
+      const expectedMaterialIds = new Set(target.items.map(item => item.materialId));
+      const extraItem = orderData.items.find(item => !expectedMaterialIds.has(item.materialId));
+      if (extraItem) {
+        trainee.recordAction(false, 'Tentativa de Gravação', `Material extra: ${extraItem.materialId}`);
+        return {
+          isValid: false,
+          fieldError: 'items',
+          activeTabHint: 'ITEMS',
+          mentorSpeech: `A posição ${extraItem.materialId} não consta na PO nem no escopo da missão. Remova o item ou registre uma alteração comercial formal antes de salvar.`,
+          whatHappened: `Material não solicitado incluído na ordem: ${extraItem.materialId}.`,
+          why: 'Uma ordem S/4HANA deve manter rastreabilidade entre demanda, item e parceiro.',
+          businessImpact: 'Itens extras podem gerar faturamento, estoque e expedição indevidos.'
+        };
       }
     }
 
@@ -1035,7 +1072,7 @@ class ScenarioEngine {
       'access_va02', 'modify_payment_terms', 'modify_incoterms', 'modify_item_quantity',
       'update_order_quantity', 'apply_discount', 'apply_volume_discount', 'update_incoterms',
       'adjust_quantity', 'update_header_terms', 'update_item_quantity', 'adjust_discount',
-      'save_order_modification', 'save_modified_order'
+      'save_order_modification', 'save_modified_order', 'check_stock_atp'
     ]);
 
     const summaryText = `Ordem ${docNumber} alterada • Total: R$ ${Number(updatedOrderData.totalValue || 0).toFixed(2)}`;

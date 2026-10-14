@@ -50,6 +50,7 @@ export const ConditionTypes = [
 export const InitialPricingRecords = [
   { materialId: 'MAT-1001', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 8500.00, validTo: '31.12.2028' },
   { materialId: 'MAT-2004', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 1250.00, validTo: '31.12.2028' },
+  { materialId: 'MAT-2004', salesOrg: '1000', distChannel: '20', conditionCode: 'PR00', amount: 1250.00, validTo: '31.12.2028' },
   { materialId: 'MAT-3050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 980.00, validTo: '31.12.2028' },
   { materialId: 'MAT-1010', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 4200.00, validTo: '31.12.2028' },
   { materialId: 'MAT-1050', salesOrg: '1000', distChannel: '10', conditionCode: 'PR00', amount: 16500.00, validTo: '31.12.2028' },

@@ -102,6 +102,19 @@ function finishCreditMission(scenario, order) {
   assert.equal(trainee.isScenarioCompleted(scenario.id), false, 'A consulta XD03 concluiu a missão antes da ação VKM1.');
   assert.equal(scenarioEngine.areActiveScenarioObjectivesComplete(), false, 'A análise XD03 concluiu todos os objetivos antes da liberação VKM1.');
 
+  if (target.creditDecision && target.creditDecision !== 'RELEASE') {
+    assert.ok(['HOLD', 'ESCALATE', 'REJECT'].includes(target.creditDecision), 'Decisão de crédito não suportada pelo laboratório.');
+    scenarioEngine.completeObjectives(['access_vkm1', 'release_with_notes', 'release_credit_order', 'analyze_credit', 'release_order']);
+    assert.equal(order.overallStatus, 'CREDIT_BLOCKED', 'Uma decisão sem RELEASE não pode desbloquear a ordem.');
+    assert.equal(scenarioEngine.areActiveScenarioObjectivesComplete(), true, 'A decisão documentada deveria concluir os objetivos do chamado.');
+    assert.equal(
+      scenarioEngine.completeActiveScenarioIfReady('Decisão documentada de crédito', `Ordem ${order.docNumber} com decisão ${target.creditDecision}`),
+      true,
+      'A decisão documentada deveria homologar a missão.'
+    );
+    return;
+  }
+
   assert.equal(db.releaseCreditOrder(order.docNumber), true, 'VKM1 não liberou a ordem-alvo.');
   // Replica os objetivos registrados pelo handler da VKM1 após uma liberação válida.
   scenarioEngine.completeObjectives(['access_vkm1', 'release_with_notes', 'release_credit_order', 'analyze_credit', 'release_order']);

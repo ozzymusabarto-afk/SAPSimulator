@@ -39,6 +39,8 @@ export class Vkm1ViewComponent {
     // Serão disparados apenas após ação real do trainee no handler de liberação.
 
     const blocked = db.creditBlockedOrders;
+    const requiredDecision = scenario?.targetCriteria?.creditDecision || null;
+    const requiresDocumentedDecision = Boolean(requiredDecision);
 
     this.container.innerHTML = `
       <div class="transaction-header-bar">
@@ -75,7 +77,7 @@ export class Vkm1ViewComponent {
                   <th>Saldo Utilizado</th>
                   <th>Risco</th>
                   <th>Motivo do Bloqueio</th>
-                  <th>Ação de Liberação</th>
+                      <th>${requiresDocumentedDecision ? 'Decisão e parecer' : 'Ação de Liberação'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,9 +100,23 @@ export class Vkm1ViewComponent {
                       ${b.reason}
                     </td>
                     <td>
-                      <button class="btn btn-primary btn-sm btn-release-order" data-doc="${b.orderDocNumber}">
-                        ${Icons.unlock} Liberar Ordem
-                      </button>
+                      ${requiresDocumentedDecision ? `
+                        <select class="erp-select credit-decision-select" data-doc="${b.orderDocNumber}" style="width: 150px; margin-bottom: 6px;">
+                          <option value="">Selecionar decisão</option>
+                          <option value="RELEASE">RELEASE — liberar</option>
+                          <option value="HOLD">HOLD — manter</option>
+                          <option value="ESCALATE">ESCALATE — encaminhar</option>
+                          <option value="REJECT">REJECT — rejeitar</option>
+                        </select>
+                        <textarea class="erp-input credit-decision-note" data-doc="${b.orderDocNumber}" rows="2" placeholder="Parecer e evidência (mín. 20 caracteres)" style="width: 190px; margin-bottom: 6px;"></textarea>
+                        <button class="btn btn-primary btn-sm btn-release-order" data-doc="${b.orderDocNumber}">
+                          ${Icons.check} Registrar decisão
+                        </button>
+                      ` : `
+                        <button class="btn btn-primary btn-sm btn-release-order" data-doc="${b.orderDocNumber}">
+                          ${Icons.unlock} Liberar Ordem
+                        </button>
+                      `}
                     </td>
                   </tr>
                 `).join('')}
@@ -144,8 +160,9 @@ export class Vkm1ViewComponent {
           const selectedOrder = db.getSalesOrder(docNumber);
           const matchesTargetDocument = !targetCriteria.targetDocNumber || targetCriteria.targetDocNumber === docNumber;
           const matchesTargetCustomer = !targetCriteria.customerId || selectedOrder?.customerId === targetCriteria.customerId;
+          const matchesTargetPo = !targetCriteria.customerPoNumber || selectedOrder?.customerPoNumber === targetCriteria.customerPoNumber;
 
-          if (activeScenario && (!matchesTargetDocument || !matchesTargetCustomer)) {
+          if (activeScenario && (!matchesTargetDocument || !matchesTargetCustomer || !matchesTargetPo)) {
             const expected = targetCriteria.targetDocNumber
               ? `ordem ${targetCriteria.targetDocNumber}`
               : targetCriteria.customerId
@@ -158,6 +175,66 @@ export class Vkm1ViewComponent {
               why: 'A alçada de crédito deve ser aplicada somente ao documento indicado no chamado.',
               businessImpact: 'A liberação de uma ordem diferente pode autorizar uma expedição indevida.',
               onConfirm: () => this.render()
+            });
+            return;
+          }
+
+          const selectedDecision = this.container.querySelector(`.credit-decision-select[data-doc="${docNumber}"]`)?.value || 'RELEASE';
+          const decisionNote = this.container.querySelector(`.credit-decision-note[data-doc="${docNumber}"]`)?.value?.trim() || '';
+          const expectedDecision = targetCriteria.creditDecision;
+          if (expectedDecision && selectedDecision !== expectedDecision) {
+            diagnosticModal.show({
+              isValid: false,
+              mentorSpeech: `A decisão selecionada (${selectedDecision || 'nenhuma'}) não corresponde à análise deste chamado. Reavalie risco, exposição e alçada antes de registrar.`,
+              whatHappened: `Decisão informada: ${selectedDecision || 'em branco'}. Decisão esperada para o exercício: ${expectedDecision}.`,
+              why: 'A decisão de crédito deve refletir as evidências do parceiro e a autorização disponível.',
+              businessImpact: 'Liberar, rejeitar ou manter uma ordem sem fundamento pode causar risco financeiro ou atraso indevido.',
+              onConfirm: () => this.render()
+            });
+            return;
+          }
+          if (expectedDecision && decisionNote.length < 20) {
+            diagnosticModal.show({
+              isValid: false,
+              mentorSpeech: 'Registre um parecer objetivo com a evidência que sustenta a decisão (mínimo de 20 caracteres).',
+              whatHappened: 'O parecer de crédito está ausente ou superficial.',
+              why: 'Uma decisão documentada precisa deixar claro o motivo, a evidência e o encaminhamento.',
+              businessImpact: 'Sem rastreabilidade, outra pessoa não consegue revisar a decisão nem assumir a próxima etapa.',
+              onConfirm: () => this.render()
+            });
+            return;
+          }
+
+          // Decisão diferente de RELEASE mantém a ordem bloqueada e registra o encaminhamento.
+          if (expectedDecision && selectedDecision !== 'RELEASE') {
+            const scenario = scenarioEngine.getActiveScenario();
+            scenarioEngine.completeObjective('access_vkm1');
+            scenarioEngine.completeObjective('release_with_notes');
+            scenarioEngine.completeObjective('release_credit_order');
+            scenarioEngine.completeObjective('analyze_credit');
+            scenarioEngine.completeObjective('release_order');
+            const summary = `Ordem ${docNumber} • decisão ${selectedDecision} • parecer: ${decisionNote}`;
+            const missionCompleted = scenarioEngine.completeActiveScenarioIfReady('Decisão documentada de crédito', summary);
+            trainee.recordAction(true, 'Decisão documentada de crédito', summary);
+            diagnosticModal.show({
+              isValid: true,
+              operationSummary: {
+                title: 'Decisão de Crédito Registrada',
+                docTypeBadge: 'Credit Management • S/4HANA reference',
+                primaryLabel: 'Ordem analisada:',
+                primaryNumber: Formatters.documentNumber(docNumber),
+                statusText: `Ordem permanece retida (${selectedDecision})`,
+                partnerLabel: 'Parecer:',
+                partnerOrOrigin: decisionNote,
+                referenceDoc: missionCompleted ? 'Missão concluída; aguarde a alçada responsável.' : 'Conclua as etapas pendentes do chamado.',
+                inspectLabel: `Inspecionar Ordem [${Formatters.documentNumber(docNumber)}] em VA03`
+              },
+              mentorSpeech: scenario?.completionFeedback?.mentorSpeech || `Decisão ${selectedDecision} registrada. A ordem continua bloqueada até a próxima alçada.`,
+              whatHappened: scenario?.completionFeedback?.whatHappened || `Parecer ${selectedDecision} registrado para a ordem ${docNumber}.`,
+              why: scenario?.completionFeedback?.why || 'A ordem não deve ser liberada sem aprovação e evidência compatíveis.',
+              businessImpact: scenario?.completionFeedback?.businessImpact || 'O caso foi encaminhado com rastreabilidade para a área responsável.',
+              onConfirm: () => this.render(),
+              onInspect: () => this.onNavigate('VA03', { docNumber })
             });
             return;
           }
