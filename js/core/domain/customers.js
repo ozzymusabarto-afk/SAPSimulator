@@ -104,7 +104,7 @@ export const InitialCustomers = [
     id: '100150',
     name: 'Rede Hospitalar São Lucas S/A',
     tradeName: 'Hospital São Lucas',
-    cnpj: '23.456.789/0001-01',
+    cnpj: '23.456.789/0001-95',
     city: 'Rio de Janeiro',
     state: 'RJ',
     salesOrg: '1000',

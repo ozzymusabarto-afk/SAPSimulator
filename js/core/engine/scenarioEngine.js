@@ -1297,6 +1297,15 @@ class ScenarioEngine {
     }
 
     const target = scenario.targetCriteria;
+    if (target.requiresDeliveryReference && !invoiceData?.deliveryNumber) {
+      return {
+        isValid: false,
+        mentorSpeech: 'O documento de faturamento precisa estar relacionado a uma outbound delivery. Selecione a remessa antes de continuar.',
+        whatHappened: 'Nenhuma remessa foi informada como referência do billing.',
+        why: 'O fluxo de produto físico mantém rastreabilidade entre ordem, entrega, PGI e faturamento.',
+        businessImpact: 'Evita faturamento desacoplado da expedição e cobrança de uma operação ainda não expedida.'
+      };
+    }
 
     // 1. Validação do Tipo de Faturamento
     if (target.billingType && billingType !== target.billingType) {

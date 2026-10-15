@@ -416,6 +416,17 @@ export class Vf01ViewComponent {
         const invoiceTarget = activeScenario?.targetCriteria;
         const wrongBillingType = invoiceTarget?.billingType && this.selectedBillingType !== invoiceTarget.billingType;
         const wrongOrder = invoiceTarget?.targetDocNumber && this.loadedOrder.docNumber !== invoiceTarget.targetDocNumber;
+        const missingDeliveryReference = invoiceTarget?.requiresDeliveryReference && !this.loadedDelivery;
+        if (missingDeliveryReference) {
+          diagnosticModal.show({
+            isValid: false,
+            mentorSpeech: 'Esta missão exige faturamento com referência à remessa. Selecione a outbound delivery correta antes de gravar o documento F2.',
+            whatHappened: `A ordem ${this.loadedOrder.docNumber} foi carregada sem uma remessa selecionada.`,
+            why: 'Para o fluxo de produto físico, o billing deve manter o vínculo entre ordem, entrega, PGI e documento de faturamento.',
+            businessImpact: 'Evita criar uma fatura desacoplada da expedição ou faturar uma ordem sem saída de mercadorias.'
+          });
+          return;
+        }
         if (activeScenario && (wrongBillingType || wrongOrder)) {
           const validation = scenarioEngine.validateInvoiceCreation(
             this.selectedBillingType,
