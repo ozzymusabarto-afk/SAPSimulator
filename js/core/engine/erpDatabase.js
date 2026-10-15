@@ -376,10 +376,15 @@ class ErpDatabase {
       return { success: false, error: `A Saída de Mercadorias (PGI) já foi registrada anteriormente para a Remessa nº ${deliveryNumber}. Movimento não pode ser duplicado.` };
     }
 
-    // 1. Confirmação do Picking
-    delivery.items.forEach(it => {
-      it.pickedQuantity = it.deliveryQuantity;
-    });
+    // 1. O PGI nunca deve completar o picking silenciosamente.
+    // A confirmação precisa ter sido feita na VL02N para cada posição.
+    const pendingPicking = delivery.items.filter(it => Number(it.pickedQuantity || 0) < Number(it.deliveryQuantity || 0));
+    if (pendingPicking.length > 0) {
+      return {
+        success: false,
+        error: `Picking incompleto: ${pendingPicking.map(it => `${it.materialId} (${it.pickedQuantity || 0}/${it.deliveryQuantity})`).join(', ')}. Confirme todas as posições antes do PGI.`
+      };
+    }
     delivery.pickingStatus = 'COMPLETED';
 
     // 2. Baixa física de estoque (Movimento 601)

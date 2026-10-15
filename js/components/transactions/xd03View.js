@@ -118,7 +118,7 @@ export class Xd03ViewComponent {
         <div class="form-grid-3">
           <div class="erp-form-group">
             <label class="erp-form-label">Condição de Pagamento (ZTERM)</label>
-            <input type="text" class="erp-input font-mono font-bold text-primary" value="${customer.paymentTerms} - 30 dias líquido" readonly />
+            <input type="text" class="erp-input font-mono font-bold text-primary" value="${customer.paymentTerms} - ${customer.paymentTerms === 'Z060' ? '60 dias líquido' : customer.paymentTerms === 'Z015' ? '15 dias líquido' : customer.paymentTerms === 'Z28D' ? '28 dias líquido' : '30 dias líquido'}" readonly />
           </div>
 
           <div class="erp-form-group">

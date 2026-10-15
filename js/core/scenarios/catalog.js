@@ -691,7 +691,7 @@ export const ScenarioCatalog = [
   {
     id: 'SCN-11',
     code: 'DSF-203',
-    title: 'Desafio Autônomo — Liberação de Crédito sob SLA',
+    title: 'Desafio Autônomo — Decisão de Crédito sob SLA',
     mode: 'CHALLENGE',
     levelRequired: 1,
     slaMinutes: 6,
@@ -701,7 +701,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'CHAMADO PRIORITÁRIO: Pedido Crítico Retido - Metalúrgica Paulista (Doc 10000004)',
-    briefing: 'Chamado Comercial Prioritário! A diretoria da Indústria Metalúrgica Paulista entrou em contato com a gerência geral cobrando o despacho imediato da Ordem nº 10000004 (Servidores Enterprise MAT-1001), afirmando que a linha de produção em Campinas/SP depende desses equipamentos. Como consultor SD de plantão, assuma este chamado sob controle de SLA: investigue a causa da retenção financeira da ordem e execute a aprovação formal do crédito na transação VKM1 para regularizar a liberação comercial dentro do prazo estipulado.',
+    briefing: 'Chamado Comercial Prioritário! A diretoria da Indústria Metalúrgica Paulista entrou em contato com a gerência geral cobrando o despacho imediato da Ordem nº 10000004 (Servidores Enterprise MAT-1001), afirmando que a linha de produção em Campinas/SP depende desses equipamentos. Como analista de operações SD em treinamento, assuma este chamado sob controle de SLA: investigue a retenção, reconcilie limite, exposição, risco e títulos pendentes e registre uma decisão documentada. A urgência da diretoria não substitui a alçada de crédito.',
 
     purchaseOrderDocument: {
       buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
@@ -719,30 +719,35 @@ export const ScenarioCatalog = [
     mentorInitialTip: 'Aviso de Desafio: Você está no comando autônomo com controle de tempo (SLA de 6 minutos). Utilize todas as transações disponíveis para diagnosticar o status do documento e regularizar o fornecimento!',
     
     sapKnowledgeBridge: {
-      tcode: 'VA03 / XD03 / VKM1',
-      tables: 'KNKK / VBAK / VBFA',
-      concept: 'Em operações corporativas com risco elevado, a tomada de decisão autônoma sobre a liberação de crédito pondera a criticidade do cliente frente à inadimplência e à garantia de recebimento.'
+      tcode: 'Manage Documented Credit Decisions / Manage Business Partner / Manage Sales Orders',
+      legacyComparison: 'VA03, XD03, VKM1, KNKK, VBAK e VBFA são referências GUI/ECC ou simplificações do laboratório.',
+      concept: 'No S/4HANA, a decisão deve considerar exposição, risco, vencidos e alçada. A NexusTech é fictícia e o laboratório registra uma decisão em memória; não reproduz FSCM real.'
     },
 
     objectives: [
-      { id: 'diagnose_situation', text: 'Diagnosticar a retenção da Ordem 10000004 no fluxo de documentos', done: false },
-      { id: 'investigate_credit', text: 'Avaliar o risco e a exposição financeira da Metalúrgica Paulista na XD03', done: false },
-      { id: 'access_vkm1', text: 'Acessar a transação VKM1 e interpretar a situação de crédito misto', done: false },
-      { id: 'release_credit_order', text: 'Liberar a Ordem 10000004 com parecer comercial na VKM1 dentro do SLA', done: false }
+      { id: 'diagnose_situation', text: 'Confirmar bloqueio, valor e fluxo da Ordem 10000004', done: false },
+      { id: 'investigate_credit', text: 'Reconciliação do BP simplificado: limite, utilizado, risco e pendências', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisões e localizar o caso de crédito', done: false },
+      { id: 'release_credit_order', text: 'Registrar ESCALATE com parecer e próxima alçada dentro do SLA', done: false }
     ],
 
     targetCriteria: {
       targetDocNumber: '10000004',
       customerId: '100088',
       action: 'CREDIT_RELEASE',
-      requiresVkm1Release: true
+      creditDecision: 'ESCALATE',
+      requiresApproval: true,
+      requiresVkm1Release: true,
+      expectedCreditLimit: 50000,
+      expectedCreditUsed: 48900,
+      targetNetValue: 17000.00
     },
 
     completionFeedback: {
-      mentorSpeech: 'Sensacional! Você resolveu com autonomia absoluta um dos casos mais complexos de crédito comercial do SAP: diagnosticou a retenção da Metalúrgica Paulista, investigou a exposição e liberou o pedido com alçada na VKM1 dentro do prazo de SLA. Você conquistou a insígnia Credit Master! +450 XP.',
-      whatHappened: 'Ordem de Venda nº 10000004 liberada com sucesso do bloqueio de crédito sob controle de SLA.',
-      why: 'O documento apresentava bloqueio misto (limite de R$ 50k com saldo comprometido de R$ 48.9k + pedido de R$ 21.6k).',
-      businessImpact: 'A fábrica em Campinas/SP receberá os servidores sem interrupção na linha de produção.'
+      mentorSpeech: 'Boa decisão operacional. Você documentou a exposição e encaminhou o caso sem liberar uma ordem acima da alçada. A urgência foi tratada como prioridade, não como autorização financeira. +450 XP.',
+      whatHappened: 'Ordem de Venda nº 10000004 permaneceu retida e foi encaminhada para decisão de crédito.',
+      why: 'A exposição projetada supera o limite fictício; risco, pendências e ausência de aprovação exigem ESCALATE.',
+      businessImpact: 'O caso foi encaminhado com evidências; remessa, PGI e faturamento continuam pendentes.'
     }
   },
   {
@@ -758,11 +763,11 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Fornecimento Autorizado: Rede Hospitalar São Lucas (Doc 10000007)',
-    briefing: 'Olá, trainee! A Ordem de Venda nº 10000007 foi devidamente aprovada e liberada comercialmente para faturamento. O cliente aguarda o envio dos equipamentos a partir da nossa matriz em São Paulo. Acesse a transação VL01N, informe o Ponto de Expedição 1000 (CD Central SP), carregue a Ordem 10000007, confira as posições e quantidades a fornecer e grave o documento de Fornecimento (Remessa / Outbound Delivery).',
+    briefing: 'Olá, trainee! A Ordem de Venda nº 10000007 está sem bloqueio de crédito/entrega e liberada para criação de remessa. O cliente aguarda o envio dos equipamentos a partir da nossa matriz em São Paulo. Acesse a transação VL01N, informe o Ponto de Expedição 1000 (CD Central SP), carregue a Ordem 10000007, confira as posições e quantidades a fornecer e grave o documento de Fornecimento (Remessa / Outbound Delivery).',
 
     purchaseOrderDocument: {
       buyerName: 'Rede Hospitalar São Lucas S/A (Rio de Janeiro/RJ)',
-      buyerCnpj: '23.456.789/0001-88',
+      buyerCnpj: '23.456.789/0001-01',
       poNumber: 'PO-HSL-2026-062',
       operationType: 'Fornecimento de Infraestrutura e Expansão de Servidores',
       itemsRequested: [
@@ -777,9 +782,10 @@ export const ScenarioCatalog = [
     mentorInitialTip: 'Dica do Chefe Wilson: Vá até a transação VL01N, preencha o Ponto de Expedição com 1000 e a Ordem de Venda com 10000007. Clique em "Carregar Ordem" para conferir os itens na grade e, em seguida, clique em "Gerar Remessa / Fornecimento (Gravar)". O sistema criará o documento oficial na faixa 80000000!',
 
     sapKnowledgeBridge: {
-      tcode: 'VL01N / LIKP',
-      tables: 'LIKP (Cabeçalho da Remessa), LIPS (Itens da Remessa), VBFA (Fluxo de Documentos)',
-      concept: 'No SAP SD, a criação da remessa (Outbound Delivery) na VL01N converte a intenção de compra da ordem de venda em uma ordem logística de movimentação física, direcionando a demanda para o Ponto de Expedição competente.'
+      tcode: 'Create Outbound Delivery with Order Reference / Manage Outbound Deliveries',
+      legacyComparison: 'VL01N, VL02N, MM03, LIKP, LIPS, MARD e VBFA são referências GUI/ECC ou simplificações do laboratório.',
+      tables: 'Objetos de entrega e fluxo documental simulados em memória; em S/4HANA o app e o customizing determinam o processo.',
+      concept: 'A criação do outbound delivery é uma etapa posterior à ordem. Esta missão valida apenas a pré-validação logística fictícia; picking, PGI e billing são etapas posteriores.'
     },
 
     objectives: [
@@ -818,24 +824,25 @@ export const ScenarioCatalog = [
     briefing: 'Olá, trainee! A Ordem de Venda nº 10000008 da MinasTech Automação precisa ser despachada com urgência para a filial de Belo Horizonte. Crie a remessa correspondente na transação VL01N, acerte o picking dos materiais na transação VL02N e execute a etapa crucial da logística: o Post Goods Issue (PGI / Saída de Mercadorias). Em seguida, consulte o mestre de materiais (MM03) para comprovar a redução física do estoque e verifique o fluxo atualizado na VA03.',
 
     purchaseOrderDocument: {
-      buyerName: 'MinasTech Automação e Painéis S/A (Belo Horizonte/MG)',
-      buyerCnpj: '45.678.901/0001-01',
+      buyerName: 'MinasTech Automação Industrial Ltda (Belo Horizonte/MG)',
+      buyerCnpj: '45.678.901/0001-23',
       poNumber: 'PO-MT-2026-077',
       operationType: 'Expedição de Discos de Alta Performance para Servidores',
       itemsRequested: [
-        { description: 'Disco SAS 2.4TB 10K RPM Hot-Swap (MAT-3020)', quantity: 8, unit: 'UN' }
+        { description: 'Disco SAS 16TB 7.2K RPM Hot-Swap (MAT-3020)', quantity: 8, unit: 'UN' }
       ],
-      deliveryAddress: 'Av. Amazonas, 4500 - Belo Horizonte/MG',
-      freightResponsibility: 'CIF - Frete contratado pela NexusTech',
+      deliveryAddress: 'MinasTech - Centro de Engenharia e Montagem BH - Belo Horizonte/MG',
+      freightResponsibility: 'DAP - MinasTech - Centro de Engenharia e Montagem BH (termo fictício da NexusTech)',
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Primeiro crie a remessa para a ordem 10000008 na VL01N. Ao ser direcionado para a VL02N (ou acessando-a diretamente), clique em "Copiar Qtd Fornecimento para Picking" e depois no botão verde "Registrar Saída de Mercadorias (PGI)". Isso disparará o movimento MM 601 e baixará o estoque físico do depósito!',
+    mentorInitialTip: 'Pista do Chefe Wilson: confirme a ordem, o material MAT-3020, a planta/depósito exibidos e a quantidade efetivamente separada. O PGI só deve ocorrer depois de uma conferência física; o simulador registra uma baixa didática em memória.',
 
     sapKnowledgeBridge: {
-      tcode: 'VL02N / MM03 / MARD',
-      tables: 'LIKP / LIPS / MARD (Saldos Físicos) / MSEG (Movimentos de Material)',
-      concept: 'O Post Goods Issue (PGI) na VL02N é a transação que efetiva a saída física das mercadorias do depósito (movimento 601), reduzindo a quantidade física e encerrando a reserva da ordem de venda.'
+      tcode: 'Manage Outbound Deliveries / Post Goods Issue / Manage Stock',
+      legacyComparison: 'VL02N, MM03, MARD e MSEG são referências GUI/ECC ou analogias do laboratório.',
+      tables: 'Entrega e documento de material são objetos simulados; MATDOC é a referência simplificada de S/4HANA para documentos de material.',
+      concept: 'O PGI representa a saída de mercadorias após o picking. Nesta experiência, o status e a baixa de estoque são simulados em memória e não equivalem a um documento MM/FI produtivo.'
     },
 
     objectives: [
@@ -847,14 +854,19 @@ export const ScenarioCatalog = [
 
     targetCriteria: {
       targetDocNumber: '10000008',
-      action: 'POST_GOODS_ISSUE'
+      action: 'POST_GOODS_ISSUE',
+      shippingPoint: '1000',
+      plantId: '1000',
+      storageLocation: 'DEP2',
+      targetMaterialId: 'MAT-3020',
+      targetQuantity: 8
     },
 
     completionFeedback: {
       mentorSpeech: 'Sensacional! Você executou com perfeição a esteira completa de expedição no SAP SD: criou o fornecimento, validou o picking e registrou o Post Goods Issue (PGI). O movimento 601 baixou o saldo físico e encerrou a reserva! Parabéns! +300 XP.',
       whatHappened: 'Saída de Mercadorias (PGI) registrada com sucesso para a Ordem 10000008.',
-      why: 'O PGI contabilizou a baixa física no estoque do CD SP e gerou o documento de material MM.',
-      businessImpact: 'A transportadora foi liberada para coleta física e a ordem está pronta para faturamento na VF01.'
+      why: 'O PGI foi registrado no centro/depósito fictício configurado para o caso e o fluxo documental simulado foi atualizado.',
+      businessImpact: 'A entrega está apta à etapa posterior de faturamento; coleta, transporte e documento fiscal não fazem parte desta missão.'
     }
   },
   {
@@ -874,7 +886,7 @@ export const ScenarioCatalog = [
 
     purchaseOrderDocument: {
       buyerName: 'UltraLink Provedor de Internet Banda Larga S/A (Fortaleza/CE)',
-      buyerCnpj: '78.901.234/0001-56',
+      buyerCnpj: '88.990.011/0001-66',
       poNumber: 'PO-UL-2026-055',
       operationType: 'Expedição de Emergência de Switches PoE+ para Expansão de Rede',
       itemsRequested: [
@@ -888,8 +900,9 @@ export const ScenarioCatalog = [
     mentorInitialTip: 'Aviso de Desafio: Você está em modo autônomo com cronômetro de SLA (6 minutos). Avalie os impedimentos da ordem no fluxo de documentos e execute todas as etapas necessárias para efetivar a saída física de mercadorias!',
 
     sapKnowledgeBridge: {
-      tcode: 'VA03 / VKM1 / VL01N / VL02N',
-      tables: 'VBAK / KNKK / LIKP / LIPS / VBFA / MARD',
+      tcode: 'Manage Documented Credit Decisions / Manage Outbound Deliveries',
+      legacyComparison: 'VA03, VKM1, VL01N, VL02N, KNKK, LIKP, LIPS, VBFA e MARD são referências GUI/ECC ou simplificações.',
+      tables: 'Crédito, entrega e fluxo são objetos simulados; a decisão moderna depende do Credit Management configurado.',
       concept: 'O ciclo completo Order-to-Cash (O2C) requer que bloqueios de crédito sejam avaliados na VKM1 antes da geração da remessa na VL01N e do PGI na VL02N.'
     },
 
@@ -925,11 +938,11 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Faturamento Liberado: Rede Hospitalar São Lucas (Doc 10000007)',
-    briefing: 'Olá, trainee! A Remessa da Ordem de Venda nº 10000007 (Rede Hospitalar São Lucas) foi devidamente separada e expedida com Saída de Mercadorias (PGI) concluída no Centro de Distribuição. Agora precisamos realizar a escrituração contábil e emitir a Fatura Comercial oficial (Tipo F2) para cobrança bancária. Acesse a transação VF01, informe o Tipo de Fatura F2, carregue a remessa expedida, confira os valores líquidos e os tributos incidentes (ICMS e PIS/COFINS) e grave o faturamento. Em seguida, consulte o resultado e o fluxo de documentos na VF03.',
+    briefing: 'Olá, trainee! A Remessa da Ordem de Venda nº 10000007 (Rede Hospitalar São Lucas) foi devidamente separada e expedida com Saída de Mercadorias (PGI) concluída no Centro de Distribuição. Agora precisamos realizar a registrar um documento de faturamento F2 simulado após o PGI. NF-e, autorização SEFAZ, FI-AR, cobrança bancária e liquidação estão fora do escopo. Acesse a transação VF01, informe o Tipo de Fatura F2, carregue a remessa expedida, confira os valores líquidos e os tributos incidentes (ICMS e PIS/COFINS) e grave o faturamento. Em seguida, consulte o resultado e o fluxo de documentos na VF03.',
 
     purchaseOrderDocument: {
       buyerName: 'Rede Hospitalar São Lucas S/A (Rio de Janeiro/RJ)',
-      buyerCnpj: '23.456.789/0001-88',
+      buyerCnpj: '23.456.789/0001-01',
       poNumber: 'PO-HSL-2026-062',
       operationType: 'Faturamento Comercial e Emissão de Nota Fiscal de Venda',
       itemsRequested: [
@@ -944,14 +957,14 @@ export const ScenarioCatalog = [
     mentorInitialTip: 'Dica do Chefe Wilson: Vá até a transação VF01, selecione o Tipo de Faturamento "F2", certifique-se de que a remessa associada à ordem 10000007 está carregada e clique em "Gravar Fatura Comercial (Post)". O sistema criará o documento na faixa 90000000 e atualizará o status da ordem para COMPLETED!',
 
     sapKnowledgeBridge: {
-      tcode: 'VF01 / VF03 / VBRK',
-      tables: 'VBRK (Cabeçalho da Fatura), VBRP (Itens da Fatura), BSID (Contas a Receber)',
-      concept: 'A emissão da fatura (Billing) na VF01 é a etapa de escrituração que converte o fornecimento físico em títulos de cobrança financeira, calculando os impostos devidos e gerando a partida contábil no Contas a Receber (FI-AR).'
+      tcode: 'Create Billing Documents / Manage Billing Documents',
+      legacyComparison: 'VF01, VF03, VBRK, VBRP e BSID são referências GUI/ECC ou analogias do laboratório.',
+      concept: 'O documento F2 simulado representa a etapa de billing relacionada à entrega. Os percentuais tributários são didáticos; FI-AR, NF-e, SEFAZ e cobrança não são implementados.'
     },
 
     objectives: [
       { id: 'access_vf01', text: 'Acessar a transação de faturamento comercial VF01', done: false },
-      { id: 'select_billing_type', text: 'Selecionar o Tipo de Faturamento F2 (Fatura Comercial / NF)', done: false },
+      { id: 'select_billing_type', text: 'Selecionar o Tipo de Faturamento F2 (Documento de faturamento F2 simulado)', done: false },
       { id: 'create_invoice', text: 'Conferir o cálculo de impostos e gravar a Fatura Comercial', done: false },
       { id: 'verify_invoice', text: 'Auditar o documento faturado e o fluxo VBFA na VF03', done: false }
     ],
@@ -967,10 +980,10 @@ export const ScenarioCatalog = [
     ],
 
     completionFeedback: {
-      mentorSpeech: 'Excelente trabalho! Você concluiu a emissão da Fatura Comercial na VF01 com total precisão tributária. O título a receber foi lançado e o ciclo Order-to-Cash da Ordem 10000007 está 100% finalizado! +300 XP.',
-      whatHappened: 'Fatura Comercial F2 emitida com sucesso a partir da remessa expedida.',
-      why: 'A escrituração fiscal e o lançamento financeiro em Contas a Receber (FI-AR) foram homologados no SAP.',
-      businessImpact: 'A duplicata foi gerada para cobrança bancária e a empresa receberá no prazo pactuado.'
+      mentorSpeech: 'Documento de faturamento F2 simulado criado após a remessa e o PGI. O fluxo logístico-fiscal completo, NF-e, FI-AR e liquidação não fazem parte desta missão. +300 XP.',
+      whatHappened: 'Documento de faturamento F2 simulado criado a partir da remessa expedida.',
+      why: 'O cálculo de impostos exibido é didático e foi registrado apenas no modelo em memória.',
+      businessImpact: 'A cobrança bancária e o recebimento permanecem fora do escopo do simulador.'
     }
   },
   {
@@ -986,12 +999,12 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Rejeição de Faturamento: Sul Distribuidora (Doc 10000009)',
-    briefing: 'Olá, trainee! A gerência financeira solicitou com urgência a emissão da Fatura Comercial da Ordem de Venda nº 10000009 (Sul Distribuidora). O setor de faturamento relatou que está ocorrendo uma rejeição de sistema ao tentar emitir o documento na VF01. Como consultor SD, assuma a análise, investigue a causa raiz da rejeição, execute as ações necessárias na transação correta para regularizar o processo e conclua a emissão da fatura com sucesso.',
+    briefing: 'Olá, trainee! A gerência financeira solicitou com urgência a emissão da Fatura Comercial da Ordem de Venda nº 10000009 (Sul Distribuidora). O setor de faturamento relatou que está ocorrendo uma rejeição de sistema ao tentar emitir o documento na VF01. Como analista de operações SD, assuma a análise, investigue a causa raiz da rejeição, execute as ações necessárias na transação correta para regularizar o processo e conclua a emissão da fatura com sucesso.',
 
     purchaseOrderDocument: {
-      buyerName: 'Sul Distribuidora e Logística de Peças Ltda (Curitiba/PR)',
-      buyerCnpj: '56.789.012/0001-23',
-      poNumber: 'PO-SD-2026-089',
+      buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
+      buyerCnpj: '56.789.012/0001-34',
+      poNumber: 'PO-SD-2026-085',
       operationType: 'Faturamento de Servidores e Módulos para Filial Curitiba',
       itemsRequested: [
         { description: 'Servidor Rack 2U Nexus Power (Dual AMD 128GB)', quantity: 2, unit: 'UN' },
@@ -999,7 +1012,7 @@ export const ScenarioCatalog = [
       ],
       deliveryAddress: 'Av. das Indústrias, 1200 - Curitiba/PR',
       freightResponsibility: 'CIF - Transporte Terrestre',
-      paymentInstructions: '45 dias líquido (Z045)'
+      paymentInstructions: '45 dias líquido (Z28D)'
     },
 
     mentorInitialTip: 'Dica do Chefe Wilson: No SAP SD, a emissão da Fatura F2 baseada em remessa exige que todas as etapas logísticas precedentes estejam concluídas. Se a VF01 rejeitar o documento, verifique na VL02N ou na VA03 se a remessa já possui a Saída de Mercadorias (PGI / Mov. 601) registrada!',
@@ -1037,7 +1050,7 @@ export const ScenarioCatalog = [
   {
     id: 'SCN-17',
     code: 'DSF-205',
-    title: 'Desafio Máximo — Ciclo Completo Order-to-Cash sob SLA',
+    title: 'Desafio Máximo — Decisão de Crédito e Encaminhamento sob SLA',
     mode: 'CHALLENGE',
     levelRequired: 1,
     slaMinutes: 6,
@@ -1046,14 +1059,14 @@ export const ScenarioCatalog = [
     initialTcode: 'VA03',
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
-    emailSubject: 'CHAMADO DIRETORIA: Fechamento O2C Urgente - Metalúrgica Paulista (Doc 10000004)',
-    briefing: 'Chamado Crítico da Diretoria Executiva! A Indústria Metalúrgica Paulista S/A (Doc 10000004) aguarda com urgência o fechamento comercial e a emissão da nota fiscal para envio dos servidores de automação fabril de Campinas/SP. A ordem encontra-se parada no ambiente com retenções pendentes. Como consultor sênior de plantão, você tem 6 minutos de SLA para diagnosticar o documento, resolver todas as travas comerciais, expedir e faturar a operação ponta a ponta até a homologação final do fluxo na VF03!',
+    emailSubject: 'CHAMADO DIRETORIA: Decisão de Crédito Urgente - Metalúrgica Paulista (Doc 10000004)',
+    briefing: 'Chamado Crítico da Diretoria Executiva! A Indústria Metalúrgica Paulista S/A (Doc 10000004) aguarda com urgência o fechamento comercial e a emissão da nota fiscal para envio dos servidores de automação fabril de Campinas/SP. A ordem encontra-se parada no ambiente com retenções pendentes. Como analista de operações SD em treinamento, você tem 6 minutos para diagnosticar a ordem, avaliar a exposição e registrar uma decisão de crédito documentada. O SLA mede priorização; não autoriza liberar nem promete O2C completo.',
 
     purchaseOrderDocument: {
       buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
       buyerCnpj: '98.765.432/0001-11',
       poNumber: 'PO-MP-2026-030',
-      operationType: 'Processamento Integral Order-to-Cash sob SLA Executivo',
+    operationType: 'Análise e encaminhamento de crédito sob SLA Executivo',
       itemsRequested: [
         { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB)', quantity: 2, unit: 'UN' }
       ],
@@ -1062,34 +1075,38 @@ export const ScenarioCatalog = [
       paymentInstructions: '60 dias líquido (Z060)'
     },
 
-    mentorInitialTip: 'Aviso de Desafio Máximo: Você está em modo 100% autônomo com cronômetro de SLA (6 minutos). Conclua a cadeia completa SD (VA03 -> VKM1 -> VL01N -> VL02N -> VF01 -> VF03) e conquiste a insígnia suprema O2C Master!',
+    mentorInitialTip: 'Aviso de Desafio Máximo: você está em modo autônomo com cronômetro de SLA (6 minutos). Diagnostique a ordem, reconcilie o crédito e registre ESCALATE com parecer e próxima alçada. Não libere acima da alçada.',
 
     sapKnowledgeBridge: {
-      tcode: 'VA03 / VKM1 / VL01N / VL02N / VF01 / VF03',
-      tables: 'VBAK / KNKK / LIKP / LIPS / VBRK / VBRP / VBFA / MARD',
-      concept: 'O ciclo Order-to-Cash (O2C) engloba todo o fluxo corporativo ponta a ponta: do pedido inicial à liquidação financeira e fiscal.'
+      tcode: 'Manage Documented Credit Decisions / Manage Sales Orders',
+      legacyComparison: 'VA03, VKM1, VL01N, VL02N, VF01, VF03 e tabelas clássicas são comparação GUI/ECC ou simplificação.',
+      concept: 'Este desafio termina na decisão de crédito. O2C completo exige etapas posteriores de entrega, PGI, billing, FI e liquidação, que não são executadas aqui.'
     },
 
     objectives: [
-      { id: 'check_order_va03', text: 'Diagnosticar a retenção da Ordem 10000004 na VA03', done: false },
-      { id: 'release_credit_order', text: 'Liberar o limite de crédito retido na VKM1', done: false },
-      { id: 'create_delivery', text: 'Gerar a remessa de fornecimento na VL01N', done: false },
-      { id: 'post_goods_issue', text: 'Confirmar picking e registrar a Saída de Mercadorias (PGI) na VL02N', done: false },
-      { id: 'create_invoice', text: 'Emitir a Fatura Comercial F2 na VF01', done: false },
-      { id: 'verify_invoice', text: 'Homologar a cadeia completa do processo na VF03 dentro do SLA', done: false }
+      { id: 'check_order_va03', text: 'Confirmar bloqueio, valor e fluxo da Ordem 10000004', done: false },
+      { id: 'investigate_credit', text: 'Reconciliação do BP simplificado: limite, utilizado, risco e pendências', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisões e localizar o caso de crédito', done: false },
+      { id: 'release_credit_order', text: 'Registrar ESCALATE com parecer e próxima alçada dentro do SLA', done: false }
     ],
-
     targetCriteria: {
       targetDocNumber: '10000004',
+      customerId: '100088',
       billingType: 'F2',
-      action: 'FULL_O2C'
+      action: 'CREDIT_RELEASE',
+      creditDecision: 'ESCALATE',
+      requiresApproval: true,
+      requiresVkm1Release: true,
+      expectedCreditLimit: 50000,
+      expectedCreditUsed: 48900,
+      targetNetValue: 17000.00
     },
 
     completionFeedback: {
-      mentorSpeech: 'Extraordinário e Magistral! Você executou com autonomia perfeita todo o ciclo Order-to-Cash no SAP SD sob controle rígido de SLA: desbloqueou crédito na VKM1, gerou remessa na VL01N, efetuou o PGI na VL02N e emitiu a fatura na VF01. Você alcançou o nível máximo de proficiência e conquistou a insígnia O2C Master! +500 XP.',
-      whatHappened: 'Ciclo completo Order-to-Cash (O2C) finalizado com sucesso para a Ordem 10000004.',
-      why: 'Todas as disciplinas do SAP SD (Vendas, Crédito, Estoque/Expedição e Faturamento/Financeiro) foram orquestradas com precisão.',
-      businessImpact: 'A Metalúrgica Paulista recebeu o faturamento em conformidade fiscal e os servidores entraram em operação na fábrica sem atrasos.'
+      mentorSpeech: 'Boa decisão de crédito sob pressão. Você documentou a exposição e encaminhou a ordem sem liberar uma operação acima da alçada. A trilha de entrega, PGI e billing poderá começar após a aprovação responsável. +500 XP.',
+      whatHappened: 'Decisão de crédito documentada para a Ordem 10000004; O2C permanece pendente de aprovação e etapas logísticas.',
+      why: 'A análise limitou-se ao crédito; nenhuma expedição, nota fiscal, contabilização ou liquidação foi executada.',
+      businessImpact: 'O caso foi encaminhado com rastreabilidade; não há promessa de entrega ou recebimento antes das etapas posteriores.'
     }
   },
   {
@@ -1172,7 +1189,7 @@ export const ScenarioCatalog = [
 
     sender: 'Marcelo Ramos (Gerente de Pricing & Inteligência Comercial)',
     emailSubject: 'CAMPANHA TRIMESTRAL: Desconto Especial de Atacado - TechLog (Doc PO-TL-2026-44)',
-    briefing: 'A TechLog Distribuição (Cliente 100120) está adquirindo um lote promocional de 10 unidades do Access Point Corporativo Wi-Fi 6 (MAT-2020) no Canal de Revenda (Canal 20). A gerência comercial autorizou a aplicação de um desconto negociado de 8% (Condição RB00) na posição. Antes de digitar o pedido, acesse a MM03 para conferir o saldo disponível do produto no CD. Depois, acesse a VA01, preencha o pedido e aplique o desconto comercial de 8% para calcular o valor líquido correto.',
+    briefing: 'A TechLog Distribuição (Cliente 100120) está adquirindo um lote promocional de 10 unidades do Access Point Corporativo Wi-Fi 6 (MAT-2020) no Canal de Revenda (Canal 20). A PO solicita 8%, mas o trainee deve conferir o PR00, a autorização da condição RB00, a vigência e a alçada. Não invente desconto nem trate o pedido do cliente como aprovação interna. Antes de digitar o pedido, acesse a MM03 para conferir o saldo disponível do produto no CD. Depois, acesse a VA01, preencha o pedido e aplique o desconto comercial de 8% para calcular o valor líquido correto.',
 
     purchaseOrderDocument: {
       buyerName: 'TechLog Soluções em TI e Distribuição (Curitiba/PR)',
@@ -1190,9 +1207,9 @@ export const ScenarioCatalog = [
     mentorInitialTip: 'Dica do Chefe Wilson: Consulte o material MAT-2020 na MM03 para auditar o saldo em estoque. Em seguida, na VA01, configure a área de vendas de revenda (1000/20/01), informe o cliente 100120 e insira o desconto de 8% no item.',
 
     sapKnowledgeBridge: {
-      tcode: 'MM03 / VA01',
-      tables: 'MARC / MARD / KONP / VBAP',
-      concept: 'Condições de desconto por percentual (RB00) incidem sobre o preço base (PR00), recalculando automaticamente a base de cálculo de impostos como ICMS e PIS/COFINS.'
+      tcode: 'Manage Product Availability / Manage Sales Orders / Manage Pricing',
+      legacyComparison: 'MM03, VA01, MARC, MARD, KONP e VBAP são referências GUI/ECC ou simplificações.',
+      concept: 'RB00 é uma condição fictícia de desconto da NexusTech. A condição precisa ter registro, validade, moeda, unidade e aprovação; os impostos exibidos são didáticos.'
     },
 
     objectives: [
@@ -1212,6 +1229,13 @@ export const ScenarioCatalog = [
       division: '01',
       customerId: '100120',
       customerPoNumber: 'PO-TL-2026-44',
+      requiresCustomerAnalysis: true,
+      requiresPoAnalysis: true,
+      requiresMaterialAnalysis: true,
+      requiresPricingEvidence: true,
+      conditionCode: 'PR00',
+      targetAmount: 890.00,
+      targetNetValue: 8188.00,
       paymentTerms: 'Z015',
       incoterms: 'CIF',
       items: [
