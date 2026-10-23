@@ -959,6 +959,28 @@ class ScenarioEngine {
       };
     }
 
+    if (target.incotermsLocation && updatedOrderData.incotermsLocation !== target.incotermsLocation) {
+      return {
+        isValid: false,
+        fieldError: 'incotermsLocation',
+        activeTabHint: 'HEADER',
+        mentorSpeech: `O local nomeado do Incoterms deve ser ${target.incotermsLocation}. Confira o cabeçalho antes de gravar.`,
+        whatHappened: `Local informado: ${updatedOrderData.incotermsLocation || 'não informado'}. Local esperado: ${target.incotermsLocation}.`,
+        why: 'O código do Incoterms sem o local nomeado não descreve completamente o ponto contratual da entrega.',
+        businessImpact: 'Evita interpretar incorretamente responsabilidade, risco e transporte em documentos posteriores.'
+      };
+    }
+    if (target.incotermsVersion && updatedOrderData.incotermsVersion !== undefined && updatedOrderData.incotermsVersion !== target.incotermsVersion) {
+      return {
+        isValid: false,
+        fieldError: 'incotermsVersion',
+        activeTabHint: 'HEADER',
+        mentorSpeech: `Use a versão de Incoterms ${target.incotermsVersion} definida na referência comercial.`,
+        whatHappened: `Versão informada: ${updatedOrderData.incotermsVersion || 'não informada'}. Versão esperada: ${target.incotermsVersion}.`,
+        why: 'A versão da regra pode alterar responsabilidades e interpretação do termo.',
+        businessImpact: 'Evita persistir uma condição comercial ambígua no pedido.'
+      };
+    }
     // 4. Validação de Itens, Quantidades e Descontos
     if (target.items && target.items.length > 0) {
       for (const targetItem of target.items) {
@@ -1137,6 +1159,19 @@ class ScenarioEngine {
       };
     }
 
+    if (target.targetMaterialId && deliveryData) {
+      const item = deliveryData.items?.find(entry => entry.materialId === target.targetMaterialId);
+      if (!item || (target.targetQuantity !== undefined && Number(item.deliveryQuantity) !== Number(target.targetQuantity))) {
+        return {
+          isValid: false,
+          fieldError: 'deliveryItems',
+          mentorSpeech: `A entrega precisa conter ${target.targetQuantity ?? 'a quantidade solicitada'} unidade(s) de ${target.targetMaterialId}.`,
+          whatHappened: `A remessa não corresponde ao item/quantidade esperados para a ordem ${salesOrderNumber}.`,
+          why: 'A outbound delivery deve manter rastreabilidade entre ordem, material e quantidade.',
+          businessImpact: 'Evita criar uma remessa para item ou volume diferente do pedido.'
+        };
+      }
+    }
     this.completeObjective('access_vl01n');
     this.completeObjective('create_delivery');
     this.completeObjective('check_order');
@@ -1189,6 +1224,27 @@ class ScenarioEngine {
     }
 
     const target = scenario.targetCriteria;
+    if (target.targetDeliveryNumber && deliveryNumber !== target.targetDeliveryNumber) {
+      return {
+        isValid: false,
+        mentorSpeech: `A missão solicita a remessa ${target.targetDeliveryNumber}; a remessa informada foi ${deliveryNumber}.`,
+        whatHappened: `Remessa processada: ${deliveryNumber}. Remessa esperada: ${target.targetDeliveryNumber}.`,
+        why: 'O PGI deve ser registrado no documento correto e vinculado à ordem solicitada.',
+        businessImpact: 'Evita baixa física em uma remessa de outro cliente ou operação.'
+      };
+    }
+    if (target.targetMaterialId && deliveryData) {
+      const item = deliveryData.items?.find(entry => entry.materialId === target.targetMaterialId);
+      if (!item || (target.targetQuantity !== undefined && Number(item.deliveryQuantity) !== Number(target.targetQuantity))) {
+        return {
+          isValid: false,
+          mentorSpeech: `A remessa precisa conter ${target.targetQuantity ?? 'a quantidade solicitada'} unidade(s) de ${target.targetMaterialId}.`,
+          whatHappened: 'Item ou quantidade da remessa divergente do chamado.',
+          why: 'O PGI deve baixar exatamente o item e o volume conferidos.',
+          businessImpact: 'Evita baixa física incorreta no estoque.'
+        };
+      }
+    }
 
     // Se o cenário tem alvo de documento de ordem específico, checa
     if (target.targetDocNumber && deliveryData && deliveryData.salesOrderNumber !== target.targetDocNumber) {
@@ -1307,6 +1363,15 @@ class ScenarioEngine {
       };
     }
 
+    if (target.targetDeliveryNumber && invoiceData?.deliveryNumber !== target.targetDeliveryNumber) {
+      return {
+        isValid: false,
+        mentorSpeech: `A fatura precisa usar a remessa ${target.targetDeliveryNumber} como referência.`,
+        whatHappened: `Remessa informada no billing: ${invoiceData?.deliveryNumber || 'não informada'}.`,
+        why: 'O documento de faturamento deve manter o vínculo com a entrega e o PGI corretos.',
+        businessImpact: 'Evita faturar uma entrega diferente da solicitada ou criar billing sem rastreabilidade.'
+      };
+    }
     // 1. Validação do Tipo de Faturamento
     if (target.billingType && billingType !== target.billingType) {
       trainee.recordAction(false, 'Tentativa de Faturamento', `Tipo de fatura divergente: ${billingType}`);

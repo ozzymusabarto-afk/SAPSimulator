@@ -17,6 +17,9 @@
 
 ## Próximo bloco de produto: Trainee
 
+- [x] Revisar e corrigir SCN-31, SCN-32, SCN-33, SCN-34, SCN-35 e SCN-38 sob a referência S/4HANA.
+- [ ] Criar e revisar SCN-36, SCN-37, SCN-39 e SCN-40; esses IDs não existem no catálogo atual.
+- [x] Exigir referência explícita de delivery/item/quantidade em criação de delivery, PGI e billing quando a missão declara esses alvos.
 - [ ] Revisar o lote SCN-01 a SCN-10 sob a referência S/4HANA antes de revisar os lotes seguintes.
 - [ ] Separar em cada missão o conceito S/4HANA, o customizing fictício da NexusTech e a simplificação do simulador.
 - [ ] Substituir caminhos ECC-only apresentados como atuais por fluxo S/4HANA ou rotulá-los como comparação legada.

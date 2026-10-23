@@ -2037,34 +2037,36 @@ export const ScenarioCatalog = [
     initialTcode: 'VA02',
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
-    emailSubject: 'Regularização Contratual: Ordem 10000052 - Metalúrgica Paulista (Z060 / FOB)',
-    briefing: 'A auditoria de contratos identificou que a Ordem nº 10000052 da Indústria Metalúrgica Paulista (Cliente 100088) foi lançada com modalidade CIF e prazo Z030, em desacordo com o contrato mestre que estabelece retirada pelo comprador (FOB) e prazo estendido de 60 dias (Z060). Acesse a VA02, corrija a Condição de Pagamento para Z060 e o Incoterms para FOB no cabeçalho da ordem, e salve o documento regularizado.',
+    emailSubject: 'Regularização Comercial: Ordem 10000052 - Metalúrgica Paulista (Z060 / FCA)',
+    briefing: 'A auditoria de contratos identificou que a Ordem nº 10000052 da Indústria Metalúrgica Paulista (Cliente 100088) foi lançada com modalidade CIF e prazo Z030, em desacordo com o contrato mestre que estabelece retirada pelo comprador no local nomeado da fábrica (FCA Campinas) e prazo de 60 dias (Z060). Atualize os campos do pedido de venda e confirme o save; o laboratório não executa transporte ou billing.',
 
     purchaseOrderDocument: {
       buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
       buyerCnpj: '98.765.432/0001-11',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-MP-TERMS-FIX',
       operationType: 'Regularização de Cláusulas Comerciais de Frete e Pagamento',
       itemsRequested: [
         { description: 'Servidor Rack 1U Nexus Edge Entry (Single Xeon 32GB) (MAT-1010)', quantity: 2, unit: 'UN' }
       ],
       deliveryAddress: 'Fábrica Campinas - Portão 3 Logística',
-      freightResponsibility: 'FOB - Retirada na origem pelo transportador do comprador',
+      freightResponsibility: 'FCA - Fábrica Campinas, Portão 3 Logística (Incoterms 2020)',
       paymentInstructions: '60 dias líquido (Z060) conforme contrato corporativo'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Na transação VA02, abra a Ordem 10000052. No cabeçalho, altere a Condição de Pagamento para Z060 e o Incoterms para FOB. Em seguida, clique em Salvar Ordem.',
+    mentorInitialTip: 'Pista do Chefe Wilson: carregue a ordem correta, confirme a autorização comercial e altere Z030 para Z060 e CIF para FCA Campinas. Verifique a persistência após salvar; não confunda alteração do pedido com execução logística.',
 
     sapKnowledgeBridge: {
-      tcode: 'VA02 / XD03',
-      tables: 'VBAK (Cabeçalho da Ordem), KNVV (Dados de Vendas)',
-      concept: 'Campos de cabeçalho como Incoterms e Condição de Pagamento afetam diretamente o faturamento e a responsabilidade civil do frete. Divergências devem ser corrigidas na VA02 antes da emissão da remessa.'
+      deploymentScope: 'S/4HANA on-premise/private com GUI ou app Change Sales Orders; Public Edition usa o app liberado.',
+      tcode: 'Change Sales Orders / Manage Business Partner',
+      legacyComparison: 'VA02, XD03, VBAK e KNVV são referências GUI/ECC; BP é o objeto mestre principal em S/4HANA.',
+      concept: 'ZTERM e Incoterms são dados comerciais do documento. A missão valida a alteração persistida no pedido; não executa remessa, faturamento ou transporte.'
     },
 
     objectives: [
       { id: 'access_va02', text: 'Carregar a Ordem 10000052 na transação VA02', done: false },
       { id: 'modify_payment_terms', text: 'Retificar a condição de pagamento do cabeçalho para Z060', done: false },
-      { id: 'modify_incoterms', text: 'Retificar o Incoterms para FOB no cabeçalho', done: false },
+      { id: 'modify_incoterms', text: 'Retificar o Incoterms para FCA, local Campinas, no cabeçalho', done: false },
       { id: 'save_order_modification', text: 'Salvar as alterações e confirmar a conformidade contratual', done: false }
     ],
 
@@ -2094,7 +2096,9 @@ export const ScenarioCatalog = [
     targetCriteria: {
       targetDocNumber: '10000052',
       paymentTerms: 'Z060',
-      incoterms: 'FOB',
+      incoterms: 'FCA',
+      incotermsLocation: 'Campinas',
+      incotermsVersion: '2020',
       items: [
         { materialId: 'MAT-1010', quantity: 2 }
       ],
@@ -2102,16 +2106,16 @@ export const ScenarioCatalog = [
     },
 
     completionFeedback: {
-      mentorSpeech: 'Regularização contratual executada com perfeição! Você alinhou a ordem aos termos FOB e Z060 na VA02, prevenindo litígios de frete e divergências de cobrança. +300 XP.',
-      whatHappened: 'Condição de pagamento Z060 e frete FOB atualizados na Ordem 10000052.',
-      why: 'O alinhamento tempestivo dos termos contratuais evita cobranças indevidas de frete no faturamento.',
-      businessImpact: 'A Metalúrgica Paulista fará a retirada da carga conforme cronograma sem atritos contábeis.'
+      mentorSpeech: 'Alteração comercial registrada com precisão: FCA Campinas e Z060 foram persistidos na ordem. A missão não simula transporte nem faturamento. +300 XP.',
+      whatHappened: 'Condição Z060 e Incoterms FCA Campinas atualizados na Ordem 10000052.',
+      why: 'A ordem passou a refletir a condição comercial autorizada; qualquer cobrança posterior depende de configuração e documentos subsequentes.',
+      businessImpact: 'O pedido ficou pronto para as validações posteriores. Nenhuma retirada ou entrega foi executada pelo simulador.'
     }
   },
   {
     id: 'SCN-32',
     code: 'TRN-125',
-    title: 'Expedição Regional no Centro Sul (Ponto de Expedição 2000)',
+    title: 'Criação de Outbound Delivery no Centro Sul',
     mode: 'TRAINING',
     levelRequired: 1,
     slaMinutes: null,
@@ -2121,27 +2125,29 @@ export const ScenarioCatalog = [
 
     sender: 'Eduardo Silva (Coordenação de Logística & Expedição CD Sul)',
     emailSubject: 'EXPEDIÇÃO REGIONAL: Gerar Fornecimento para Ordem 10000055 - CD Sul (Pto 2000)',
-    briefing: 'A Ordem de Venda nº 10000055 referente a 2 Nobreaks Rackmount (MAT-1090) para a Sul Distribuidora tem fornecimento alocado no Centro Sul (Planta 2000). A equipe de logística precisa que você acesse a transação VL01N, informe o Ponto de Expedição 2000 (CD Sul - Curitiba) e o número da Ordem 10000055 para gerar o documento de remessa de saída correspondente.',
+    briefing: 'A Ordem de Venda nº 10000055 referente a 2 Nobreaks Rackmount (MAT-1090) está elegível para criação de outbound delivery a partir da planta 2000. No escopo GUI/private edition, valide o shipping point 2000 e gere a entrega com referência à ordem; a variante Public Edition usa o app Fiori equivalente. Picking, PGI e billing ficam pendentes.',
 
     purchaseOrderDocument: {
       buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
       buyerCnpj: '56.789.012/0001-34',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-SDI-SUL-2000',
       operationType: 'Expedição Logística Regional a partir da Planta Sul 2000',
       itemsRequested: [
         { description: 'Nobreak Online Dupla Conversão 10kVA Rackmount (MAT-1090)', quantity: 2, unit: 'UN' }
       ],
       deliveryAddress: 'CD Sul Distribuição Joinville / SC',
-      freightResponsibility: 'CIF - Transporte rodoviário regional a partir de Curitiba',
+      freightResponsibility: 'DAP - CD Sul Distribuição Joinville (cenário fictício)',
       paymentInstructions: '28 dias líquido (Z28D)'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VL01N. Como esta ordem é atendida pelo centro de distribuição do Sul, informe obrigatoriamente o Ponto de Expedição 2000 e o número da ordem 10000055.',
+    mentorInitialTip: 'Pista do Chefe Wilson: valide a determinação do shipping point 2000 para a planta 2000 e a ordem 10000055. Crie apenas a entrega; não declare picking ou PGI concluídos.',
 
     sapKnowledgeBridge: {
-      tcode: 'VL01N',
-      tables: 'TVST (Pontos de Expedição), LIKP (Cabeçalho de Remessa), LIPS (Itens de Remessa)',
-      concept: 'O Ponto de Expedição (VSTEL) é a unidade organizacional responsável pela expedição física da mercadoria. O SAP determina o ponto com base na condição de expedição do cliente, grupo de carregamento do material e centro fornecedor.'
+      deploymentScope: 'S/4HANA on-premise/private com VL01N/GUI; Public Edition usa Create Outbound Delivery - with Order Reference.',
+      tcode: 'Create Outbound Delivery with Order Reference',
+      legacyComparison: 'VL01N, TVST, LIKP e LIPS são referências GUI/ECC ou de compatibilidade; o app Fiori é a alternativa Public Edition.',
+      concept: 'Shipping point é determinado a partir de planta e regras de expedição. Nesta fixture, 2000 é pré-configurado para a ordem; a missão termina na criação da entrega.'
     },
 
     objectives: [
@@ -2160,8 +2166,9 @@ export const ScenarioCatalog = [
         customerId: '100240',
         customerPoNumber: 'PO-SDI-SUL-2000',
         paymentTerms: 'Z28D',
-        incoterms: 'CIF',
-        incotermsLocation: 'Joinville',
+        incoterms: 'DAP',
+        incotermsLocation: 'CD Sul Distribuição Joinville',
+        incotermsVersion: '2020',
         items: [
           { materialId: 'MAT-1090', quantity: 2, unitPrice: 7800.00, manualDiscountPercent: 0, manualFreight: 0 }
         ],
@@ -2176,6 +2183,10 @@ export const ScenarioCatalog = [
     targetCriteria: {
       targetDocNumber: '10000055',
       shippingPoint: '2000',
+      plantId: '2000',
+      targetMaterialId: 'MAT-1090',
+      targetQuantity: 2,
+      deliveryCreated: true,
       action: 'CREATE_DELIVERY'
     },
 
@@ -2183,13 +2194,13 @@ export const ScenarioCatalog = [
       mentorSpeech: 'Remessa regional gerada com êxito! Você selecionou o Ponto de Expedição 2000 na VL01N e encaminhou a carga corretamente para o armazém regional do Sul. +300 XP.',
       whatHappened: 'Documento de remessa gerado a partir do Ponto de Expedição 2000.',
       why: 'O direcionamento logístico correto respeita a rota regional e minimiza prazos de entrega.',
-      businessImpact: 'A carga de nobreaks sairá do CD Curitiba diretamente para Joinville com custo de frete reduzido.'
+      businessImpact: 'A entrega foi criada e ficou aguardando picking. Nenhum transporte físico ou faturamento foi executado.'
     }
   },
   {
     id: 'SCN-33',
     code: 'TRN-126',
-    title: 'Conferência de Romaneio, Pesagem e Baixa Física (PGI) na VL02N',
+    title: 'Confirmação de Picking e PGI na VL02N',
     mode: 'TRAINING',
     levelRequired: 1,
     slaMinutes: null,
@@ -2199,27 +2210,29 @@ export const ScenarioCatalog = [
 
     sender: 'Eduardo Silva (Coordenação de Logística & Expedição CD SP)',
     emailSubject: 'CONFERÊNCIA DE EXPEDIÇÃO: Confirmar Picking e PGI na Remessa 80000060',
-    briefing: 'A remessa nº 80000060 (Ordem 10000058 da Varejo Eletro Brasil) já foi separada fisicamente pelos operadores de empilhadeira no CD SP. O romaneio de pesagem e conferência dos 5 switches gerenciáveis (MAT-2004) está aprovado pela doca. Acesse a transação VL02N, abra a remessa 80000060, confirme o picking das 5 unidades e clique em "Registrar Saída de Mercadorias (PGI)" para dar baixa no estoque e encerrar a etapa de expedição.',
+    briefing: 'A remessa 80000060 está pronta para conferência de picking no CD SP. Confirme 5 unidades e registre PGI na VL02N; o laboratório não simula romaneio, pesagem, transporte ou recebimento.',
 
     purchaseOrderDocument: {
       buyerName: 'Varejo Eletro Brasil Ltda (Matriz SP)',
       buyerCnpj: '12.345.678/0001-90',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-EB-PGI-60',
       operationType: 'Baixa Física e Fiscal de Estoque (Post Goods Issue / PGI)',
       itemsRequested: [
         { description: 'Switch Gigabit 24 Portas Managed Layer 3 (MAT-2004)', quantity: 5, unit: 'UN' }
       ],
       deliveryAddress: 'Av. das Nações Unidas, 14200 - São Paulo/SP',
-      freightResponsibility: 'CIF - Transporte rodoviário fretado pela NexusTech',
+      freightResponsibility: 'DAP - Cliente Varejo Eletro Brasil, São Paulo (cenário fictício)',
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
     mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VL02N com a Remessa 80000060. Verifique se as 5 unidades estão conferidas e clique no botão verde "Registrar Saída de Mercadorias (PGI)".',
 
     sapKnowledgeBridge: {
-      tcode: 'VL02N',
-      tables: 'LIKP (Status de Remessa), MKPF / MSEG (Movimento Contábil 601)',
-      concept: 'O Post Goods Issue (PGI) desencadeia o movimento contábil 601, transferindo a propriedade do estoque para o cliente e gerando os lançamentos contábeis de Custo das Mercadorias Vendidas (CPV).'
+      deploymentScope: 'S/4HANA on-premise/private com VL02N/GUI; Public Edition usa Pick Outbound Delivery/Change Outbound Delivery.',
+      tcode: 'Pick Outbound Delivery / Post Goods Issue',
+      legacyComparison: 'VL02N, MKPF e MSEG são referências GUI/ECC; o modelo S/4HANA usa MATDOC/objetos compatíveis.',
+      concept: 'PGI registra a saída física e o movimento 601 conforme a fixture. Não prova transferência jurídica genérica de propriedade nem transporte concluído.'
     },
 
     objectives: [
@@ -2266,14 +2279,17 @@ export const ScenarioCatalog = [
 
     targetCriteria: {
       targetDocNumber: '10000058',
+      targetDeliveryNumber: '80000060',
+      targetMaterialId: 'MAT-2004',
+      targetQuantity: 5,
       action: 'POST_GOODS_ISSUE'
     },
 
     completionFeedback: {
-      mentorSpeech: 'Saída de mercadorias confirmada com maestria! O PGI na VL02N baixou o saldo do almoxarifado via movimento 601 e liberou o caminhão para o trajeto da entrega. +300 XP.',
+      mentorSpeech: 'Picking completo e PGI registrados na remessa 80000060. O estoque foi atualizado no laboratório; transporte e recebimento não foram simulados. +300 XP.',
       whatHappened: 'Post Goods Issue (PGI) registrado com sucesso para a Remessa 80000060.',
-      why: 'O registro do PGI oficializa a saída física e contábil das mercadorias da empresa.',
-      businessImpact: 'A carga segue protegida com romaneio validado e o faturamento na VF01 está liberado.'
+      why: 'O PGI simulou a saída física e o movimento 601. Documentos fiscais, transporte e recebimento ficam fora do escopo.',
+      businessImpact: 'A remessa ficou elegível para a etapa de billing conforme as regras do laboratório; nenhuma fatura foi criada nesta missão.'
     }
   },
   {
@@ -2289,27 +2305,29 @@ export const ScenarioCatalog = [
 
     sender: 'Beatriz Albuquerque (Auditoria Fiscal & Faturamento)',
     emailSubject: 'FATURAMENTO COMERCIAL: Emitir Fatura F2 para Remessa 80000065 - Metalúrgica Paulista',
-    briefing: 'A remessa nº 80000065 da Indústria Metalúrgica Paulista (Ordem 10000062 - 1 Servidor Enterprise MAT-1001) teve a saída de mercadorias concluída na doca e está pronta para encerramento fiscal. Acesse a transação VF01, selecione o Tipo de Faturamento F2 (Fatura Comercial / NF), informe o número do documento de fornecimento 80000065 e gere a fatura comercial correspondente para faturamento e integração contábil.',
+    briefing: 'A remessa nº 80000065 está com PGI concluído e elegível para um documento de faturamento F2 simulado. Crie o billing relacionado à entrega; NF-e, SEFAZ, FI-AR e cobrança bancária não fazem parte desta missão.',
 
     purchaseOrderDocument: {
       buyerName: 'Indústria Metalúrgica Paulista S/A (Campinas/SP)',
       buyerCnpj: '98.765.432/0001-11',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-MP-FOB-BILL',
       operationType: 'Emissão de Fatura Comercial (Billing Type F2) para Fornecimento Concluído',
       itemsRequested: [
         { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB) (MAT-1001)', quantity: 1, unit: 'UN' }
       ],
       deliveryAddress: 'Fábrica Campinas - Portão 3 Logística',
-      freightResponsibility: 'FOB - Retirada na origem (sem destaque de frete pela NexusTech)',
+      freightResponsibility: 'FCA - Fábrica Campinas, Portão 3 Logística (cenário fictício)',
       paymentInstructions: '60 dias líquido (Z060)'
     },
 
     mentorInitialTip: 'Dica do Chefe Wilson: Acesse a transação VF01. Selecione o Tipo de Faturamento F2, insira o número da remessa 80000065 como documento de referência e clique em Gravar Fatura.',
 
     sapKnowledgeBridge: {
-      tcode: 'VF01 / VF03',
-      tables: 'VBRK (Cabeçalho de Faturamento), VBRP (Itens de Faturamento), BKPF (Documento Contábil FI)',
-      concept: 'O faturamento (VF01) encerra a cadeia comercial em SD e gera automaticamente os lançamentos no módulo contábil e financeiro (FI-AR) em contas a receber.'
+      deploymentScope: 'S/4HANA on-premise/private com VF01/VF03 ou Fiori; Public Edition usa Create/Manage Billing Documents.',
+      tcode: 'Create Billing Documents / Manage Billing Documents',
+      legacyComparison: 'VF01, VF03, VBRK, VBRP e BKPF são referências GUI/ECC/compatibilidade; FI-AR e NF-e não são implementados como integração real.',
+      concept: 'O F2 simulado deve referenciar a entrega e atualizar o fluxo em memória. Um billing document não prova NF-e, SEFAZ ou contabilização real.'
     },
 
     objectives: [
@@ -2356,21 +2374,24 @@ export const ScenarioCatalog = [
 
     targetCriteria: {
       targetDocNumber: '10000062',
+      targetDeliveryNumber: '80000065',
       billingType: 'F2',
+      requiresDeliveryReference: true,
+      requiresPostGoodsIssue: true,
       action: 'CREATE_INVOICE'
     },
 
     completionFeedback: {
-      mentorSpeech: 'Faturamento comercial emitido com precisão impecável! A Fatura F2 foi gerada na VF01, concluindo o ciclo Order-to-Cash com integração contábil completa. +300 XP.',
-      whatHappened: 'Fatura Comercial F2 emitida para a remessa expedida sob modalidade FOB.',
-      why: 'A emissão da fatura encerra o ciclo de fornecimento e gera os títulos a receber no financeiro.',
-      businessImpact: 'A Nota Fiscal Eletrônica foi escriturada e a cobrança programada para vencimento em 60 dias.'
+      mentorSpeech: 'Documento F2 simulado criado com referência à remessa 80000065. NF-e, SEFAZ, FI-AR e cobrança não foram executados. +300 XP.',
+      whatHappened: 'Documento de faturamento F2 simulado criado para a remessa 80000065.',
+      why: 'O billing simulado encerra a etapa SD deste laboratório; título financeiro e fiscalidade legal dependem de integrações não implementadas.',
+      businessImpact: 'A fatura simulada ficou registrada no fluxo documental; NF-e, cobrança e vencimento financeiro não são garantidos pelo motor.'
     }
   },
   {
     id: 'SCN-35',
     code: 'DSF-207',
-    title: 'Desafio SLA: Diagnóstico Cadastral na XD03 e Expedição Urgente',
+    title: 'Desafio SLA: Validação de BP e Criação de Outbound Delivery',
     mode: 'CHALLENGE',
     levelRequired: 1,
     slaMinutes: 6,
@@ -2380,31 +2401,33 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'DESAFIO SLA (6 MIN): Expedição Urgente de Servidores para DataCore Cloud',
-    briefing: 'Chamado de Emergência com SLA! O cliente DataCore Cloud & Datacenters (Cliente 100180) solicitou despacho urgente para a Ordem de Venda nº 10000065 (2 Servidores Rack 1U - MAT-1010) para ampliação de capacidade no data center de Alphaville. Você tem 6 minutos no cronômetro de SLA para: consultar o cadastro do parceiro na XD03 e confirmar as condições de entrega e expedição, acessar a VL01N com o Ponto de Expedição 1000 e gerar a remessa de saída correspondente antes do encerramento da janela logística!',
+    briefing: 'Desafio de plantão com SLA de 6 minutos: valide o BP/ship-to da DataCore 100180 e crie a outbound delivery para a Ordem 10000065 pelo shipping point 1000. O desafio termina na criação da entrega; picking, PGI, billing e transporte não são simulados.',
 
     purchaseOrderDocument: {
       buyerName: 'DataCore Cloud & Datacenters Brasil Ltda (Barueri/SP)',
       buyerCnpj: '34.567.890/0001-12',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-DC-URG-2026',
       operationType: 'Expedição Expressa sob SLA com Validação Cadastral Prévia',
       itemsRequested: [
         { description: 'Servidor Rack 1U Nexus Edge Entry (Single Xeon 32GB) (MAT-1010)', quantity: 2, unit: 'UN' }
       ],
       deliveryAddress: 'DataCore DC1 - Alphaville Barueri / SP',
-      freightResponsibility: 'CIF - Despacho expresso rodoviário dedicado',
+      freightResponsibility: 'DAP - DataCore DC1 Alphaville (cenário fictício)',
       paymentInstructions: '15 dias líquido (Z015)'
     },
 
-    mentorInitialTip: 'Aviso de Desafio com SLA (6 minutos): Consulte primeiro os dados de expedição do parceiro 100180 na XD03. Em seguida, acerte o Ponto de Expedição 1000 na VL01N para a Ordem 10000065 e gere a remessa com rapidez!',
+    mentorInitialTip: 'Aviso de Desafio com SLA (6 minutos): valide BP/ship-to 100180 e a determinação do shipping point 1000. Crie a entrega correta sem transformar urgência em atalho de autorização.',
 
     sapKnowledgeBridge: {
-      tcode: 'XD03 / VL01N',
-      tables: 'KNVV / VBAK / LIKP / LIPS',
-      concept: 'Em operações expressas sob pressão de SLA, a consulta cadastral prévia evita erros de despacho logístico para centros de distribuição ou filiais equivocadas.'
+      deploymentScope: 'S/4HANA on-premise/private com GUI/compatibilidade; Public Edition usa apps Fiori de BP e Create Outbound Delivery.',
+      tcode: 'Manage Business Partner / Create Outbound Delivery',
+      legacyComparison: 'XD03, VL01N, KNVV, VBAK, LIKP e LIPS são referências GUI/ECC/compatibilidade; BP é o modelo mestre S/4HANA.',
+      concept: 'A validação prévia do BP/ship-to e da determinação de shipping point reduz risco de despacho para endereço incorreto. A missão termina na criação da entrega.'
     },
 
     objectives: [
-      { id: 'check_customer_xd03', text: 'Validar dados de expedição do cliente 100180 na transação XD03', done: false },
+      { id: 'check_customer_xd03', text: 'Validar BP/ship-to 100180 e dados de expedição', done: false },
       { id: 'access_vl01n', text: 'Acessar a transação VL01N com Ponto de Expedição 1000', done: false },
       { id: 'create_delivery', text: 'Gerar a remessa para a Ordem 10000065 dentro do tempo de SLA', done: false }
     ],
@@ -2436,14 +2459,18 @@ export const ScenarioCatalog = [
       targetDocNumber: '10000065',
       customerId: '100180',
       shippingPoint: '1000',
+      plantId: '1000',
+      targetMaterialId: 'MAT-1010',
+      targetQuantity: 2,
+      deliveryCreated: true,
       action: 'CREATE_DELIVERY'
     },
 
     completionFeedback: {
-      mentorSpeech: 'Extraordinária performance sob pressão de SLA! Você validou os dados cadastrais na XD03 e gerou o fornecimento na VL01N com velocidade e precisão militar, batendo o cronômetro do chamado. +450 XP.',
+      mentorSpeech: 'Desafio concluído: BP/ship-to validado e outbound delivery criada para a ordem correta dentro do SLA. Nenhum transporte ou billing foi executado. +450 XP.',
       whatHappened: 'Remessa de saída criada dentro do prazo de SLA de 6 minutos para a Ordem 10000065.',
-      why: 'A rápida orquestração entre consulta cadastral e geração de fornecimento garantiu a saída do veículo.',
-      businessImpact: 'O datacenter da DataCore em Alphaville recebeu os novos servidores sem indisponibilidade de rede.'
+      why: 'A ordem foi ligada à entrega correta no laboratório; o veículo só pode ser considerado em transporte após etapas físicas não simuladas.',
+      businessImpact: 'A entrega ficou aguardando picking no CD. Recebimento e impacto operacional não são mensurados.'
     }
   },
   {
@@ -2459,35 +2486,37 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem de Compra Especial com Prazo Estendido: InovaCorp (PO-INOVA-Z60)',
-    briefing: 'Olá! A InovaCorp Soluções Tecnológicas fechou a aquisição de 6 unidades do Roteador de Borda SD-WAN Multi-WAN (MAT-2010). O cliente está cadastrado sob a conta 100045, cujo mestre comercial em KNVV propõe automaticamente a condição Z030 (30 dias). Porém, em negociação formal autorizada pela diretoria comercial, foi concedido o prazo especial estendido de 60 dias líquido (Z060). Abra a VA01, preencha a estrutura comercial nacional (1000/10/01), selecione o parceiro 100045, sobreponha manualmente o campo Condição de Pagamento de Z030 para Z060 no cabeçalho e lance os itens com frete CIF!',
+    briefing: 'A InovaCorp Soluções Tecnológicas de teste solicitou 6 roteadores MAT-2010. O cadastro do cliente 100045 propõe Z030, mas existe autorização comercial registrada para usar Z060. Na VA01, confirme a área 1000/10/01, o parceiro e a referência do cliente, sobreponha Z030 por Z060 e grave a ordem com Incoterms DAP. A missão termina no pedido criado; não executa entrega ou billing.',
 
     purchaseOrderDocument: {
-      buyerName: 'InovaCorp Soluções Tecnológicas (Varejo Eletro Brasil - Conta Corp)',
+      buyerName: 'InovaCorp Soluções Tecnológicas (cliente corporativo de teste)',
       buyerCnpj: '12.345.678/0001-90',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
       poNumber: 'PO-INOVA-Z60',
       operationType: 'Venda Comercial com Alçada de Prazo Estendido Autorizada',
       itemsRequested: [
         { description: 'Roteador de Borda SD-WAN Gigabit Multi-WAN (MAT-2010)', quantity: 6, unit: 'UN' }
       ],
       deliveryAddress: 'Av. das Nações Unidas, 14200 - São Paulo/SP',
-      freightResponsibility: 'CIF - Entrega e seguro por conta da NexusTech',
+      freightResponsibility: 'DAP - Endereço do cliente em São Paulo (cenário fictício)',
       paymentInstructions: '60 dias líquido (Z060) - Aprovado formalmente pela Diretoria Comercial'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Ao selecionar o cliente 100045 na VA01, observe que o sistema puxa Z030 por padrão. Altere manualmente o campo ZTERM para Z060 antes de simular e gravar. Isso demonstra o domínio sobre a sobreposição de dados mestres em SD!',
+    mentorInitialTip: 'Pista do Chefe Wilson: confira o valor proposto Z030, a autorização para Z060 e a área de vendas. Grave com DAP; uma alteração no pedido não altera o mestre permanente do cliente.',
 
     sapKnowledgeBridge: {
-      tcode: 'VA01 / XD03',
-      tables: 'VBAK (Cabeçalho da Ordem), KNVV (Dados de Vendas do Cliente)',
-      concept: 'No SAP SD, os dados mestres do cliente (tabela KNVV) propõem valores padrão para a ordem de venda. Contudo, usuários com perfil autorizado podem sobrepor a condição de pagamento (ZTERM) ou Incoterms diretamente no cabeçalho da ordem para refletir negociações pontuais com alçada.'
+      deploymentScope: 'S/4HANA on-premise/private com VA01/GUI ou app Fiori; Public Edition usa Create Sales Orders.',
+      tcode: 'Create Sales Orders / Manage Business Partner',
+      legacyComparison: 'VA01, XD03, VBAK e KNVV são referências GUI/ECC/compatibilidade; BP é o objeto mestre S/4HANA.',
+      concept: 'A ordem pode receber um valor de cabeçalho diferente do default mestre quando a configuração e a autorização permitem. Nesta missão, o engine valida apenas os campos comerciais e a gravação do pedido.'
     },
 
     objectives: [
       { id: 'set_org_structure', text: 'Configurar Área de Vendas 1000 / 10 / 01 e Tipo de Ordem OR na VA01', done: false },
       { id: 'select_customer', text: 'Selecionar Cliente corporativo (100045) e informar Pedido PO-INOVA-Z60', done: false },
-      { id: 'fill_terms', text: 'Sobrepor a Condição de Pagamento padrão para Z060 conforme alçada e Incoterms CIF', done: false },
+      { id: 'fill_terms', text: 'Sobrepor Z030 para Z060 conforme alçada e usar Incoterms DAP', done: false },
       { id: 'add_item', text: 'Inserir 6 unidades do Roteador de Borda SD-WAN (MAT-2010)', done: false },
-      { id: 'save_order', text: 'Simular os preços e gravar a ordem de venda com a nova condição de pagamento', done: false }
+      { id: 'save_order', text: 'Gravar a ordem com Z060, DAP e os dados do pedido', done: false }
     ],
 
     targetCriteria: {
@@ -2499,17 +2528,19 @@ export const ScenarioCatalog = [
       customerId: '100045',
       customerPoNumber: 'PO-INOVA-Z60',
       paymentTerms: 'Z060',
-      incoterms: 'CIF',
+      incoterms: 'DAP',
+      incotermsLocation: 'São Paulo - endereço do cliente',
+      incotermsVersion: '2020',
       items: [
         { materialId: 'MAT-2010', quantity: 6, discountPercent: 0 }
       ]
     },
 
     completionFeedback: {
-      mentorSpeech: 'Perfeita sobreposição de parâmetros comerciais! Você manteve a rastreabilidade cadastral e aplicou o prazo estendido Z060 autorizado pela diretoria, demonstrando maturidade operacional em SD. +300 XP.',
+      mentorSpeech: 'Ordem criada com a sobreposição autorizada Z060 e Incoterms DAP. O mestre do cliente permaneceu inalterado e nenhuma entrega ou fatura foi criada. +300 XP.',
       whatHappened: 'Ordem de venda gravada com condição Z060 sobreposta manualmente ao mestre do cliente.',
-      why: 'A flexibilidade de sobreposição no cabeçalho permite atender alçadas comerciais sem necessidade de alterar o cadastro permanente do cliente.',
-      businessImpact: 'O cliente receberá faturamento com vencimento correto em 60 dias sem gerar retrabalho contábil ou financeiro.'
+      why: 'A alteração pontual do documento atende a autorização comercial sem alterar o cadastro permanente; a alçada é evidência da fixture, não aprovação automática de crédito.',
+      businessImpact: 'O pedido ficou registrado com os termos autorizados. Vencimento financeiro, entrega e billing dependem das etapas posteriores.'
     }
   },
   {

@@ -699,6 +699,7 @@ export class Va02ViewComponent {
       paymentTerms: this.paymentTerms,
       incoterms: this.incoterms,
       incotermsLocation: this.incotermsLocation,
+      incotermsVersion: '2020',
       items: this.items,
       netValue: totals.totalNet,
       taxValue: totals.totalTaxes,
