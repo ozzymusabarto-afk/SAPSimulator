@@ -71,7 +71,7 @@ export class ConfiguracoesViewComponent {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px;">
             <div style="background: var(--erp-surface-subtle); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--erp-border-subtle);">
               <div style="font-size: 10.5px; color: var(--erp-text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Missões Concluídas</div>
-              <div style="font-size: 22px; font-weight: 800; color: var(--erp-blue-primary); font-family: var(--font-mono);">${completed} / 50</div>
+              <div style="font-size: 22px; font-weight: 800; color: var(--erp-blue-primary); font-family: var(--font-mono);">${completed} / 54</div>
             </div>
             <div style="background: var(--erp-surface-subtle); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--erp-border-subtle);">
               <div style="font-size: 10.5px; color: var(--erp-text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">XP Total da Carreira</div>

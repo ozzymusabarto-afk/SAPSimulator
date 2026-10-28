@@ -16,13 +16,13 @@ Aqui usamos “analista” para representar a rotina interna de operação, supo
 
 ## Ciclo Trainee
 
-O primeiro ciclo tem **50 missões oficiais**. Esse número é adequado como ciclo de entrada porque cobre o fluxo Order-to-Cash sem obrigar o usuário a repetir uma sequência fixa. As missões são selecionadas por um motor pseudoaleatório determinístico, que evita repetir a mesma ação ou dificuldade em sequência e permite retomar o expediente após recarregar a página.
+O primeiro ciclo tem **54 missões oficiais**. Esse número é adequado como ciclo de entrada porque cobre o fluxo Order-to-Cash sem obrigar o usuário a repetir uma sequência fixa. As missões são selecionadas por um motor pseudoaleatório determinístico, que evita repetir a mesma ação ou dificuldade em sequência e permite retomar o expediente após recarregar a página.
 
-As 50 missões atuais são a base homologada do Trainee. O catálogo já possui metadados de estágio, dificuldade, grupo de processo e trilha de carreira para receber novos blocos sem reescrever o motor. A expansão deve acontecer por qualidade e variedade, não por cópias superficiais:
+As 54 missões atuais são a base homologada do Trainee. O catálogo já possui metadados de estágio, dificuldade, grupo de processo e trilha de carreira para receber novos blocos sem reescrever o motor. A expansão deve acontecer por qualidade e variedade, não por cópias superficiais:
 
 | Fase | Foco | Estado |
 |---|---|---|
-| Trainee | Rotina assistida, consultas, pedidos, preço, ATP, crédito, remessa e faturamento | 50 missões oficiais |
+| Trainee | Rotina assistida, consultas, pedidos, preço, ATP, crédito, remessa e faturamento | 54 missões oficiais |
 | Analista Júnior | Autonomia parcial, priorização, exceções e comunicação operacional | Motor preparado; conteúdo em expansão |
 | Analista Pleno | Causa-raiz, governança, alçada, incidentes O2C e apoio ao time | Motor preparado; conteúdo futuro |
 
@@ -52,7 +52,7 @@ npm run build
 npm run audit:missions
 ```
 
-O resultado esperado do catálogo atual é `50/50 aprovadas`. O acesso rápido de desenvolvimento só aparece durante `npm run dev` e nunca deve ser usado como autenticação de produção.
+O resultado esperado do catálogo atual é `54/54 aprovadas`. O acesso rápido de desenvolvimento só aparece durante `npm run dev` e nunca deve ser usado como autenticação de produção.
 
 ## Escopo e segurança
 

@@ -1,5 +1,5 @@
 /**
- * Auditoria isolada das 50 missões com o banco em memória do simulador.
+ * Auditoria isolada das 54 missões com o banco em memória do simulador.
  * Execute com: npm run audit:missions
  * Não acessa o localStorage do navegador nem grava dados do trainee real.
  */
@@ -165,18 +165,6 @@ function auditScenario(scenario) {
     assert.equal(inspection.isValid, true, inspection.mentorSpeech || `${scenario.code}: VA03 rejeitou o documento-alvo.`);
   }
 
-  const atpTarget = (target.items || []).find(item => item.requestedQuantity !== undefined && item.atpFeedback);
-  if (atpTarget && scenario.objectives.some(objective => objective.id === 'check_atp_error')) {
-    const attempted = createOrderData(scenario);
-    attempted.items = attempted.items.map(item => item.materialId === atpTarget.materialId
-      ? { ...item, quantity: atpTarget.requestedQuantity }
-      : item);
-    const rejected = scenarioEngine.validateSalesOrderSubmission(attempted);
-    assert.equal(rejected.isValid, false, `${scenario.code}: a quantidade acima do ATP deveria ser rejeitada.`);
-    assert.equal(scenarioEngine.getActiveScenario().objectives.find(objective => objective.id === 'check_atp_error')?.done, true,
-      `${scenario.code}: a tentativa acima do ATP não registrou o diagnóstico.`);
-  }
-
   for (const item of target.items || []) {
     if (scenario.objectives.some(objective => ['check_stock_atp', 'check_stock_mm03', 'check_material', 'investigate_availability'].includes(objective.id))) {
       const analysis = scenarioEngine.validateMaterialAnalysis(item.materialId);
@@ -192,6 +180,18 @@ function auditScenario(scenario) {
     });
     assert.equal(hasMissingPrice, false, `${scenario.code}: a simulação de preço encontrou material sem PR00.`);
     scenarioEngine.completeObjective('simulate_pricing');
+  }
+
+  const atpTarget = (target.items || []).find(item => item.requestedQuantity !== undefined && item.atpFeedback);
+  if (atpTarget && scenario.objectives.some(objective => objective.id === 'check_atp_error')) {
+    const attempted = createOrderData(scenario);
+    attempted.items = attempted.items.map(item => item.materialId === atpTarget.materialId
+      ? { ...item, quantity: atpTarget.requestedQuantity }
+      : item);
+    const rejected = scenarioEngine.validateSalesOrderSubmission(attempted);
+    assert.equal(rejected.isValid, false, `${scenario.code}: a quantidade acima do ATP deveria ser rejeitada.`);
+    assert.equal(scenarioEngine.getActiveScenario().objectives.find(objective => objective.id === 'check_atp_error')?.done, true,
+      `${scenario.code}: a tentativa acima do ATP não registrou o diagnóstico.`);
   }
 
   if (target.targetMaterialId && target.targetAmount !== undefined) {
@@ -513,10 +513,10 @@ verifyUnrelatedVa01DoesNotCompleteInvoiceMission();
 verifyMissingAndWrongPricingAreRejected();
 verifyMm03CanIdentifyMissingPricing();
 verifyRedoUsesCurrentAttemptForCompletionCard();
-useIsolatedProfile('audit-all-50-missions');
-assert.equal(ScenarioCatalog.length, 50, 'O catálogo precisa conter exatamente 50 missões.');
-assert.equal(new Set(ScenarioCatalog.map(item => item.id)).size, 50, 'Há IDs de missão duplicados.');
-assert.equal(new Set(ScenarioCatalog.map(item => item.code)).size, 50, 'Há códigos de missão duplicados.');
+useIsolatedProfile('audit-all-54-missions');
+assert.equal(ScenarioCatalog.length, 54, 'O catálogo precisa conter exatamente 54 missões.');
+assert.equal(new Set(ScenarioCatalog.map(item => item.id)).size, 54, 'Há IDs de missão duplicados.');
+assert.equal(new Set(ScenarioCatalog.map(item => item.code)).size, 54, 'Há códigos de missão duplicados.');
 for (const scenario of ScenarioCatalog) {
   try {
     assert.ok(scenario.title?.trim() && scenario.briefing?.trim() && scenario.mentorInitialTip?.trim(), 'Título, briefing ou dica inicial ausente.');

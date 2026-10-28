@@ -4,7 +4,7 @@
  * Arquivo: js/components/transactions/myJourneyView.js
  * 
  * Exibe a fase atual, linha de carreira com fases futuras bloqueadas,
- * progresso das 50 missões, matriz dos 7 pilares e avaliação do Chefe Wilson.
+ * progresso das 54 missões, matriz dos 7 pilares e avaliação do Chefe Wilson.
  */
 
 import { Icons } from '../../utils/icons.js';
@@ -29,7 +29,7 @@ export class MyJourneyViewComponent {
       ? profile.completedScenarios
       : Object.keys(profile.completedScenarios || {});
     const completedCount = completedList.length;
-    const progressPercent = Math.min(100, Math.round((completedCount / 50) * 100));
+    const progressPercent = Math.min(100, Math.round((completedCount / 54) * 100));
 
     this.container.innerHTML = `
       <!-- Header Institucional -->
@@ -41,14 +41,14 @@ export class MyJourneyViewComponent {
           <h1 class="view-header-title">Minha Jornada no Nexus ERP Lab</h1>
           <p class="view-header-subtitle">
             Acompanhe sua evolução profissional sequencial no ambiente de simulação SAP SD.
-            Sua formação combina a execução das 50 missões oficiais, o domínio dos 7 pilares operacionais
+            Sua formação combina a execução das 54 missões oficiais, o domínio dos 7 pilares operacionais
             e a homologação do Chefe Wilson.
           </p>
         </div>
         <div style="text-align: right; flex-shrink: 0;">
           <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">Fase Atual</div>
           <div style="font-size: 18px; font-weight: 700; color: #60a5fa;">${PhaseLabels[PhaseId.TRAINEE]}</div>
-          <div style="font-size: 12px; color: #cbd5e1; margin-top: 4px;">${completedCount} de 50 missões concluídas (${progressPercent}%)</div>
+          <div style="font-size: 12px; color: #cbd5e1; margin-top: 4px;">${completedCount} de 54 missões concluídas (${progressPercent}%)</div>
         </div>
       </div>
 
@@ -66,10 +66,10 @@ export class MyJourneyViewComponent {
               <span class="career-step-badge active-badge">Em Curso</span>
             </div>
             <div class="career-step-desc">
-              Capacitação prática nos processos fundamentais de Vendas e Distribuição (Order-to-Cash) em 50 missões.
+              Capacitação prática nos processos fundamentais de Vendas e Distribuição (Order-to-Cash) em 54 missões.
             </div>
             <div class="career-step-footer">
-              <span style="color: #2563eb;">●</span> Acesso Gratuito • 50 Missões
+              <span style="color: #2563eb;">●</span> Acesso Gratuito • 54 Missões
             </div>
           </div>
 

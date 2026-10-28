@@ -3,7 +3,7 @@
  * Mapeamento Desacoplado de Competências (Competency Map)
  * Módulo: js/core/models/competencyMap.js
  * 
- * Correlaciona os 50 cenários oficiais aos 7 pilares de competência operacional,
+ * Correlaciona os 54 cenários oficiais aos 7 pilares de competência operacional,
  * sem introduzir qualquer alteração no catalog.js ou nos motores transacionais.
  */
 
@@ -62,7 +62,7 @@ export const CompetencyMetadata = Object.freeze({
 });
 
 /**
- * Mapeamento formal de cada um dos 50 cenários oficiais aos 7 pilares,
+ * Mapeamento formal de cada um dos 54 cenários oficiais aos 7 pilares,
  * alinhado à competência pedagógica efetivamente exercitada em cada chamado.
  */
 export const ScenarioCompetencyMap = Object.freeze({
@@ -100,6 +100,10 @@ export const ScenarioCompetencyMap = Object.freeze({
   'SCN-33': [CompetencyId.SHIPPING, CompetencyId.MASTER_DATA],
   'SCN-34': [CompetencyId.BILLING, CompetencyId.CREDIT],
   'SCN-35': [CompetencyId.SHIPPING, CompetencyId.PRICING],
+  'SCN-36': [CompetencyId.ATP, CompetencyId.ORDER_MGMT],
+  'SCN-37': [CompetencyId.MASTER_DATA, CompetencyId.ORDER_MGMT],
+  'SCN-39': [CompetencyId.CREDIT, CompetencyId.MASTER_DATA],
+  'SCN-40': [CompetencyId.BILLING, CompetencyId.SHIPPING],
   'SCN-38': [CompetencyId.ORDER_MGMT, CompetencyId.PRICING],
   'SCN-41': [CompetencyId.BILLING, CompetencyId.SHIPPING],
   'SCN-42': [CompetencyId.PRICING],

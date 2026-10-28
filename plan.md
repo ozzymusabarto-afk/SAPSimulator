@@ -12,7 +12,7 @@ A referência tecnológica principal será **SAP S/4HANA**, com interface inspir
 
 A jornada é uma experiência narrativa de contratação e evolução:
 
-- **Trainee:** integração, primeiro expediente, rotina assistida, 50 missões de prática e avaliação de prontidão.
+- **Trainee:** integração, primeiro expediente, rotina assistida, 54 missões de prática e avaliação de prontidão.
 - **Analista SAP SD Júnior:** promoção narrativa pelo Chefe Wilson, chamados com autonomia parcial, priorização, exceções e comunicação operacional.
 - **Analista SAP SD Pleno:** análise de causa-raiz, governança, decisões de alçada, incidentes O2C e apoio ao time.
 
@@ -22,7 +22,7 @@ A jornada é uma experiência narrativa de contratação e evolução:
 
 O catálogo continuará dirigido por dados. Cada missão terá estágio, competência, modo, dificuldade, pré-requisitos e variações. A seleção será pseudoaleatória e determinística por usuário/ciclo: evita sequência fixa, evita repetir a mesma família em seguida e permite reproduzir a fila em caso de recarga.
 
-A versão atual mantém 50 missões Trainee como primeiro ciclo. O motor será preparado para crescer com missões Júnior e Pleno sem alterar o fluxo de execução. O trainee não precisa concluir necessariamente todas as 50 para “aprender”; o ciclo usa as 50 como repertório completo de homologação e o usuário recebe uma amostra variada por expediente.
+A versão atual mantém 54 missões Trainee como primeiro ciclo. O motor será preparado para crescer com missões Júnior e Pleno sem alterar o fluxo de execução. O trainee não precisa concluir necessariamente todas as 54 para “aprender”; o ciclo usa as 54 como repertório completo de homologação e o usuário recebe uma amostra variada por expediente.
 
 ## Interface
 

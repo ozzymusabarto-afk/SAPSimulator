@@ -5,7 +5,7 @@
  * Módulo: js/core/engine/traineeEngine.js
  * 
  * Arquitetura de Progressão:
- * TRAINEE SD → Formação Prática (50 Missões Oficiais) → Diagnóstico → ANALISTA SAP SD JÚNIOR
+ * TRAINEE SD → Formação Prática (54 Missões Oficiais) → Diagnóstico → ANALISTA SAP SD JÚNIOR
  * O XP representa a experiência acumulada da carreira e é estritamente desacoplado da promoção formal.
  */
 
@@ -138,7 +138,7 @@ class TraineeEngine {
         id: 1,
         name: 'Ciclo 1: Formação Prática Trainee SD',
         status: 'IN_PROGRESS', // 'IN_PROGRESS' | 'COMPLETED' | 'CONSOLIDATION_PENDING' | 'APPROVED'
-        totalMissionsRequired: 50,
+        totalMissionsRequired: 54,
         completedMissionsCount: 0
       },
 
@@ -191,7 +191,7 @@ class TraineeEngine {
       journey = createUserJourney('trainee_default', initialPhase);
       journey.completedScenarioIds = [...completedScenarios];
       journey.totalPhaseXp = old.currentCycleXp || old.xp || 0;
-      if (completedScenarios.length >= 50) {
+      if (completedScenarios.length >= 54) {
         journey.state = JourneyState.DIAGNOSTIC_PENDING;
       }
     } else {
@@ -236,10 +236,10 @@ class TraineeEngine {
       this.profile.journey.totalPhaseXp = this.profile.currentCycleXp || 0;
       this.profile.journey.lastActiveAt = new Date().toISOString();
 
-      // Se concluiu todas as 50 missões e ainda está IN_PROGRESS, passa para DIAGNOSTIC_PENDING
+      // Se concluiu todas as 54 missões e ainda está IN_PROGRESS, passa para DIAGNOSTIC_PENDING
       if (
         this.profile.journey.currentPhaseId === PhaseId.TRAINEE &&
-        this.profile.completedScenarios.length >= 50 &&
+        this.profile.completedScenarios.length >= 54 &&
         this.profile.journey.state === JourneyState.IN_PROGRESS
       ) {
         this.profile.journey.state = JourneyState.DIAGNOSTIC_PENDING;
@@ -489,7 +489,7 @@ class TraineeEngine {
       id: newCycleId,
       name: newCycleName,
       status: 'IN_PROGRESS',
-      totalMissionsRequired: 50,
+      totalMissionsRequired: 54,
       completedMissionsCount: 0
     };
 
@@ -541,7 +541,7 @@ class TraineeEngine {
       currentCycleXp: this.profile.currentCycleXp,
       nextLevelTitle: nextTitle,
       nextMinXp: 1000,
-      progressPercent: Math.min(100, Math.round((this.profile.completedScenarios.length / Math.max(1, this.profile.currentCycle.totalMissionsRequired || 50)) * 100))
+      progressPercent: Math.min(100, Math.round((this.profile.completedScenarios.length / Math.max(1, this.profile.currentCycle.totalMissionsRequired || 54)) * 100))
     };
   }
 

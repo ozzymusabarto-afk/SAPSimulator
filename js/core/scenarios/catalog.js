@@ -2474,6 +2474,282 @@ export const ScenarioCatalog = [
     }
   },
   {
+    id: 'SCN-36',
+    code: 'TRN-131',
+    title: 'Confirmação Parcial de ATP para Pedido de Revenda',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'atp_decision_maker',
+    initialTcode: 'MM03',
+
+    sender: 'Renata Siqueira (Planejamento de Demanda e Suprimentos - S&OP)',
+    emailSubject: 'Ruptura de Disponibilidade: Sul Distribuidora - PO-SUL-ATP-2026',
+    briefing: 'A Sul Distribuidora (cliente 100240) solicitou 80 switches MAT-2080 para uma expansão regional. O ATP do centro regional não confirma todo o volume: apenas 70 unidades podem ser comprometidas na data analisada. Verifique a disponibilidade do material, registre a tentativa original de 80 para evidenciar a ruptura e depois grave a ordem com a confirmação comercialmente aprovada de 70 unidades. Não prometa o saldo pendente sem uma data confirmada.',
+
+    purchaseOrderDocument: {
+      buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
+      buyerCnpj: '56.789.012/0001-34',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
+      poNumber: 'PO-SUL-ATP-2026',
+      operationType: 'Venda de Revenda com Confirmação Parcial de Disponibilidade',
+      itemsRequested: [
+        { description: 'Switch 48 Portas Gigabit PoE+ com 4x 10G SFP+ (MAT-2080)', quantity: 80, unit: 'UN' }
+      ],
+      deliveryAddress: 'CD Sul Distribuição Joinville/SC',
+      freightResponsibility: 'CIF - Transporte rodoviário regional',
+      paymentInstructions: '28 dias líquido (Z28D)'
+    },
+
+    mentorInitialTip: 'Consulte o saldo e o centro de atendimento antes de gravar. Primeiro tente a quantidade pedida de 80 para que o sistema registre a exceção de ATP; depois ajuste para as 70 unidades confirmadas pelo planejamento. O restante precisa ficar como pendência comercial, não como promessa automática.',
+
+    sapKnowledgeBridge: {
+      deploymentScope: 'S/4HANA com Product Availability / aATP e Manage Sales Orders; a tela MM03 é uma referência GUI/ECC de laboratório.',
+      tcode: 'Manage Product Availability / Manage Sales Orders',
+      legacyComparison: 'MM03, CO09, MMBE e VA01 são referências GUI/ECC ou simplificações; a confirmação moderna depende do escopo de aATP configurado.',
+      concept: 'ATP separa a quantidade solicitada da quantidade confirmada. Uma confirmação parcial precisa ser comunicada e registrada no documento, sem transformar estoque futuro ou não confirmado em compromisso firme.'
+    },
+
+    objectives: [
+      { id: 'check_material', text: 'Consultar o saldo e o centro de atendimento de MAT-2080', done: false },
+      { id: 'check_atp_error', text: 'Registrar a ruptura ao tentar confirmar as 80 unidades solicitadas', done: false },
+      { id: 'access_va01', text: 'Acessar a criação da ordem de venda', done: false },
+      { id: 'fill_header_sales_area', text: 'Definir Área de Vendas 1000 / 20 / 01 e Tipo OR', done: false },
+      { id: 'fill_header_commercial', text: 'Informar o cliente 100240, a PO e a condição Z28D', done: false },
+      { id: 'add_order_items', text: 'Registrar 70 unidades confirmadas de MAT-2080', done: false },
+      { id: 'simulate_pricing', text: 'Simular a precificação e gravar a ordem parcial', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_SUBMISSION',
+      orderType: 'OR', salesOrg: '1000', distChannel: '20', division: '01',
+      customerId: '100240', customerPoNumber: 'PO-SUL-ATP-2026',
+      paymentTerms: 'Z28D', incoterms: 'CIF', incotermsLocation: 'Curitiba',
+      requiresCustomerAnalysis: true, requiresPoAnalysis: true, requiresMaterialAnalysis: true,
+      items: [{
+        materialId: 'MAT-2080', requestedQuantity: 80, quantity: 70, discountPercent: 0,
+        atpFeedback: {
+          mentorSpeech: 'A quantidade solicitada excede a confirmação disponível no centro regional. Registre a exceção e ajuste o pedido para 70 unidades confirmadas; não trate o saldo pendente como confirmação firme.',
+          whatHappened: 'O ATP não confirmou as 80 unidades solicitadas; a disponibilidade firme do cenário é de 70 unidades.',
+          why: 'A confirmação deve respeitar a quantidade e a data disponíveis no escopo de atendimento.',
+          businessImpact: 'Prometer 80 unidades sem confirmação pode gerar atraso, reprogramação e ruptura com o cliente.'
+        }
+      }]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Boa decisão de ATP: você evidenciou a ruptura, registrou somente as 70 unidades confirmadas e deixou o saldo pendente para tratativa comercial. +350 XP.',
+      whatHappened: 'A ordem foi gravada com confirmação parcial de 70 unidades.',
+      why: 'O documento comercial deve refletir uma confirmação disponível e rastreável, não apenas a quantidade desejada na PO.',
+      businessImpact: 'A Sul Distribuidora recebe uma confirmação realista e a pendência de 10 unidades pode seguir para replanejamento.'
+    }
+  },
+  {
+    id: 'SCN-37',
+    code: 'TRN-132',
+    title: 'Reconciliação de Business Partner antes da Venda Hospitalar',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'partner_data_guardian',
+    initialTcode: 'XD03',
+
+    sender: 'Carla Mendes (Key Account B2B | Contas Estratégicas)',
+    emailSubject: 'Pedido Hospitalar com Ship-to Técnico: São Lucas - PO-HSL-BP-2026',
+    briefing: 'A Rede Hospitalar São Lucas (cliente 100150) enviou a PO-HSL-BP-2026 para um servidor de infraestrutura. Antes de criar a ordem, reconcilie o Business Partner: confirme o sold-to, o ship-to do almoxarifado central e o payer do grupo. Depois registre a ordem na área 1000/10/01 com condição Z030 e CIF. O objetivo é evitar que uma venda válida seja criada com parceiro ou endereço errado.',
+
+    purchaseOrderDocument: {
+      buyerName: 'Rede Hospitalar São Lucas S/A (Sede RJ)',
+      buyerCnpj: '67.890.123/0001-45',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
+      poNumber: 'PO-HSL-BP-2026',
+      operationType: 'Venda Corporativa para Infraestrutura Hospitalar',
+      itemsRequested: [
+        { description: 'Servidor Rack 4U Nexus Power (Dual AMD 256GB) (MAT-1050)', quantity: 1, unit: 'UN' }
+      ],
+      deliveryAddress: 'Hospital São Lucas - Almoxarifado Central Copacabana/RJ',
+      freightResponsibility: 'CIF - Entrega no almoxarifado central',
+      paymentInstructions: '30 dias líquido (Z030)'
+    },
+
+    mentorInitialTip: 'Na referência S/4HANA, o Business Partner concentra as funções do parceiro. Não confunda o emissor da ordem com o endereço técnico de entrega nem com o pagador. Registre a evidência da consulta antes de abrir a VA01.',
+
+    sapKnowledgeBridge: {
+      deploymentScope: 'S/4HANA com Maintain Business Partner e Manage Sales Orders.',
+      tcode: 'Maintain Business Partner / Manage Sales Orders',
+      legacyComparison: 'XD03, KNA1, KNVV e funções SP/SH/BP/PY são referências GUI/ECC ou simplificações; o objeto mestre principal em S/4HANA é o Business Partner.',
+      concept: 'As funções de parceiro determinam quem compra, recebe a mercadoria, recebe a fatura e paga. A ordem deve carregar essa combinação correta para evitar falha de entrega e cobrança.'
+    },
+
+    objectives: [
+      { id: 'check_customer', text: 'Reconciliar sold-to, ship-to, bill-to e payer do BP 100150', done: false },
+      { id: 'analyze_po', text: 'Conferir a PO, endereço técnico e condição comercial', done: false },
+      { id: 'access_va01', text: 'Acessar a criação da ordem de venda', done: false },
+      { id: 'fill_header_sales_area', text: 'Definir Área de Vendas 1000 / 10 / 01 e Tipo OR', done: false },
+      { id: 'fill_header_commercial', text: 'Informar o cliente 100150, a PO e Z030', done: false },
+      { id: 'add_order_items', text: 'Inserir 1 unidade de MAT-1050', done: false },
+      { id: 'simulate_pricing', text: 'Simular precificação e gravar a ordem', done: false }
+    ],
+
+    targetCriteria: {
+      action: 'SALES_ORDER_SUBMISSION',
+      orderType: 'OR', salesOrg: '1000', distChannel: '10', division: '01',
+      customerId: '100150', customerPoNumber: 'PO-HSL-BP-2026',
+      paymentTerms: 'Z030', incoterms: 'CIF', incotermsLocation: 'Rio de Janeiro',
+      requiresCustomerAnalysis: true, requiresPoAnalysis: true,
+      items: [{ materialId: 'MAT-1050', quantity: 1, discountPercent: 0 }]
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Reconciliação correta: o pedido foi criado depois de conferir as funções do Business Partner e o endereço técnico de entrega. +350 XP.',
+      whatHappened: 'A ordem hospitalar foi criada com o cliente e a referência de compra reconciliados.',
+      why: 'Parceiros e endereços corretos são pré-requisitos para entrega, faturamento e cobrança sem retrabalho.',
+      businessImpact: 'A operação segue para disponibilidade e logística sem risco de enviar o servidor para a sede errada.'
+    }
+  },
+  {
+    id: 'SCN-39',
+    code: 'TRN-136',
+    title: 'Decisão HOLD por Exposição de Crédito sem Evidência de Alçada',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'credit_governance',
+    initialTcode: 'VA03',
+
+    sender: 'Marcelo Ramos (Gerente de Pricing & Inteligência Comercial)',
+    emailSubject: 'Bloqueio de Crédito: Construfort - Ordem 10000079',
+    briefing: 'A Construfort Obras e Engenharia (cliente 100350) pediu 15 access points MAT-2020 para um canteiro de obras. A ordem 10000079 está bloqueada: a exposição projetada ultrapassa o limite disponível e o chamado não traz aprovação de alçada. Analise a ordem e o Business Partner, registre um parecer objetivo e selecione HOLD. Não libere a ordem apenas porque a obra é urgente.',
+
+    purchaseOrderDocument: {
+      buyerName: 'Construfort Obras e Engenharia Ltda (Brasília/DF)',
+      buyerCnpj: '23.456.789/0001-56',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
+      poNumber: 'PO-CF-CREDIT-2026',
+      operationType: 'Venda de Infraestrutura de Conectividade para Obra',
+      itemsRequested: [
+        { description: 'Access Point Corporativo Wi-Fi 6 Dual-Band PoE+ (MAT-2020)', quantity: 15, unit: 'UN' }
+      ],
+      deliveryAddress: 'Canteiro de Obras Rodovia GO-040 - Logística/GO',
+      freightResponsibility: 'CIF - Entrega no canteiro conforme programação',
+      paymentInstructions: '60 dias líquido (Z060) - sujeito à aprovação de crédito'
+    },
+
+    initialDocuments: [{
+      docNumber: '10000079', orderType: 'OR', salesOrg: '1000', distChannel: '10', division: '01',
+      customerId: '100350', customerPoNumber: 'PO-CF-CREDIT-2026', paymentTerms: 'Z060',
+      incoterms: 'CIF', incotermsLocation: 'Brasília',
+      items: [{ materialId: 'MAT-2020', quantity: 15, unitPrice: 890.00 }],
+      netValue: 13350.00, totalValue: 13350.00, overallStatus: 'CREDIT_BLOCKED',
+      creditStatus: 'BLOCKED', deliveryStatus: 'NOT_DELIVERED', billingStatus: 'NOT_BILLED'
+    }],
+
+    mentorInitialTip: 'A urgência comercial não substitui a alçada. Se a exposição excede o limite e não há aprovação formal, registre HOLD com evidência e encaminhamento. A ordem deve permanecer bloqueada.',
+
+    sapKnowledgeBridge: {
+      deploymentScope: 'S/4HANA Credit Management com Manage Documented Credit Decisions / Manage Sales Orders.',
+      tcode: 'Manage Sales Orders / Manage Documented Credit Decisions',
+      legacyComparison: 'VA03, VKM1 e KNKK são referências GUI/ECC ou simplificações; a decisão moderna depende do Credit Management configurado.',
+      concept: 'A decisão de crédito precisa ser proporcional à exposição e à alçada disponível. HOLD preserva o bloqueio e cria rastreabilidade para a área responsável.'
+    },
+
+    objectives: [
+      { id: 'check_order_va03', text: 'Consultar a Ordem 10000079 e confirmar o bloqueio', done: false },
+      { id: 'investigate_credit', text: 'Consultar a exposição e o limite do BP 100350', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisão de crédito', done: false },
+      { id: 'release_credit_order', text: 'Registrar HOLD com parecer e encaminhamento, sem liberar a ordem', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000079', customerId: '100350', salesOrg: '1000', distChannel: '10', division: '01',
+      paymentTerms: 'Z060', incoterms: 'CIF', creditDecision: 'HOLD', requiresApproval: true,
+      expectedCreditLimit: 80000, expectedCreditUsed: 79000, targetNetValue: 13350.00,
+      action: 'CREDIT_RELEASE', requiresVkm1Release: true
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Decisão correta: a ordem permaneceu em HOLD porque faltava evidência de alçada para liberar a exposição. O parecer ficou rastreável para o responsável de crédito. +350 XP.',
+      whatHappened: 'A decisão HOLD foi registrada para a ordem 10000079.',
+      why: 'Sem aprovação compatível com a exposição, liberar crédito criaria risco financeiro e de governança.',
+      businessImpact: 'A expedição permanece bloqueada até a análise do responsável autorizado.'
+    }
+  },
+  {
+    id: 'SCN-40',
+    code: 'TRN-142',
+    title: 'Auditoria do Billing Relacionado à Delivery após PGI',
+    mode: 'TRAINING',
+    levelRequired: 1,
+    slaMinutes: null,
+    xpReward: 350,
+    badgeReward: 'billing_auditor',
+    initialTcode: 'VF01',
+
+    sender: 'Fernanda Alves (Faturamento e Contas a Receber)',
+    emailSubject: 'Conferência de Faturamento: DataCore - Remessa 80000077',
+    briefing: 'O faturamento recebeu a solicitação de emitir a fatura comercial F2 para a remessa 80000077 da DataCore Cloud. A entrega já possui PGI registrado. Emita o billing somente com a remessa correta e depois abra a consulta do documento para conferir o vínculo com a ordem 10000077. A missão avalia rastreabilidade do documento; não simula NF-e, SEFAZ ou lançamento contábil real.',
+
+    purchaseOrderDocument: {
+      buyerName: 'DataCore Cloud & Datacenters Brasil Ltda (Barueri/SP)',
+      buyerCnpj: '34.567.890/0001-12',
+      buyerCnpjNote: 'Identificador sintético de treinamento; não usar para validação fiscal.',
+      poNumber: 'PO-DC-BILL-AUDIT-2026',
+      operationType: 'Billing relacionado à remessa de servidor',
+      itemsRequested: [
+        { description: 'Servidor Rack 1U Nexus Edge Entry (MAT-1010)', quantity: 1, unit: 'UN' }
+      ],
+      deliveryAddress: 'DataCore DC1 - Alphaville Barueri/SP',
+      freightResponsibility: 'CIF - Entrega no Data Center',
+      paymentInstructions: '15 dias líquido (Z015)'
+    },
+
+    initialDocuments: [{
+      docNumber: '10000077', orderType: 'OR', salesOrg: '1000', distChannel: '10', division: '01',
+      customerId: '100180', customerPoNumber: 'PO-DC-BILL-AUDIT-2026', paymentTerms: 'Z015',
+      incoterms: 'CIF', incotermsLocation: 'Barueri',
+      items: [{ materialId: 'MAT-1010', quantity: 1, unitPrice: 4200.00 }],
+      netValue: 4200.00, totalValue: 4200.00, overallStatus: 'OPEN',
+      creditStatus: 'RELEASED', deliveryStatus: 'COMPLETED', billingStatus: 'NOT_BILLED'
+    }],
+
+    initialDeliveries: [{
+      deliveryNumber: '80000077', salesOrderNumber: '10000077', shippingPoint: '1000', customerId: '100180',
+      autoPgi: true, items: [{ materialId: 'MAT-1010', quantity: 1 }]
+    }],
+
+    mentorInitialTip: 'Na VF01, selecione o tipo F2 e a remessa 80000077. Depois consulte a fatura na VF03 e confira se o fluxo mantém a sequência ordem → delivery → PGI → billing. Um documento de billing de outra remessa não atende ao chamado.',
+
+    sapKnowledgeBridge: {
+      deploymentScope: 'S/4HANA com Create Billing Documents / Manage Billing Documents.',
+      tcode: 'Create Billing Documents / Manage Billing Documents',
+      legacyComparison: 'VF01, VF03, VBRK, VBRP e VBFA são referências GUI/ECC ou simplificações do laboratório.',
+      concept: 'Billing relacionado à delivery deve preservar o vínculo documental e ocorrer após o PGI. A consulta posterior confirma a rastreabilidade, mas não substitui integração fiscal ou contábil real.'
+    },
+
+    objectives: [
+      { id: 'access_vf01', text: 'Abrir a criação de billing para a operação', done: false },
+      { id: 'select_billing_type', text: 'Selecionar o tipo de faturamento F2', done: false },
+      { id: 'create_invoice', text: 'Emitir o billing usando a remessa 80000077', done: false },
+      { id: 'verify_invoice', text: 'Consultar o documento criado e confirmar a referência da ordem', done: false },
+      { id: 'verify_document_flow', text: 'Conferir o fluxo ordem → delivery → PGI → billing', done: false }
+    ],
+
+    targetCriteria: {
+      targetDocNumber: '10000077', targetDeliveryNumber: '80000077', billingType: 'F2',
+      requiresDeliveryReference: true, action: 'CREATE_INVOICE'
+    },
+
+    completionFeedback: {
+      mentorSpeech: 'Billing auditado corretamente: F2 foi criado para a delivery certa e o fluxo documental foi conferido na consulta posterior. +350 XP.',
+      whatHappened: 'O billing relacionado à remessa 80000077 foi emitido e conferido.',
+      why: 'A sequência documental evita faturar uma remessa diferente ou uma operação ainda não expedida.',
+      businessImpact: 'O caso fica pronto para as integrações fiscais e financeiras do ambiente produtivo, que não são simuladas aqui.'
+    }
+  },
+  {
     id: 'SCN-38',
     code: 'TRN-130',
     title: 'Sobreposição de Condição de Pagamento com Alçada na VA01',

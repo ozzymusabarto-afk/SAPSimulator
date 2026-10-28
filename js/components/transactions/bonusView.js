@@ -25,7 +25,7 @@ export class BonusViewComponent {
       ? profile.completedScenarios
       : Object.keys(profile.completedScenarios || {});
     const completedCount = completedList.length;
-    const isTraineeEligible = completedCount >= 50;
+    const isTraineeEligible = completedCount >= 54;
 
     this.container.innerHTML = `
       <!-- Header Institucional -->
@@ -43,7 +43,7 @@ export class BonusViewComponent {
         <div style="flex-shrink: 0; background: rgba(255, 255, 255, 0.08); padding: 12px 18px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); text-align: right;">
           <div style="font-size: 11px; text-transform: uppercase; color: #cbd5e1; font-weight: 700;">Requisito de Desbloqueio</div>
           <div style="font-size: 14px; font-weight: 700; color: #a5b4fc; margin-top: 2px;">
-            ${completedCount} / 50 Missões Homologadas
+            ${completedCount} / 54 Missões Homologadas
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@ export class BonusViewComponent {
           Materiais de Apoio • Formação Trainee SD
         </h3>
         <span style="font-size: 12px; color: ${isTraineeEligible ? '#15803d' : '#64748b'}; font-weight: 600;">
-          ${isTraineeEligible ? '✓ Materiais Desbloqueados para Consulta' : '🔒 Requer Conclusão das 50 Missões'}
+          ${isTraineeEligible ? '✓ Materiais Desbloqueados para Consulta' : '🔒 Requer Conclusão das 54 Missões'}
         </span>
       </div>
 
