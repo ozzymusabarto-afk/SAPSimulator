@@ -6,6 +6,7 @@
 import { Icons } from '../utils/icons.js';
 import { trainee } from '../core/engine/traineeEngine.js';
 import { aboutModal } from './aboutModal.js';
+import { welcomeModal } from './welcomeModal.js';
 import { authService } from '../core/auth/authService.js';
 
 export class SidebarComponent {
@@ -64,6 +65,11 @@ export class SidebarComponent {
         <button class="sidebar-nav-item ${this.currentActiveRoute === 'TREINAMENTO' ? 'active' : ''}" data-route="TREINAMENTO">
           <span class="sidebar-nav-icon">${Icons.zap}</span>
           <span class="sidebar-nav-label">Treinamento</span>
+        </button>
+
+        <button class="sidebar-nav-item" id="sidebar-tutorial-btn" title="Reabrir o tutorial do primeiro expediente">
+          <span class="sidebar-nav-icon">${Icons.bookOpen}</span>
+          <span class="sidebar-nav-label">Tutorial do expediente</span>
         </button>
 
         <button class="sidebar-nav-item ${this.currentActiveRoute === 'MINHA_JORNADA' ? 'active' : ''}" data-route="MINHA_JORNADA">
@@ -157,6 +163,14 @@ export class SidebarComponent {
       aboutBtn.addEventListener('click', () => {
         this.closeMobileDrawer();
         aboutModal.show();
+      });
+    }
+
+    const tutorialBtn = this.container.querySelector('#sidebar-tutorial-btn');
+    if (tutorialBtn) {
+      tutorialBtn.addEventListener('click', () => {
+        this.closeMobileDrawer();
+        welcomeModal.showTutorial();
       });
     }
 

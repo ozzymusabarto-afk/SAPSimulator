@@ -290,3 +290,48 @@
 .detail-value {
   color: #0f172a;
 }
+
+
+/* Tutorial de primeiro expediente */
+.tutorial-copy p {
+  margin: 0 0 12px;
+}
+
+.tutorial-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-callout {
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 14px 0;
+  line-height: 1.55;
+}
+
+.tutorial-callout-blue {
+  color: #1e3a8a;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.tutorial-callout-amber {
+  color: #78350f;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.tutorial-callout-rose {
+  color: #881337;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+}
+
+@media (max-width: 560px) {
+  .tutorial-body {
+    padding: 22px 18px !important;
+  }
+
+  .tutorial-body h2 {
+    font-size: 19px !important;
+  }
+}
