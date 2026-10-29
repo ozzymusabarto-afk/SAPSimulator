@@ -94,9 +94,9 @@ class App {
     } else {
       // Usuário autenticado: associa sessão no traineeRepository e recarrega perfil correto
       traineeRepository.setSessionUserId(user.uid);
-      await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
       trainee.syncAuthenticatedName(user.name);
+      this._hydrateProfileInBackground(user);
       if (!document.getElementById('app-root')) {
         this.renderLayout();
         const targetScenarioId = scenarioEngine.getCurrentActiveOrPendingScenarioId();
@@ -112,9 +112,9 @@ class App {
   async handleAuthSuccess(user) {
     if (user) {
       traineeRepository.setSessionUserId(user.uid);
-      await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
       trainee.syncAuthenticatedName(user.name);
+      this._hydrateProfileInBackground(user);
       if (!document.getElementById('app-root')) {
         this.renderLayout();
       }
@@ -128,6 +128,16 @@ class App {
         welcomeModal.show();
       }
     }
+  }
+
+  _hydrateProfileInBackground(user) {
+    traineeRepository.hydrateProfileFromCloud(user.uid)
+      .then(remoteProfile => {
+        if (!remoteProfile || authService.getCurrentUser()?.uid !== user.uid) return;
+        trainee.reloadForUser(user.uid);
+        trainee.syncAuthenticatedName(user.name);
+      })
+      .catch(error => console.warn('[App] Perfil remoto será sincronizado depois:', error));
   }
 
   init() {
