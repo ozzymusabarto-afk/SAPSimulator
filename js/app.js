@@ -96,6 +96,7 @@ class App {
       traineeRepository.setSessionUserId(user.uid);
       await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
+      trainee.syncAuthenticatedName(user.name);
       if (!document.getElementById('app-root')) {
         this.renderLayout();
         const targetScenarioId = scenarioEngine.getCurrentActiveOrPendingScenarioId();
@@ -113,6 +114,7 @@ class App {
       traineeRepository.setSessionUserId(user.uid);
       await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
+      trainee.syncAuthenticatedName(user.name);
       if (!document.getElementById('app-root')) {
         this.renderLayout();
       }

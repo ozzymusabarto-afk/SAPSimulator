@@ -30,6 +30,11 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
+function getFirstName(fullName) {
+  const firstName = String(fullName || '').trim().split(/\s+/)[0];
+  return firstName || 'Trainee';
+}
+
 export class WelcomeModalComponent {
   constructor() {
     this.overlay = document.createElement('div');
@@ -185,7 +190,7 @@ export class WelcomeModalComponent {
 
   showWelcome() {
     const profile = trainee.getProfile();
-    const traineeName = escapeHtml(profile.name || 'Trainee SD');
+    const traineeName = escapeHtml(getFirstName(profile.name));
     this.overlay.innerHTML = `
       <div class="erp-modal-window" style="max-width: 580px;">
         <div class="erp-modal-header" style="background-color: var(--erp-navy-900); padding: 14px 20px;">
@@ -201,7 +206,7 @@ export class WelcomeModalComponent {
             <div><div style="font-size: 15px; font-weight: 800; color: var(--erp-navy-900);">Chefe Wilson</div><div style="font-size: 12px; color: var(--erp-text-muted);">Gestor de Operações SD</div></div>
           </div>
           <div style="font-size: 14px; color: var(--erp-navy-900); line-height: 1.65; display: flex; flex-direction: column; gap: 10px;">
-            <p style="margin: 0;">Olá, <strong>${traineeName}</strong>! Que bom ter você com a gente. Seu primeiro expediente começa agora — fique tranquila: vou acompanhar seus primeiros passos.</p>
+            <p style="margin: 0;">Olá, <strong>${traineeName}</strong>! Que bom ter você com a gente. Seu primeiro expediente começa agora — fique à vontade: vou acompanhar seus primeiros passos.</p>
             <p style="margin: 0;">Eu sou o Wilson, seu gestor de Operações SD. Você já estudou SAP SD; aqui você não vai assistir a outra aula. Vai receber solicitações da rotina comercial, consultar os dados disponíveis, tomar decisões e aprender a lidar com as exceções que aparecem no dia a dia.</p>
             <p style="margin: 0;">Não precisa acertar tudo de primeira. Leia o contexto, confira as informações e, quando ficar em dúvida, use as pistas e a ajuda do ambiente. O mais importante é entender por que uma decisão é correta e qual impacto ela produz.</p>
             <p style="margin: 0;">Vamos começar com calma. Depois da primeira missão, você já vai se sentir mais à vontade com a rotina.</p>

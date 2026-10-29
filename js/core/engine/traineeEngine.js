@@ -112,6 +112,15 @@ class TraineeEngine {
     this.notify();
   }
 
+  syncAuthenticatedName(fullName) {
+    const cleanName = String(fullName || '').trim();
+    if (!cleanName) return;
+    const defaultNames = new Set(['Trainee SAP SD', 'Trainee SD']);
+    if (!defaultNames.has(this.profile?.name)) return;
+    this.profile.name = cleanName;
+    this.saveProfile();
+  }
+
   createDefaultProfile(userId = null) {
     // P3+P4: usa o userId real do repositório (ou o parâmetro) para garantir seed correta na randomização
     const resolvedUserId = userId || traineeRepository.getCurrentUserId() || 'trainee_default';
