@@ -56,9 +56,9 @@ O resultado esperado do catálogo atual é `54/54 aprovadas`. O acesso rápido d
 
 ## Escopo e segurança
 
-A autenticação atual é um **mock local** baseado em armazenamento do navegador. Isso é suficiente para protótipo e prática individual, mas não é segurança de produção. Não use dados reais de clientes, contratos, preços, documentos fiscais, credenciais corporativas ou informações pessoais.
+O piloto usa **Firebase Authentication** para contas reais e Cloud Firestore para sincronizar o progresso por usuário. As regras do banco estão versionadas em `firestore.rules`; cada usuário deve acessar somente o próprio documento. Mesmo assim, o projeto continua sendo um laboratório de prática com dados fictícios: não use dados reais de clientes, contratos, preços, documentos fiscais, credenciais corporativas ou informações pessoais.
 
-Antes de vender ou abrir para múltiplos usuários, será necessário implementar autenticação real, banco isolado por usuário/tenant, autorização server-side, progresso sincronizado, recuperação de senha, rate limiting, logs, backups, LGPD e cobrança segura. Consulte [SECURITY.md](SECURITY.md) e [docs/SAAS-ROADMAP.md](docs/SAAS-ROADMAP.md).
+Antes de vender ou abrir para múltiplos usuários em escala, ainda serão necessários autoridade server-side para planos e conclusão oficial, rate limiting, logs, backups, LGPD, observabilidade, suporte e cobrança segura. Consulte [SECURITY.md](SECURITY.md) e [docs/SAAS-ROADMAP.md](docs/SAAS-ROADMAP.md).
 
 ## Empresa fictícia
 

@@ -14,6 +14,8 @@ import {
   createDefaultEntitlements,
   createDefaultCompetencies
 } from '../models/journey.js';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { firestore, firebaseConfigured } from '../firebase/firebaseClient.js';
 
 const STORAGE_KEYS = Object.freeze({
   PROFILE_V3: 'nexustech_trainee_profile_v3',
@@ -29,6 +31,7 @@ class TraineeRepository {
   constructor() {
     this._memoryStore = new Map();
     this._currentUserId = 'TRAINEE_01';
+    this._cloudWriteChain = Promise.resolve();
   }
 
   setSessionUserId(userId) {
@@ -165,9 +168,42 @@ class TraineeRepository {
       // Garante timestamp de atualização
       profile.updatedAt = new Date().toISOString();
       this._setItem(STORAGE_KEYS.PROFILE_V3, JSON.stringify(profile));
+      this._queueCloudProfileWrite(profile);
     } catch (e) {
       console.error('[TraineeRepository] Erro ao salvar perfil:', e);
     }
+  }
+
+  _queueCloudProfileWrite(profile) {
+    const userId = this.getCurrentUserId();
+    if (!firebaseConfigured || !userId || userId === 'TRAINEE_01' || userId === 'trainee_default') return;
+
+    const snapshot = JSON.parse(JSON.stringify(profile));
+    this._cloudWriteChain = this._cloudWriteChain
+      .then(() => setDoc(doc(firestore, 'users', userId), {
+        profile: snapshot,
+        updatedAt: serverTimestamp()
+      }, { merge: true }))
+      .catch(error => console.error('[TraineeRepository] Falha ao sincronizar perfil:', error));
+  }
+
+  /**
+   * Carrega o perfil remoto antes de o TraineeEngine iniciar a jornada.
+   * O cache local continua sendo usado como fallback quando o documento ainda não existe.
+   */
+  async hydrateProfileFromCloud(userId = this.getCurrentUserId()) {
+    if (!firebaseConfigured || !userId || userId === 'TRAINEE_01' || userId === 'trainee_default') return null;
+    try {
+      const remote = await getDoc(doc(firestore, 'users', userId));
+      const remoteProfile = remote.exists() ? remote.data()?.profile : null;
+      if (remoteProfile) {
+        this._setItem(STORAGE_KEYS.PROFILE_V3, JSON.stringify(remoteProfile));
+        return remoteProfile;
+      }
+    } catch (error) {
+      console.error('[TraineeRepository] Falha ao carregar perfil remoto:', error);
+    }
+    return null;
   }
 
   // ==========================================

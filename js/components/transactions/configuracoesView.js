@@ -110,8 +110,7 @@ export class ConfiguracoesViewComponent {
             ${Icons.edit} Alterar Senha
           </button>
           <div class="text-xs text-muted">
-            Em ambiente local (mock), a senha é armazenada com hash simulado no localStorage.
-            Em produção com backend real, a alteração será processada de forma segura via servidor.
+            A alteração é processada pelo Firebase Authentication e a senha não é armazenada pelo simulador.
           </div>
         </div>
       </div>
@@ -210,7 +209,7 @@ export class ConfiguracoesViewComponent {
     // Alterar Senha
     const changePwd = q('#btn-change-password');
     if (changePwd) {
-      changePwd.onclick = () => {
+      changePwd.onclick = async () => {
         const current = q('#cfg-pwd-current')?.value || '';
         const newPwd  = q('#cfg-pwd-new')?.value || '';
         const confirm = q('#cfg-pwd-confirm')?.value || '';
@@ -221,7 +220,11 @@ export class ConfiguracoesViewComponent {
           return;
         }
         if (newPwd.length < 12) {
-          if (msg) { msg.textContent = 'A nova senha deve ter no mínimo 6 caracteres.'; msg.style.color = '#e11d48'; }
+          if (msg) { msg.textContent = 'A nova senha deve ter no mínimo 12 caracteres.'; msg.style.color = '#e11d48'; }
+          return;
+        }
+        if (!/[A-Z]/.test(newPwd) || !/[a-z]/.test(newPwd) || !/[0-9]/.test(newPwd)) {
+          if (msg) { msg.textContent = 'A nova senha deve conter maiúscula, minúscula e número.'; msg.style.color = '#e11d48'; }
           return;
         }
         if (newPwd !== confirm) {
@@ -229,29 +232,8 @@ export class ConfiguracoesViewComponent {
           return;
         }
 
-        // Atualiza hash no localStorage mock
         try {
-          const storage = window.localStorage;
-          const raw = storage.getItem('nexustech_auth_users_dev_v1');
-          const users = raw ? JSON.parse(raw) : [];
-          const user = authService.getCurrentUser();
-          const idx = users.findIndex(u => u.email === user?.email);
-          if (idx < 0) {
-            if (msg) { msg.textContent = 'Usuário não encontrado.'; msg.style.color = '#e11d48'; }
-            return;
-          }
-          // Simula hash (mesmo método do authService)
-          const devHash = str => {
-            let h = 0x811c9dc5;
-            for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
-            return 'dev_hash_' + (h >>> 0).toString(16);
-          };
-          if (users[idx].passwordHash !== devHash(current)) {
-            if (msg) { msg.textContent = 'Senha atual incorreta.'; msg.style.color = '#e11d48'; }
-            return;
-          }
-          users[idx].passwordHash = devHash(newPwd);
-          storage.setItem('nexustech_auth_users_dev_v1', JSON.stringify(users));
+          await authService.changePassword(current, newPwd);
           if (msg) { msg.textContent = '✓ Senha alterada com sucesso!'; msg.style.color = 'var(--erp-green-success)'; }
           q('#cfg-pwd-current').value = '';
           q('#cfg-pwd-new').value = '';

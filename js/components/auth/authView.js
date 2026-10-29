@@ -3,10 +3,10 @@
  * Módulo: js/components/auth/authView.js
  * 
  * Componente de interface para Login, Cadastro e Recuperação de Senha.
- * Desacoplado, corporativo e com sinalização explícita de ambiente de desenvolvimento.
+ * Desacoplado, corporativo e adequado ao piloto fechado.
  */
 
-import { authService, AUTH_DEV_ENV_BANNER } from '../../core/auth/authService.js';
+import { authService } from '../../core/auth/authService.js';
 import { Icons } from '../../utils/icons.js';
 
 export class AuthViewComponent {
@@ -41,12 +41,6 @@ export class AuthViewComponent {
 
   render() {
     this.container.innerHTML = `
-      <!-- Banner de Notificação Obrigatório de Ambiente de Desenvolvimento -->
-      <div class="auth-dev-badge nexus-dev-banner" title="Simulador desacoplado operando com Mock Local de Autenticação">
-        <span class="auth-dev-badge-dot"></span>
-        <span>${AUTH_DEV_ENV_BANNER}</span>
-      </div>
-
       <!-- Cartão Principal -->
       <div class="auth-card">
         <!-- Cabeçalho Institucional com Chefe Wilson -->
@@ -83,7 +77,7 @@ export class AuthViewComponent {
       <!-- Rodapé do Wrapper -->
       <footer class="auth-wrapper-footer">
         <span>Nexus ERP Lab • SD Practice Environment</span>
-        <span>Ambiente Educacional de Simulação • Autenticação Desacoplada</span>
+        <span>Ambiente Educacional de Simulação • Piloto Fechado</span>
       </footer>
     `;
 
@@ -114,7 +108,7 @@ export class AuthViewComponent {
   _renderLoginForm() {
     return `
       <h2 class="auth-view-title">Acessar Simulador</h2>
-      <p class="auth-view-subtitle">Entre com suas credenciais corporativas de Trainee para acessar a esteira SD.</p>
+      <p class="auth-view-subtitle">Entre com sua conta do piloto para iniciar o expediente prático em SD.</p>
 
       <form id="auth-login-form">
         <div class="auth-form-group">
@@ -123,8 +117,7 @@ export class AuthViewComponent {
             type="email" 
             id="login-email" 
             class="auth-form-input" 
-            placeholder="ex: trainee.sd@nexus.lab" 
-            value="trainee.sd@nexus.lab"
+            placeholder="seu@email.com"
             required 
             autocomplete="username"
           />
@@ -136,8 +129,7 @@ export class AuthViewComponent {
             type="password" 
             id="login-password" 
             class="auth-form-input" 
-            placeholder="••••••••" 
-            value="TraineeDev2026!"
+            placeholder="Digite sua senha"
             required 
             autocomplete="current-password"
           />
@@ -146,11 +138,6 @@ export class AuthViewComponent {
         <button type="submit" class="auth-btn-primary" id="btn-submit-login">
           <span>Entrar no Nexus ERP Lab</span>
         </button>
-
-        ${import.meta.env.DEV ? `
-        <button type="button" class="auth-btn-secondary" id="btn-quick-dev-login" title="Login imediato como Trainee SD padrão">
-          <span>Entrar como Trainee SD (Acesso Rápido Dev)</span>
-        </button>` : ''}
 
         <div class="auth-divider">
           <span>ou</span>

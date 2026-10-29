@@ -82,7 +82,7 @@ class App {
     authService.onAuthStateChanged(this.handleAuthStateChanged.bind(this));
   }
 
-  handleAuthStateChanged(user) {
+  async handleAuthStateChanged(user) {
     if (!user) {
       // Usuário deslogado: renderiza a tela de login/auth guard
       if (this.rootEl) {
@@ -94,6 +94,7 @@ class App {
     } else {
       // Usuário autenticado: associa sessão no traineeRepository e recarrega perfil correto
       traineeRepository.setSessionUserId(user.uid);
+      await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
       if (!document.getElementById('app-root')) {
         this.renderLayout();
@@ -107,9 +108,10 @@ class App {
     }
   }
 
-  handleAuthSuccess(user) {
+  async handleAuthSuccess(user) {
     if (user) {
       traineeRepository.setSessionUserId(user.uid);
+      await traineeRepository.hydrateProfileFromCloud(user.uid);
       trainee.reloadForUser(user.uid); // F1-D: garante perfil isolado por userId
       if (!document.getElementById('app-root')) {
         this.renderLayout();
@@ -376,4 +378,3 @@ if (document.readyState === 'loading') {
 } else {
   bootApp();
 }
-
