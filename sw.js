@@ -6,7 +6,7 @@
  * REGRA ARQUITETURAL: Não contém regras de negócio, dados de missões ou sincronização em nuvem.
  */
 
-const CACHE_NAME = 'nexus-erp-lab-v3';
+const CACHE_NAME = 'nexus-erp-lab-v4';
 
 const STATIC_PRECACHE = [
   './',

@@ -44,7 +44,7 @@
       if ('caches' in window) {
         caches.keys().then((keys) => {
           keys.forEach((key) => {
-            if (key !== 'nexus-erp-lab-v3') {
+            if (key !== 'nexus-erp-lab-v4') {
               caches.delete(key);
               console.log('[PWA] Cache legado purgado:', key);
             }

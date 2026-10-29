@@ -22,6 +22,25 @@
   box-sizing: border-box;
 }
 
+/* Em janelas baixas, o cartão deve começar no topo e rolar inteiro;
+   centralizá-lo verticalmente pode esconder os links inferiores. */
+@media (max-height: 720px) {
+  .nexus-auth-wrapper,
+  .nexus-auth-container {
+    justify-content: flex-start;
+  }
+
+  .auth-card {
+    flex-shrink: 0;
+    margin: 0 auto;
+  }
+
+  .auth-wrapper-footer {
+    flex-shrink: 0;
+    padding-bottom: 0.5rem;
+  }
+}
+
 /* Banner de Notificação de Ambiente de Desenvolvimento Local */
 .auth-dev-badge,
 .nexus-dev-banner {
