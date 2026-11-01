@@ -239,9 +239,13 @@ export class MentorDockComponent {
         ` : ''}
 
         ${doc && scenario.objectives.some(objective => ['analyze_po', 'process_demand'].includes(objective.id) && !objective.done) ? `
-          <button id="btn-confirm-po-analysis" class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 8px;">
-            Confirmar análise do pedido de compra
-          </button>
+          <div class="mentor-required-step" role="status" aria-live="polite">
+            <div class="mentor-required-step-title">${Icons.alertTriangle} Etapa obrigatória antes da VA01</div>
+            <div class="mentor-required-step-text">Leia a PO acima, compare cliente, endereço de entrega, material, quantidade e frete. Depois clique abaixo para registrar formalmente sua conferência.</div>
+            <button id="btn-confirm-po-analysis" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 9px; font-weight: 700;">
+              ${Icons.check} Registrar conferência da PO
+            </button>
+          </div>
         ` : ''}
 
         <!-- Orientação e Fala do Supervisor Chefe Wilson -->

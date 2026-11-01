@@ -437,11 +437,15 @@ class ScenarioEngine {
       if (!group.enabled) continue;
       const objective = scenario.objectives.find(item => group.ids.includes(item.id));
       if (objective && !objective.done) {
+        const isPoPrerequisite = group.ids.includes('analyze_po') || group.ids.includes('process_demand');
+        const actionHint = isPoPrerequisite
+          ? 'Volte ao painel do Chefe Wilson, revise o Pedido de Compra anexado e clique em “Registrar conferência da PO”. Esse botão é o registro da sua análise; apenas ler o documento não conclui a etapa.'
+          : '';
         return {
           isValid: false,
           fieldError: 'prerequisite',
           activeTabHint: 'HEADER',
-          mentorSpeech: `Antes de gravar, conclua a ${group.label}. A ordem não deve ser criada com dados não reconciliados.`,
+          mentorSpeech: `${actionHint || `Antes de gravar, conclua a ${group.label}. A ordem não deve ser criada com dados não reconciliados.`}`,
           whatHappened: `A etapa de ${group.label} ainda não foi registrada na missão.`,
           why: 'No fluxo S/4HANA, a decisão comercial precisa estar baseada em dados de parceiro, produto, preço e disponibilidade conferidos.',
           businessImpact: 'Evita criar uma ordem com parceiro, preço, quantidade, prazo ou risco incorretos.'
