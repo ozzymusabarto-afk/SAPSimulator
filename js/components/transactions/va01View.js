@@ -29,6 +29,7 @@ export class Va01ViewComponent {
     this.paymentTerms = '';
     this.incoterms = '';
     this.incotermsLocation = '';
+    this.atpEvidence = {};
 
     // Posições de venda vazias para preenchimento
     this.items = [
@@ -51,12 +52,62 @@ export class Va01ViewComponent {
     this.paymentTerms = '';
     this.incoterms = '';
     this.incotermsLocation = '';
+    this.atpEvidence = {};
     this.items = [
       { materialId: '', quantity: 0, manualDiscountPercent: 0, manualFreight: 0 }
     ];
     this.activeTab = 'HEADER';
     this.fieldErrors = {};
     this.savedDocNumber = null; // Nova missão: nenhuma OR ainda gravada
+  }
+
+  renderAtpEvidencePanel(activeScenario) {
+    const contract = activeScenario?.targetCriteria?.atpContract;
+    if (!contract) return '';
+    const evidence = this.atpEvidence || {};
+    return `
+      <div class="erp-card" style="margin: 14px 0; border: 1px solid #93c5fd; background: #eff6ff;">
+        <div class="section-title" style="margin-bottom: 8px;">
+          <span>${Icons.alertTriangle} Decisão de Disponibilidade (ATP) — evidência obrigatória</span>
+          <span class="erp-badge erp-badge-sap text-xs">aATP / VBEP</span>
+        </div>
+        <p class="text-sm text-muted" style="margin: 0 0 12px;">
+          Não basta reduzir a quantidade. Registre a tentativa original, o compromisso firme, o saldo pendente, a data confirmada e o encaminhamento comercial.
+        </p>
+        <div class="form-grid-4">
+          <label class="erp-form-group"><span class="erp-form-label">Quantidade solicitada</span>
+            <input class="erp-input font-mono atp-requested" type="number" min="0" value="${evidence.requestedQuantity ?? ''}" placeholder="ex.: ${contract.requestedQuantity}">
+          </label>
+          <label class="erp-form-group"><span class="erp-form-label">Confirmada na data</span>
+            <input class="erp-input font-mono atp-confirmed" type="number" min="0" value="${evidence.confirmedQuantity ?? ''}" placeholder="ex.: ${contract.confirmedQuantity}">
+          </label>
+          <label class="erp-form-group"><span class="erp-form-label">Saldo pendente</span>
+            <input class="erp-input font-mono atp-remaining" type="number" min="0" value="${evidence.remainingQuantity ?? ''}" placeholder="ex.: ${contract.remainingQuantity}">
+          </label>
+          <label class="erp-form-group"><span class="erp-form-label">Data confirmada</span>
+            <input class="erp-input font-mono atp-date" type="date" value="${evidence.confirmationDate ?? ''}">
+          </label>
+        </div>
+        <div class="form-grid-2" style="margin-top: 10px;">
+          <label class="erp-form-group"><span class="erp-form-label">Encaminhamento comercial</span>
+            <select class="erp-select atp-decision">
+              <option value="">-- Selecione a decisão --</option>
+              <option value="PARTIAL" ${evidence.decision === 'PARTIAL' ? 'selected' : ''}>Confirmar parcialmente e tratar saldo</option>
+              <option value="FUTURE" ${evidence.decision === 'FUTURE' ? 'selected' : ''}>Confirmar em data futura</option>
+              <option value="REVISED_PO" ${evidence.decision === 'REVISED_PO' ? 'selected' : ''}>Aguardar PO revisada</option>
+              <option value="ESCALATE" ${evidence.decision === 'ESCALATE' ? 'selected' : ''}>Escalar para planejamento</option>
+            </select>
+          </label>
+          <label class="erp-form-group"><span class="erp-form-label">Parecer / próximo passo</span>
+            <input class="erp-input atp-note" type="text" value="${evidence.note ?? ''}" placeholder="Explique a confirmação e o tratamento do saldo...">
+          </label>
+        </div>
+        <label class="text-sm" style="display:flex; gap:8px; align-items:center; margin-top:10px;">
+          <input class="atp-attempt" type="checkbox" ${evidence.attemptRecorded ? 'checked' : ''}>
+          Registrei a tentativa original acima do saldo disponível antes de ajustar a ordem.
+        </label>
+      </div>
+    `;
   }
 
   render() {
@@ -99,6 +150,8 @@ export class Va01ViewComponent {
           </button>
         </div>
       </div>
+
+      ${this.renderAtpEvidencePanel(activeScenario)}
 
       <!-- Abas da Ordem de Venda -->
       <div class="transaction-tabs-bar">
@@ -616,6 +669,25 @@ export class Va01ViewComponent {
       });
     });
 
+    const atpFields = {
+      '.atp-requested': ['requestedQuantity', value => Number(value) || 0],
+      '.atp-confirmed': ['confirmedQuantity', value => Number(value) || 0],
+      '.atp-remaining': ['remainingQuantity', value => Number(value) || 0],
+      '.atp-date': ['confirmationDate', value => value],
+      '.atp-decision': ['decision', value => value],
+      '.atp-note': ['note', value => value]
+    };
+    Object.entries(atpFields).forEach(([selector, [key, normalize]]) => {
+      const field = this.container.querySelector(selector);
+      if (field) field.addEventListener('input', event => {
+        this.atpEvidence = { ...this.atpEvidence, [key]: normalize(event.target.value) };
+      });
+    });
+    const atpAttempt = this.container.querySelector('.atp-attempt');
+    if (atpAttempt) atpAttempt.addEventListener('change', event => {
+      this.atpEvidence = { ...this.atpEvidence, attemptRecorded: event.target.checked };
+    });
+
     this.container.querySelectorAll('.item-qty-input').forEach(inp => {
       inp.addEventListener('change', (e) => {
         const index = parseInt(inp.getAttribute('data-index'), 10);
@@ -715,6 +787,7 @@ export class Va01ViewComponent {
       incoterms: this.incoterms,
       incotermsLocation: this.incotermsLocation,
       items: this.items,
+      atpEvidence: this.atpEvidence,
       netValue: totals.totalNet,
       taxValue: totals.totalTaxes,
       totalValue: totals.totalOrderValue

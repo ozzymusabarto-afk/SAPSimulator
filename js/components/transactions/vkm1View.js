@@ -106,7 +106,6 @@ export class Vkm1ViewComponent {
                           <option value="RELEASE">RELEASE — liberar</option>
                           <option value="HOLD">HOLD — manter</option>
                           <option value="ESCALATE">ESCALATE — encaminhar</option>
-                          <option value="REJECT">REJECT — rejeitar</option>
                         </select>
                         <textarea class="erp-input credit-decision-note" data-doc="${b.orderDocNumber}" rows="2" placeholder="Parecer e evidência (mín. 20 caracteres)" style="width: 190px; margin-bottom: 6px;"></textarea>
                         <button class="btn btn-primary btn-sm btn-release-order" data-doc="${b.orderDocNumber}">
@@ -207,6 +206,18 @@ export class Vkm1ViewComponent {
 
           // Decisão diferente de RELEASE mantém a ordem bloqueada e registra o encaminhamento.
           if (expectedDecision && selectedDecision !== 'RELEASE') {
+            const decisionResult = db.applyCreditDecision(docNumber, selectedDecision, decisionNote);
+            if (!decisionResult.success) {
+              diagnosticModal.show({
+                isValid: false,
+                mentorSpeech: decisionResult.error,
+                whatHappened: 'A decisão não foi persistida no documento de crédito.',
+                why: 'HOLD e ESCALATE também precisam de parecer rastreável e não podem alterar o status por atalho.',
+                businessImpact: 'Sem registro, a ordem não pode ser encaminhada para a próxima alçada com segurança.',
+                onConfirm: () => this.render()
+              });
+              return;
+            }
             const scenario = scenarioEngine.getActiveScenario();
             scenarioEngine.completeObjective('access_vkm1');
             scenarioEngine.completeObjective('release_with_notes');
@@ -244,7 +255,12 @@ export class Vkm1ViewComponent {
           btn.textContent = 'Processando...';
 
           try {
-            const success = db.releaseCreditOrder(docNumber, 'Liberado pelo trainee com alçada comercial supervisionada.');
+            const decisionResult = db.applyCreditDecision(
+              docNumber,
+              'RELEASE',
+              decisionNote || 'Liberação aprovada após análise de limite, exposição e alçada comercial.'
+            );
+            const success = decisionResult.success;
 
             if (success) {
               const scenario = scenarioEngine.getActiveScenario();

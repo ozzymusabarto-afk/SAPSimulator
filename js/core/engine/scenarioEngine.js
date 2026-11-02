@@ -412,6 +412,57 @@ class ScenarioEngine {
   }
 
   /**
+   * Valida a evidência operacional de confirmação parcial ATP.
+   * A quantidade final da VA01, sozinha, não prova que o trainee analisou
+   * a ruptura nem que comunicou o saldo pendente.
+   */
+  validateAtpEvidence(orderData) {
+    const scenario = this.activeScenario;
+    const contract = scenario?.targetCriteria?.atpContract;
+    if (!contract) return { isValid: true };
+
+    const evidence = orderData.atpEvidence || {};
+    const requested = Number(evidence.requestedQuantity);
+    const confirmed = Number(evidence.confirmedQuantity);
+    const remaining = Number(evidence.remainingQuantity);
+    const expectedRemaining = Number(contract.requestedQuantity) - Number(contract.confirmedQuantity);
+    const errors = [];
+
+    if (evidence.attemptRecorded !== true) errors.push('registre a tentativa com a quantidade originalmente solicitada');
+    if (requested !== Number(contract.requestedQuantity)) errors.push(`informe ${contract.requestedQuantity} unidades como quantidade solicitada`);
+    if (confirmed !== Number(contract.confirmedQuantity)) errors.push(`registre ${contract.confirmedQuantity} unidades como confirmação firme`);
+    if (remaining !== expectedRemaining) errors.push(`calcule o saldo pendente como ${expectedRemaining} unidades`);
+    if (evidence.decision !== contract.expectedDecision) errors.push(`selecione a decisão ${contract.expectedDecision}`);
+    if (evidence.confirmationDate !== contract.confirmationDate) errors.push(`informe a data de confirmação ${contract.confirmationDate}`);
+    if (String(evidence.note || '').trim().length < 20) errors.push('registre uma justificativa operacional com pelo menos 20 caracteres');
+
+    if (errors.length) {
+      trainee.recordAction(false, 'Evidência ATP incompleta', errors.join('; '));
+      return {
+        isValid: false,
+        fieldError: 'atpEvidence',
+        activeTabHint: 'ITEMS',
+        mentorSpeech: `A confirmação ATP ainda não está documentada: ${errors[0]}.`,
+        whatHappened: 'A ordem foi mantida sem gravação porque a quantidade confirmada, o saldo ou a data não correspondem à análise de disponibilidade.',
+        why: 'ATP separa demanda solicitada, compromisso firme e saldo pendente. A quantidade final do item não substitui essa evidência.',
+        businessImpact: 'Sem esse registro, a equipe pode prometer um volume ou uma data que o centro não consegue atender.'
+      };
+    }
+
+    scenario.atpEvidence = {
+      ...evidence,
+      requestedQuantity: requested,
+      confirmedQuantity: confirmed,
+      remainingQuantity: remaining,
+      recordedAt: new Date().toISOString()
+    };
+    this.completeObjectives([
+      'check_atp_error', 'create_adjusted_order'
+    ]);
+    return { isValid: true, atpEvidence: scenario.atpEvidence };
+  }
+
+  /**
    * Valida o envio de Ordem de Venda na VA01 com feedback pedagógico rigoroso e amigável do Chefe Wilson
    * @param {Object} orderData
    * @returns {Object} { isValid, mentorSpeech, whatHappened, why, businessImpact, fieldError, activeTabHint }
@@ -433,6 +484,9 @@ class ScenarioEngine {
       scenario.validationRules?.actionType === 'SALES_ORDER_SUBMISSION';
     const isCreditReleaseMission = target.action === 'CREDIT_RELEASE' ||
       scenario.validationRules?.actionType === 'CREDIT_RELEASE';
+
+    const atpValidation = this.validateAtpEvidence(orderData);
+    if (!atpValidation.isValid) return atpValidation;
 
     const prerequisiteGroups = [
       { enabled: target.requiresCustomerAnalysis, ids: ['check_customer', 'check_customer_xd03', 'investigate_credit'], label: 'consulta e reconciliação do Business Partner' },

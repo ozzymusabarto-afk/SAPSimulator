@@ -393,6 +393,7 @@ export const ScenarioCatalog = [
     ],
 
     targetCriteria: {
+      atpContract: { requestedQuantity: 5, confirmedQuantity: 3, remainingQuantity: 2, expectedDecision: 'PARTIAL', confirmationDate: '2026-11-10', plantId: '1000' },
       action: 'SALES_ORDER_SUBMISSION',
       orderType: 'OR',
       salesOrg: '1000',
@@ -469,6 +470,7 @@ export const ScenarioCatalog = [
     ],
 
     targetCriteria: {
+      atpContract: { requestedQuantity: 4, confirmedQuantity: 2, remainingQuantity: 2, expectedDecision: 'PARTIAL', confirmationDate: '2026-11-12', plantId: '1000' },
       action: 'SALES_ORDER_SUBMISSION',
       orderType: 'OR',
       salesOrg: '1000',
@@ -546,6 +548,7 @@ export const ScenarioCatalog = [
     ],
 
     targetCriteria: {
+      atpContract: { requestedQuantity: 10, confirmedQuantity: 4, remainingQuantity: 6, expectedDecision: 'PARTIAL', confirmationDate: '2026-11-08', plantId: '1000' },
       action: 'SALES_ORDER_SUBMISSION',
       orderType: 'OR',
       salesOrg: '1000',
@@ -2522,6 +2525,7 @@ export const ScenarioCatalog = [
     ],
 
     targetCriteria: {
+      atpContract: { requestedQuantity: 80, confirmedQuantity: 70, remainingQuantity: 10, expectedDecision: 'PARTIAL', confirmationDate: '2026-11-18', plantId: '2000' },
       action: 'SALES_ORDER_SUBMISSION',
       orderType: 'OR', salesOrg: '1000', distChannel: '20', division: '01',
       customerId: '100240', customerPoNumber: 'PO-SUL-ATP-2026',

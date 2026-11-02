@@ -145,6 +145,7 @@ class ErpDatabase {
       paymentTerms: orderData.paymentTerms,
       incoterms: orderData.incoterms,
       incotermsLocation: orderData.incotermsLocation || '',
+      atpEvidence: orderData.atpEvidence || null,
       orderDate: orderData.orderDate || new Date().toISOString(),
       items: orderData.items || [],
       netValue: calculatedNet || 0,
@@ -269,6 +270,48 @@ class ErpDatabase {
   }
 
   // --- Liberação de Crédito Comercial (VKM1) ---
+  applyCreditDecision(docNumber, decision, decisionNotes = '') {
+    const normalizedDecision = String(decision || '').toUpperCase();
+    const order = this.getSalesOrder(docNumber);
+    if (!order) return { success: false, error: 'Ordem não encontrada.' };
+    if (!['HOLD', 'ESCALATE', 'RELEASE'].includes(normalizedDecision)) {
+      return { success: false, error: 'Decisão de crédito inválida.' };
+    }
+    if (String(decisionNotes).trim().length < 20) {
+      return { success: false, error: 'Parecer de crédito insuficiente.' };
+    }
+
+    const decisionRecord = {
+      docNumber,
+      decision: normalizedDecision,
+      notes: String(decisionNotes).trim(),
+      recordedAt: new Date().toISOString()
+    };
+    this.creditDecisions.push(decisionRecord);
+    order.creditDecision = normalizedDecision;
+    order.creditDecisionNotes = decisionRecord.notes;
+    order.creditDecisionAt = decisionRecord.recordedAt;
+
+    if (normalizedDecision === 'RELEASE') {
+      this.releaseCreditOrder(docNumber, decisionRecord.notes);
+    } else {
+      // HOLD e ESCALATE nunca removem a trava nem a fila VKM1.
+      order.overallStatus = 'CREDIT_BLOCKED';
+      order.creditStatus = 'BLOCKED';
+      if (!this.creditBlockedOrders.some(item => item.orderDocNumber === docNumber)) {
+        this.creditBlockedOrders.push({
+          orderDocNumber: docNumber,
+          customer: this.getCustomer(order.customerId),
+          totalValue: order.totalValue,
+          blockedDate: new Date().toLocaleDateString('pt-BR'),
+          reason: `Decisão ${normalizedDecision}: ${decisionRecord.notes}`
+        });
+      }
+      this.notify();
+    }
+    return { success: true, decision: decisionRecord, order: this.getSalesOrder(docNumber) };
+  }
+
   releaseCreditOrder(docNumber, managerNotes = 'Liberado por alçada comercial') {
     const order = this.getSalesOrder(docNumber);
     if (!order) return false;
@@ -605,6 +648,7 @@ class ErpDatabase {
     this.deliveries = [];
     this.invoices = [];
     this.creditBlockedOrders = [];
+    this.creditDecisions = [];
     this.nextOrderNumber = 10000100;
     this.nextDeliveryNumber = 80000001;
     this.nextInvoiceNumber = 90000001;

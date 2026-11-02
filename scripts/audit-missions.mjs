@@ -52,6 +52,15 @@ function createOrderData(scenario) {
     paymentTerms: target.paymentTerms || scenario.initialDocuments?.[0]?.paymentTerms || 'Z030',
     incoterms: target.incoterms || scenario.initialDocuments?.[0]?.incoterms || 'CIF',
     items,
+    atpEvidence: target.atpContract ? {
+      attemptRecorded: true,
+      requestedQuantity: target.atpContract.requestedQuantity,
+      confirmedQuantity: target.atpContract.confirmedQuantity,
+      remainingQuantity: target.atpContract.remainingQuantity,
+      decision: target.atpContract.expectedDecision,
+      confirmationDate: target.atpContract.confirmationDate,
+      note: `Auditoria: confirmação de ${target.atpContract.confirmedQuantity} UN; saldo ${target.atpContract.remainingQuantity} UN encaminhado para tratativa comercial.`
+    } : undefined,
     netValue,
     taxValue: netValue * 0.2725,
     totalValue: netValue * 1.2725
