@@ -187,6 +187,13 @@ class ScenarioEngine {
       for (const delReq of this.activeScenario.initialDeliveries) {
         const res = db.createDelivery(delReq);
         if (res.success && delReq.autoPgi) {
+          // Uma entrega marcada como autoPgi representa uma fixture já separada.
+          // O banco exige picking explícito antes do PGI; não descartar essa
+          // pré-condição silenciosamente durante a semeadura do cenário.
+          res.delivery.items.forEach(item => {
+            item.pickedQuantity = item.deliveryQuantity;
+          });
+          res.delivery.pickingStatus = 'COMPLETED';
           db.postGoodsIssue(res.delivery.deliveryNumber);
         }
       }
@@ -298,7 +305,7 @@ class ScenarioEngine {
       const distChannel = target.distChannel || '10';
       const division = target.division || '01';
       const paymentTerms = target.paymentTerms || 'Z030';
-      const incoterms = target.incoterms || 'CIF';
+      const incoterms = target.incoterms || scenario.initialDocuments?.[0]?.incoterms || 'CIF';
 
       return {
         isValid: true,

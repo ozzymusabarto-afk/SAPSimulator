@@ -48,7 +48,7 @@ export const ScenarioCatalog = [
       { id: 'check_material', text: 'Conferir material, unidade, centro 1000 e disponibilidade antes da ordem', done: false },
       { id: 'set_org_structure', text: 'Definir Tipo de Ordem (OR), Org. Vendas (1000), Canal (10) e Setor (01)', done: false },
       { id: 'select_customer', text: 'Selecionar o cliente Varejo Eletro Brasil e informar o Nº do Pedido', done: false },
-      { id: 'fill_terms', text: 'Selecionar Condição de Pagamento Z030 e Incoterms CIF', done: false },
+      { id: 'fill_terms', text: 'Selecionar Condição de Pagamento Z030 e Incoterms DAP para o ship-to nomeado', done: false },
       { id: 'add_item', text: 'Adicionar a linha do Servidor Enterprise Nexus Pro X com quantidade 2', done: false },
       { id: 'save_order', text: 'Simular o cálculo de preços e gravar a Ordem de Venda no sistema', done: false }
     ],
@@ -1747,7 +1747,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'PO Corporativa: Rede Hospitalar São Lucas - Copacabana (PO-HSL-COPA-2026)',
-    briefing: 'Olá, trainee! A Rede Hospitalar São Lucas enviou uma ordem de compra para aquisição de 4 unidades do SSD NVMe Server Grade (MAT-3010) para ampliação do storage da unidade de Copacabana. Como hospitais possuem múltiplos endereços e parceiros de entrega, valide o Business Partner/cliente 100150. XD03 é apenas comparação GUI/ECC; o laboratório então cria o pedido para validar a Área de Vendas (1000/10/01), o endereço de entrega em Copacabana, a condição de pagamento Z030 e o Incoterms CIF. Em seguida, acesse a VA01 e emita a ordem de venda com precisão cadastral!',
+    briefing: 'Olá, trainee! A Rede Hospitalar São Lucas enviou uma ordem de compra para aquisição de 4 unidades do SSD NVMe Server Grade (MAT-3010) para ampliação do storage da unidade de Copacabana. Como hospitais possuem múltiplos endereços e parceiros de entrega, valide o Business Partner/cliente 100150. XD03 é apenas comparação GUI/ECC; o laboratório então cria o pedido para validar a Área de Vendas (1000/10/01), o endereço de entrega em Copacabana, a condição de pagamento Z030 e o Incoterms DAP para o ship-to nomeado. Em seguida, acesse a VA01 e emita a ordem de venda com precisão cadastral!',
 
     purchaseOrderDocument: {
       buyerName: 'Rede Hospitalar São Lucas S/A (Copacabana/RJ)',
@@ -1762,7 +1762,7 @@ export const ScenarioCatalog = [
       paymentInstructions: '30 dias líquido (Z030)'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Abra primeiro a XD03 para o cliente 100150. Na aba de Vendas, valide a Área de Vendas (1000 / 10 / 01), a Condição Z030 e o Incoterms CIF Rio de Janeiro. Depois vá para a VA01 e selecione os mesmos dados.',
+    mentorInitialTip: 'Dica do Chefe Wilson: Abra primeiro a XD03 para o cliente 100150. Na aba de Vendas, valide a Área de Vendas (1000 / 10 / 01), a Condição Z030 e o Incoterms DAP para o ship-to de Copacabana. Depois vá para a VA01 e selecione os mesmos dados.',
 
     sapKnowledgeBridge: {
       tcode: 'Manage Business Partner / Create Sales Orders',
@@ -1774,7 +1774,7 @@ export const ScenarioCatalog = [
       { id: 'check_customer_xd03', text: 'Consultar dados comerciais do cliente 100150 na transação XD03', done: false },
       { id: 'set_org_structure', text: 'Preencher Área de Vendas 1000 / 10 / 01 e Tipo OR na VA01', done: false },
       { id: 'select_customer', text: 'Selecionar Cliente 100150 e informar PO-HSL-COPA-2026', done: false },
-      { id: 'fill_terms', text: 'Definir Condição de Pagamento Z030 e Incoterms CIF', done: false },
+      { id: 'fill_terms', text: 'Definir Condição de Pagamento Z030 e Incoterms DAP para o ship-to nomeado', done: false },
       { id: 'add_item', text: 'Inserir 4 unidades do material MAT-3010 e gravar a ordem', done: false }
     ],
 
@@ -1814,7 +1814,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Ordem Comercial Atacado: Sul Distribuidora (PO-SDI-2026-08)',
-    briefing: 'A distribuidora parceira Sul Distribuidora de Informática enviou a ordem de compra PO-SDI-2026-08 solicitando 10 unidades de Access Point Wi-Fi 6 (MAT-2020). Como se trata de um cliente do canal indireto atacadista (Canal 20), certifique-se de configurar a Área de Vendas com Canal 20 na VA01, aplicar a condição de pagamento negociada para revendas (Z28D - 28 dias) e manter o Incoterms CIF Joinville conforme registrado no cadastro.',
+    briefing: 'A distribuidora parceira Sul Distribuidora de Informática enviou a ordem de compra PO-SDI-2026-08 solicitando 10 unidades de Access Point Wi-Fi 6 (MAT-2020). Como se trata de um cliente do canal indireto atacadista (Canal 20), certifique-se de configurar a Área de Vendas com Canal 20 na VA01, aplicar a condição de pagamento negociada para revendas (Z28D - 28 dias) e manter o Incoterms DAP para o CD de Joinville conforme registrado no cadastro.',
 
     purchaseOrderDocument: {
       buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
@@ -1840,7 +1840,7 @@ export const ScenarioCatalog = [
     objectives: [
       { id: 'set_org_structure', text: 'Configurar Área de Vendas com Canal 20 (1000 / 20 / 01) e Tipo OR na VA01', done: false },
       { id: 'select_customer', text: 'Selecionar Cliente Sul Distribuidora (100240) e informar PO-SDI-2026-08', done: false },
-      { id: 'fill_terms', text: 'Definir Condição de Pagamento Z28D e Incoterms CIF', done: false },
+      { id: 'fill_terms', text: 'Definir Condição de Pagamento Z28D e Incoterms DAP para o CD de Joinville', done: false },
       { id: 'add_item', text: 'Inserir 10 unidades do material MAT-2020 e gravar a ordem', done: false }
     ],
 

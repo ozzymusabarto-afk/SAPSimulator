@@ -177,6 +177,20 @@ class ErpDatabase {
         newOrder.creditStatus = 'RELEASED';
         customer.creditUsed += newOrder.totalValue;
       }
+    } else if (customer && (orderData.creditStatus === 'BLOCKED' || orderData.overallStatus === 'CREDIT_BLOCKED')) {
+      // Documentos semeados representam um estado já conhecido do processo.
+      // Eles também precisam aparecer na fila de decisão, mesmo sem passar
+      // novamente pelo cálculo automático de limite.
+      const alreadyQueued = this.creditBlockedOrders.some(item => item.orderDocNumber === docNumber);
+      if (!alreadyQueued) {
+        this.creditBlockedOrders.push({
+          orderDocNumber: docNumber,
+          customer,
+          totalValue: newOrder.totalValue,
+          blockedDate: new Date().toLocaleDateString('pt-BR'),
+          reason: 'Bloqueio de crédito informado no documento inicial do cenário; requer decisão documentada.'
+        });
+      }
     }
 
     this.salesOrders.push(newOrder);
