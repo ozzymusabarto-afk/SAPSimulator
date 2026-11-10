@@ -67,8 +67,8 @@ export const FIELD_HELP_CATALOG = {
     title: 'Termos Internacionais de Comércio (INCO1 / INCO2)',
     sapCode: 'VBAK-INCO1 / VBAK-INCO2',
     description: 'Define as cláusulas padronizadas de responsabilidade por frete, custos de transporte e seguro entre comprador e vendedor.',
-    importance: 'Determina quem contrata a transportadora e quem assume os riscos da carga durante o trânsito da entrega.',
-    example: 'CIF (Custo, Seguro e Frete por conta do vendedor) ou FOB (Frete por conta do comprador)',
+    importance: 'Determina quem contrata a transportadora, quem assume custos e riscos e qual é o local nomeado da entrega. No laboratório, confira sempre o termo contra a PO e o cadastro do cliente.',
+    example: 'DAP (entrega no local nomeado), CIF (custo, seguro e frete do vendedor) ou FOB (frete por conta do comprador)',
     table: 'VBAK'
   },
 
@@ -84,10 +84,58 @@ export const FIELD_HELP_CATALOG = {
   quantity: {
     title: 'Quantidade Solicitada do Item (KWMENG)',
     sapCode: 'VBAP-KWMENG',
-    description: 'Quantidade física demandada pelo cliente na unidade de medida de vendas (VRKME).',
-    importance: 'Base para verificação de disponibilidade (ATP), reserva de lote de estoque e cálculo do valor total do pedido.',
-    example: '2 UN (Unidades)',
+    description: 'Quantidade física demandada pelo cliente na unidade de medida de vendas (VRKME). Em cenários de ATP parcial, diferencie a quantidade solicitada da quantidade confirmada.',
+    importance: 'A quantidade solicitada inicia o ATP; a quantidade confirmada representa o compromisso firme, o saldo pendente precisa ser tratado e a data confirmada deve ser registrada antes de gravar.',
+    example: 'PO: 80 UN • confirmadas: 70 UN • saldo pendente: 10 UN',
     table: 'VBAP'
+  },
+  atpRequestedQuantity: {
+    title: 'Quantidade originalmente solicitada (ATP)',
+    sapCode: 'VBEP-KWMENG / aATP Request',
+    description: 'Volume que consta na PO antes de qualquer ajuste comercial.',
+    importance: 'Preserva a rastreabilidade da demanda e permite demonstrar por que houve ruptura ou confirmação parcial.',
+    example: 'PO: 80 UN',
+    table: 'VBEP / Documento de compra do cliente'
+  },
+  atpConfirmedQuantity: {
+    title: 'Quantidade confirmada (ATP)',
+    sapCode: 'VBEP-BMENG / aATP Confirmation',
+    description: 'Quantidade que o centro consegue comprometer na data analisada.',
+    importance: 'Representa o compromisso firme. Não deve ser preenchida com estoque físico não confirmado.',
+    example: 'Confirmadas: 70 UN',
+    table: 'VBEP / Resultado de disponibilidade'
+  },
+  atpRemainingQuantity: {
+    title: 'Saldo pendente de confirmação',
+    sapCode: 'VBEP-OPEN_QTY / ATP Backlog',
+    description: 'Diferença entre a quantidade solicitada e a quantidade confirmada.',
+    importance: 'O saldo precisa ter tratamento comercial; ele não pode desaparecer apenas porque a ordem foi reduzida.',
+    example: '80 solicitadas − 70 confirmadas = 10 pendentes',
+    table: 'VBEP / Registro de decisão comercial'
+  },
+  atpConfirmationDate: {
+    title: 'Data da confirmação ATP',
+    sapCode: 'VBEP-EDATU / Confirmed Date',
+    description: 'Data em que o centro consegue assumir a quantidade confirmada.',
+    importance: 'Quantidade sem data não é uma promessa operacional completa.',
+    example: '18/11/2026',
+    table: 'VBEP / Linha de programação'
+  },
+  atpDecision: {
+    title: 'Encaminhamento da exceção ATP',
+    sapCode: 'aATP Decision / Sales Order Resolution',
+    description: 'Decisão tomada após comparar PO, disponibilidade, quantidade confirmada e data.',
+    importance: 'PARTIAL confirma apenas o volume firme; FUTURE, REVISED_PO e ESCALATE exigem tratamento diferente e não devem ser confundidos.',
+    example: 'PARTIAL — confirmar 70 e tratar 10 pendentes',
+    table: 'Registro de decisão do chamado'
+  },
+  atpDecisionNote: {
+    title: 'Parecer da decisão ATP',
+    sapCode: 'Decision Evidence / Audit Note',
+    description: 'Justificativa que explica a evidência consultada e o próximo passo para o saldo.',
+    importance: 'Permite que outra pessoa revise a decisão sem repetir toda a investigação.',
+    example: 'Confirmar 70 UN e encaminhar 10 UN ao planejamento.',
+    table: 'Log operacional da missão'
   },
   manualDiscountPercent: {
     title: 'Desconto Comercial Especial (RB00)',
@@ -120,9 +168,9 @@ export const FIELD_HELP_CATALOG = {
   creditStatus: {
     title: 'Status Geral de Liberação de Crédito (CMGST)',
     sapCode: 'VBUK-CMGST / VBAK-CMGST',
-    description: 'Indica se a ordem de venda está retida ou liberada pela análise de risco financeiro.',
-    importance: 'Bloqueia o faturamento ou a remessa caso o montante do pedido supere o limite de crédito aprovado.',
-    example: 'A (Aprovado / Liberado) ou B (Retido por Crédito / Credit Block)',
+    description: 'Indica se a ordem de venda está retida ou liberada pela análise de risco financeiro e qual decisão documentada foi registrada.',
+    importance: 'Um bloqueio exige evidência e parecer. HOLD mantém a ordem retida, ESCALATE encaminha para outra alçada e somente RELEASE remove a trava.',
+    example: 'CREDIT_BLOCKED + HOLD/ESCALATE ou OPEN + RELEASED_MANUAL',
     table: 'VBUK / KNKK'
   },
   billingType: {
@@ -158,8 +206,8 @@ export const TRANSACTION_GENERAL_HELP = {
   },
   MM03: {
     title: 'Transação MM03 • Exibir Mestre de Materiais',
-    description: 'Consulta os dados técnicos e logísticos dos materiais, incluindo saldo disponível em estoque no centro/depósito e preço base da tabela.',
-    tip: 'Verifique o saldo disponível para garantir que a quantidade pedida não sofrerá ruptura de estoque.'
+    description: 'Consulta os dados técnicos e logísticos dos materiais, incluindo centro, depósito, unidade, estoque físico e saldo ATP disponível.',
+    tip: 'Compare a quantidade da PO com a quantidade confirmável, registre o saldo pendente e a data; não trate o estoque físico como promessa automática.'
   },
   VK11: {
     title: 'Transação VK11 • Criar Condição de Preço',
@@ -168,8 +216,8 @@ export const TRANSACTION_GENERAL_HELP = {
   },
   VKM1: {
     title: 'Transação VKM1 • Documentos de Vendas Bloqueados por Crédito',
-    description: 'Painel gerencial de análise de risco financeiro para liberar ou rejeitar ordens de venda retidas por ultrapassagem do limite de crédito.',
-    tip: 'A liberação na VKM1 remove o bloqueio global de remessa (Credit Block), permitindo a continuidade do fluxo.'
+    description: 'Painel gerencial de análise de risco financeiro para registrar uma decisão documentada sobre ordens retidas por crédito.',
+    tip: 'Registre HOLD para manter a trava, ESCALATE para encaminhar a outra alçada ou RELEASE somente com aprovação e parecer. HOLD e ESCALATE nunca removem o bloqueio.'
   },
   VL01N: {
     title: 'Transação VL01N • Criar Remessa com Referência à Ordem',

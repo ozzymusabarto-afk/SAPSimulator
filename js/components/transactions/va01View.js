@@ -76,21 +76,21 @@ export class Va01ViewComponent {
         </p>
         <div class="form-grid-4">
           <label class="erp-form-group"><span class="erp-form-label">Quantidade solicitada</span>
-            <input class="erp-input font-mono atp-requested" type="number" min="0" value="${evidence.requestedQuantity ?? ''}" placeholder="ex.: ${contract.requestedQuantity}">
+            <input class="erp-input font-mono atp-requested" data-help-id="atpRequestedQuantity" type="number" min="0" value="${evidence.requestedQuantity ?? ''}" placeholder="ex.: ${contract.requestedQuantity}">
           </label>
           <label class="erp-form-group"><span class="erp-form-label">Confirmada na data</span>
-            <input class="erp-input font-mono atp-confirmed" type="number" min="0" value="${evidence.confirmedQuantity ?? ''}" placeholder="ex.: ${contract.confirmedQuantity}">
+            <input class="erp-input font-mono atp-confirmed" data-help-id="atpConfirmedQuantity" type="number" min="0" value="${evidence.confirmedQuantity ?? ''}" placeholder="ex.: ${contract.confirmedQuantity}">
           </label>
           <label class="erp-form-group"><span class="erp-form-label">Saldo pendente</span>
-            <input class="erp-input font-mono atp-remaining" type="number" min="0" value="${evidence.remainingQuantity ?? ''}" placeholder="ex.: ${contract.remainingQuantity}">
+            <input class="erp-input font-mono atp-remaining" data-help-id="atpRemainingQuantity" type="number" min="0" value="${evidence.remainingQuantity ?? ''}" placeholder="ex.: ${contract.remainingQuantity}">
           </label>
           <label class="erp-form-group"><span class="erp-form-label">Data confirmada</span>
-            <input class="erp-input font-mono atp-date" type="date" value="${evidence.confirmationDate ?? ''}">
+            <input class="erp-input font-mono atp-date" data-help-id="atpConfirmationDate" type="date" value="${evidence.confirmationDate ?? ''}">
           </label>
         </div>
         <div class="form-grid-2" style="margin-top: 10px;">
           <label class="erp-form-group"><span class="erp-form-label">Encaminhamento comercial</span>
-            <select class="erp-select atp-decision">
+            <select class="erp-select atp-decision" data-help-id="atpDecision">
               <option value="">-- Selecione a decisão --</option>
               <option value="PARTIAL" ${evidence.decision === 'PARTIAL' ? 'selected' : ''}>Confirmar parcialmente e tratar saldo</option>
               <option value="FUTURE" ${evidence.decision === 'FUTURE' ? 'selected' : ''}>Confirmar em data futura</option>
@@ -99,7 +99,7 @@ export class Va01ViewComponent {
             </select>
           </label>
           <label class="erp-form-group"><span class="erp-form-label">Parecer / próximo passo</span>
-            <input class="erp-input atp-note" type="text" value="${evidence.note ?? ''}" placeholder="Explique a confirmação e o tratamento do saldo...">
+            <input class="erp-input atp-note" data-help-id="atpDecisionNote" type="text" value="${evidence.note ?? ''}" placeholder="Explique a confirmação e o tratamento do saldo...">
           </label>
         </div>
         <label class="text-sm" style="display:flex; gap:8px; align-items:center; margin-top:10px;">
