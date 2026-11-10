@@ -2,7 +2,7 @@
 
 ## Resultado
 
-- **50/50 missões aprovadas** no auditor isolado.
+- **54/54 missões aprovadas** no auditor isolado.
 - **Build de produção aprovada** com Vite.
 - `git diff --check` sem erros.
 
@@ -26,7 +26,7 @@
 - Missões com pricing obrigatório não usam preço-base silencioso quando não existe condição válida.
 - A auditoria da VA03 só é concluída depois da inspeção real do documento.
 - A análise ATP é registrada após consulta/ação, não apenas porque a ordem foi salva.
-- A tela de crédito recebeu seleção explícita de `RELEASE`, `HOLD`, `ESCALATE` ou `REJECT` e campo de parecer.
+- A tela de crédito recebeu seleção explícita de `RELEASE`, `HOLD` ou `ESCALATE` e campo de parecer.
 - Decisões sem RELEASE mantêm a ordem bloqueada e exigem parecer com evidência.
 - A fila de crédito valida ordem, cliente e PO antes de aceitar a decisão.
 
@@ -34,4 +34,4 @@
 
 Este é um simulador independente. Ele usa dados fictícios e representa conceitos S/4HANA, regras da empresa NexusTech e simplificações de navegador. Não é uma conexão com SAP S/4HANA real e não garante que nomes de apps, status, tabelas, autorizações ou regras tributárias sejam idênticos em uma instalação produtiva.
 
-O próximo lote deve revisar a interface e os dados das transações modernas de Business Partner, crédito e ATP, além de cobrir cenários Júnior e Pleno sem copiar a sequência Trainee.
+O próximo ciclo deve revisar a interface e os dados das transações modernas de Business Partner, crédito e ATP, além de cobrir cenários Júnior e Pleno sem copiar a sequência Trainee.
