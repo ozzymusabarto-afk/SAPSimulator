@@ -213,7 +213,7 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Aditivo Comercial Urgente: Aumento de Volume TechLog (PO-TL-2026-042)',
-    briefing: 'Olá, trainee! O cliente corporativo TechLog Soluções em TI enviou uma solicitação de aditivo para o pedido que acabamos de registrar. Devido a uma nova demanda contratual no projeto de Curitiba, eles precisam aumentar a quantidade do Switch Gigabit Managed de 10 para 25 unidades. O aditivo AD01 mantém a condição de preço autorizada e solicita aumento de volume. Antes de alterar, confira a aprovação do aditivo, a disponibilidade por centro e a confirmação de data; não trate o saldo físico como ATP universal. Em vez de cancelarmos o pedido ou gerarmos duplicidade, localize a ordem de venda existente no sistema e utilize a transação VA02 para ajustar o volume. Não se esqueça de conferir a disponibilidade de estoque ATP e simular o recálculo dos impostos antes de gravar!',
+    briefing: 'Olá, trainee! O cliente corporativo TechLog Soluções em TI enviou uma solicitação de aditivo para o pedido que acabamos de registrar. Devido a uma nova demanda contratual no projeto de Curitiba, eles precisam aumentar a quantidade do Switch Gigabit Managed de 10 para 25 unidades. O aditivo AD01 mantém a condição de preço autorizada, ajusta o frete para CIF por conta da NexusTech e solicita aumento de volume. Antes de alterar, confira a aprovação do aditivo, a disponibilidade por centro e a confirmação de data; não trate o saldo físico como ATP universal. Em vez de cancelarmos o pedido ou gerarmos duplicidade, localize a ordem de venda existente no sistema e utilize a transação VA02 para ajustar o volume e o frete. Não se esqueça de conferir a disponibilidade de estoque ATP e simular o recálculo dos impostos antes de gravar!',
 
     purchaseOrderDocument: {
       buyerName: 'TechLog Soluções em TI e Distribuição (Curitiba/PR)',
@@ -304,7 +304,7 @@ export const ScenarioCatalog = [
         { description: 'Cabo de Fibra Óptica 10m Duplex LC-LC Patch Cord', quantity: 50, unit: 'UN' }
       ],
       deliveryAddress: 'Alameda Rio Negro, 100 - Alphaville - Barueri/SP',
-      freightResponsibility: 'CIF - Entrega no Data Center por conta da NexusTech',
+      freightResponsibility: 'DAP - Entrega no Data Center de Barueri/SP, conforme contrato da NexusTech',
       paymentInstructions: '15 dias direto (Z015) - Preço de tabela corporativa acordado de R$ 65,00 por unidade'
     },
 
@@ -634,10 +634,10 @@ export const ScenarioCatalog = [
     },
 
     completionFeedback: {
-      mentorSpeech: 'Excelente condução! Você verificou o bloqueio na VA03, investigou a exposição financeira do cliente UltraLink na XD03 e efetuou a liberação com alçada comercial na VKM1. Esse é o fluxo padrão de integração entre SD e FI-AR no SAP! Parabéns! +300 XP.',
-      whatHappened: 'Ordem de Venda nº 10000006 liberada do bloqueio de crédito e status atualizado para OPEN.',
-      why: 'A exposição projetada supera o limite configurado da conta; a decisão deve ser documentada e encaminhada ao responsável de crédito.',
-      businessImpact: 'A ordem permanece retida até decisão autorizada; somente depois será possível avaliar a criação da remessa.'
+      mentorSpeech: 'Excelente condução! Você verificou o bloqueio na VA03, investigou a exposição financeira do cliente UltraLink na XD03 e registrou o parecer fundamentado na VKM1, encaminhando a decisão (ESCALATE) para a alçada competente. A ordem permanece retida com segurança até a deliberação formal. Esse é o fluxo correto de governança de crédito no SAP S/4HANA! Parabéns! +300 XP.',
+      whatHappened: 'Parecer registrado e decisão ESCALATE documentada na VKM1 para a Ordem nº 10000006, mantendo o documento retido (CREDIT_BLOCKED) até aprovação de alçada.',
+      why: 'A exposição projetada (R$ 125.600) supera o limite de crédito aprovado (R$ 110.000); sem autorização formal e alçada verificável, a ordem não pode ser liberada.',
+      businessImpact: 'A ordem permanece retida com rastreabilidade, evitando riscos financeiros e garantindo que a expedição logística só ocorra após autorização formal de crédito.'
     }
   },
   {
