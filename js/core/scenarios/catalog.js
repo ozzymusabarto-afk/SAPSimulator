@@ -875,57 +875,59 @@ export const ScenarioCatalog = [
   {
     id: 'SCN-14',
     code: 'DSF-204',
-    title: 'Desafio Autônomo — Expedição Crítica sob SLA',
+    title: 'Desafio Autônomo — Decisão de Crédito do Cliente UltraLink',
     mode: 'CHALLENGE',
     levelRequired: 1,
     slaMinutes: 6,
     xpReward: 450,
-    badgeReward: 'shipping_master',
+    badgeReward: 'credit_master',
     initialTcode: 'VA03',
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
-    emailSubject: 'CHAMADO CRÍTICO: Despacho Imediato de Switches (Doc 10000006)',
-    briefing: 'Chamado Crítico da Diretoria! O provedor UltraLink acionou a gerência informando que a Ordem de Venda nº 10000006 (6x Switches 48P PoE+ MAT-2080) precisa ser liberada e expedida imediatamente para o centro operacional de Fortaleza/CE. O chamado está sob controle de SLA (6 minutos). Como consultor SD de plantão, investigue a situação completa do documento, solucione qualquer retenção comercial que impeça o fornecimento, gere a remessa física e conclua o Post Goods Issue (PGI) dentro do prazo limite!',
-
+    emailSubject: 'CHAMADO CRÍTICO: Decisão de Crédito UltraLink (Doc 10000006)',
+    briefing: 'Chamado Crítico da Diretoria! O provedor UltraLink solicitou prioridade para a Ordem de Venda nº 10000006 (6x Switches MAT-2080), mas o documento está retido por crédito. Sob SLA de 6 minutos, investigue a ordem, reconcilie o Business Partner, limite, exposição e risco e registre uma decisão documentada. A urgência comercial não substitui aprovação ou alçada; remessa, PGI e billing são etapas posteriores.',
     purchaseOrderDocument: {
       buyerName: 'UltraLink Provedor de Internet Banda Larga S/A (Fortaleza/CE)',
       buyerCnpj: '88.990.011/0001-66',
       poNumber: 'PO-UL-2026-055',
-      operationType: 'Expedição de Emergência de Switches PoE+ para Expansão de Rede',
+      operationType: 'Decisão documentada de crédito para venda de conectividade',
       itemsRequested: [
         { description: 'Switch 48 Portas Gigabit PoE+ com 4x 10G SFP+ (MAT-2080)', quantity: 6, unit: 'UN' }
       ],
       deliveryAddress: 'Av. Santos Dumont, 2800 - Fortaleza/CE',
-      freightResponsibility: 'CIF - Frete Expresso Dedicado',
-      paymentInstructions: '15 dias líquido (Z015)'
+      freightResponsibility: 'CIF - Entrega no Centro Operacional Fortaleza',
+      paymentInstructions: '15 dias líquido (Z015) - sujeito à decisão de crédito'
     },
-
-    mentorInitialTip: 'Aviso de Desafio: Você está em modo autônomo com cronômetro de SLA (6 minutos). Avalie os impedimentos da ordem no fluxo de documentos e execute todas as etapas necessárias para efetivar a saída física de mercadorias!',
-
+    mentorInitialTip: 'Aviso de Desafio: valide primeiro a ordem e o Business Partner. Depois registre na gestão de decisões de crédito o parecer, a evidência de exposição e ESCALATE para a alçada competente. Não crie remessa nem libere a ordem sem aprovação formal.',
     sapKnowledgeBridge: {
-      tcode: 'Manage Documented Credit Decisions / Manage Outbound Deliveries',
-      legacyComparison: 'VA03, VKM1, VL01N, VL02N, KNKK, LIKP, LIPS, VBFA e MARD são referências GUI/ECC ou simplificações.',
-      tables: 'Crédito, entrega e fluxo são objetos simulados; a decisão moderna depende do Credit Management configurado.',
-      concept: 'O ciclo completo Order-to-Cash (O2C) requer que bloqueios de crédito sejam avaliados na VKM1 antes da geração da remessa na VL01N e do PGI na VL02N.'
+      deploymentScope: 'S/4HANA Credit Management com Manage Documented Credit Decisions, Manage Business Partner e Manage Sales Orders.',
+      tcode: 'Manage Documented Credit Decisions / Manage Business Partner / Manage Sales Orders',
+      legacyComparison: 'VA03, XD03, VKM1, KNKK, VBAK e VBFA são referências GUI/ECC ou simplificações do laboratório.',
+      concept: 'No S/4HANA, a decisão precisa reconciliar exposição, risco, vencidos e alçada. O laboratório registra a recomendação em memória; ESCALATE mantém o documento bloqueado até aprovação responsável.'
     },
-
     objectives: [
-      { id: 'check_order_va03', text: 'Identificar a retenção da Ordem 10000006 na VA03', done: false },
-      { id: 'release_credit_order', text: 'Solucionar o bloqueio de crédito comercial na VKM1', done: false },
-      { id: 'create_delivery', text: 'Criar o documento de fornecimento na VL01N', done: false },
-      { id: 'post_goods_issue', text: 'Confirmar picking e registrar o PGI na VL02N dentro do SLA', done: false }
+      { id: 'check_order_va03', text: 'Confirmar o bloqueio, valor e fluxo da Ordem 10000006', done: false },
+      { id: 'investigate_credit', text: 'Reconciliar limite, utilizado, risco e pendências do BP 100800', done: false },
+      { id: 'access_vkm1', text: 'Abrir a fila de decisões e localizar o caso de crédito', done: false },
+      { id: 'release_credit_order', text: 'Registrar ESCALATE com parecer e próxima alçada dentro do SLA', done: false }
     ],
-
     targetCriteria: {
       targetDocNumber: '10000006',
-      action: 'POST_GOODS_ISSUE'
+      salesOrg: '1000', distChannel: '10', division: '01', paymentTerms: 'Z015', incoterms: 'CIF',
+      customerId: '100800',
+      action: 'CREDIT_RELEASE',
+      creditDecision: 'ESCALATE',
+      requiresApproval: true,
+      requiresVkm1Release: true,
+      expectedCreditLimit: 110000,
+      expectedCreditUsed: 108500,
+      targetNetValue: 17100.00
     },
-
     completionFeedback: {
-      mentorSpeech: 'Extraordinário! Você dominou de ponta a ponta o ciclo comercial e logístico do SAP SD sob pressão de SLA: identificou a trava financeira, liberou a ordem na VKM1, gerou o fornecimento na VL01N e processou a saída de mercadorias na VL02N. Você conquistou a insígnia máxima Shipping Master! +450 XP.',
-      whatHappened: 'Ordem 10000006 liberada de crédito e expedida com sucesso (Remessa + PGI concluídos).',
-      why: 'Todo o encadeamento SD -> FI-AR -> MM (VA03 -> VKM1 -> VL01N -> VL02N) foi perfeitamente executado.',
-      businessImpact: 'Os switches foram despachados no transporte aéreo expresso, cumprindo o acordo de nível de serviço com a UltraLink.'
+      mentorSpeech: 'Boa decisão sob pressão. Você documentou a exposição da UltraLink e encaminhou ESCALATE sem liberar uma ordem acima da alçada. A urgência foi tratada como prioridade, não como autorização financeira. +450 XP.',
+      whatHappened: 'A decisão ESCALATE foi registrada para a Ordem 10000006, que permaneceu retida até a aprovação responsável.',
+      why: 'A exposição projetada supera a margem de crédito disponível; sem evidência de aprovação compatível, a ordem não deve avançar para a logística.',
+      businessImpact: 'O caso ficou rastreável para a área de crédito, sem promessa de remessa, PGI ou faturamento antes da deliberação formal.'
     }
   },
   {
@@ -941,13 +943,13 @@ export const ScenarioCatalog = [
 
     sender: 'Chefe Wilson (Coordenador Comercial | Mentor SD)',
     emailSubject: 'Faturamento Liberado: Rede Hospitalar São Lucas (Doc 10000007)',
-    briefing: 'Olá, trainee! A Remessa da Ordem de Venda nº 10000007 (Rede Hospitalar São Lucas) foi devidamente separada e expedida com Saída de Mercadorias (PGI) concluída no Centro de Distribuição. Agora precisamos realizar a registrar um documento de faturamento F2 simulado após o PGI. NF-e, autorização SEFAZ, FI-AR, cobrança bancária e liquidação estão fora do escopo. Acesse a transação VF01, informe o Tipo de Fatura F2, carregue a remessa expedida, confira os valores líquidos e os tributos incidentes (ICMS e PIS/COFINS) e grave o faturamento. Em seguida, consulte o resultado e o fluxo de documentos na VF03.',
+    briefing: 'Olá, trainee! A Remessa da Ordem de Venda nº 10000007 (Rede Hospitalar São Lucas) foi devidamente separada e expedida com Saída de Mercadorias (PGI) concluída no Centro de Distribuição. Agora precisamos registrar um documento de faturamento F2 simulado após o PGI. NF-e, autorização SEFAZ, FI-AR, cobrança bancária e liquidação estão fora do escopo. Acesse a transação VF01, informe o Tipo de Fatura F2, carregue a remessa expedida, confira os valores líquidos e os tributos incidentes (ICMS e PIS/COFINS) e grave o faturamento. Em seguida, consulte o resultado e o fluxo de documentos na VF03.',
 
     purchaseOrderDocument: {
       buyerName: 'Rede Hospitalar São Lucas S/A (Rio de Janeiro/RJ)',
       buyerCnpj: '23.456.789/0001-95',
       poNumber: 'PO-HSL-2026-062',
-      operationType: 'Faturamento Comercial e Emissão de Nota Fiscal de Venda',
+      operationType: 'Faturamento comercial baseado em remessa (documento F2 simulado)',
       itemsRequested: [
         { description: 'Servidor Enterprise Nexus Pro X (Dual Xeon 64GB)', quantity: 1, unit: 'UN' },
         { description: 'Memória ECC 64GB DDR5 4800MHz (MAT-3050)', quantity: 4, unit: 'UN' }
@@ -1008,7 +1010,7 @@ export const ScenarioCatalog = [
       buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
       buyerCnpj: '56.789.012/0001-34',
       poNumber: 'PO-SD-2026-085',
-      operationType: 'Faturamento de Servidores e Módulos para Filial Curitiba',
+      operationType: 'Faturamento comercial baseado em remessa no simulador',
       itemsRequested: [
         { description: 'Servidor Rack 2U Nexus Power (Dual AMD 128GB)', quantity: 2, unit: 'UN' },
         { description: 'Disco SSD 1.92TB Enterprise SATA (MAT-3010)', quantity: 4, unit: 'UN' }
@@ -1046,8 +1048,8 @@ export const ScenarioCatalog = [
     completionFeedback: {
       mentorSpeech: 'Brilhante diagnóstico! Você identificou rapidamente que o faturamento estava retido por ausência de Saída de Mercadorias (PGI), regularizou o movimento de estoque na VL02N e emitiu a Fatura Comercial com maestria! +300 XP.',
       whatHappened: 'A Remessa foi completada com PGI e a Fatura Comercial foi emitida com sucesso.',
-      why: 'O princípio contábil e fiscal de confrontação de receitas e custos no SAP exige a baixa física antes do faturamento.',
-      businessImpact: 'A ordem foi totalmente liquidada e a mercadoria já pode trafegar com a nota fiscal correspondente.'
+      why: 'A regra de faturamento baseado em remessa do laboratório exige PGI antes do documento F2 simulado.',
+      businessImpact: 'O documento F2 simulado foi concluído após o PGI; emissão fiscal, transporte e liquidação permanecem fora do escopo.'
     }
   },
   {
@@ -1250,13 +1252,13 @@ export const ScenarioCatalog = [
       mentorSpeech: 'Parabéns! Você conduziu perfeitamente a negociação de atacado, conferiu o saldo físico na MM03 e aplicou o desconto de 8% respeitando a política comercial. +300 XP.',
       whatHappened: 'Ordem de atacado criada com desconto comercial de 8% aplicado com sucesso.',
       why: 'O desconto comercial negociado foi deduzido da base tributável, mantendo a rentabilidade e a conformidade fiscal.',
-      businessImpact: 'O cliente parceiro recebeu o lote de conectividade no prazo e com as condições promocionais acordadas.'
+      businessImpact: 'A ordem de atacado ficou pronta para as etapas posteriores, sem prometer entrega antes da confirmação logística.'
     }
   },
   {
     id: 'SCN-20',
     code: 'TRN-114',
-    title: 'Análise de Disponibilidade e Alocação de Fornecimento em Centro Regional',
+    title: 'Análise de ATP e Confirmação no Centro Regional',
     mode: 'TRAINING',
     levelRequired: 1,
     xpReward: 300,
@@ -1265,7 +1267,7 @@ export const ScenarioCatalog = [
 
     sender: 'Renata Siqueira (Planejamento de Demanda e Suprimentos - S&OP)',
     emailSubject: 'URGENTE: Atendimento de Switches 48P para Sul Distribuidora (Doc PO-SUL-2026-12)',
-    briefing: 'A Sul Distribuidora de Informática (Cliente 100240) enviou o pedido PO-SUL-2026-12 solicitando 20 unidades do Switch 48 Portas Gigabit PoE+ (MAT-2080). A equipe comercial precisa confirmar a alocação de estoque antes de confirmar o pedido. Acesse a MM03 para verificar a disponibilidade do produto no Centro 2000 (Filial Itajaí). Após certificar-se do saldo livre de 70 unidades, acesse a VA01 e registre a ordem no canal de revenda (1000/20/01) com a condição escalonada Z28D e frete CIF.',
+    briefing: 'A Sul Distribuidora de Informática (Cliente 100240) enviou o pedido PO-SUL-2026-12 solicitando 20 unidades do Switch 48 Portas Gigabit PoE+ (MAT-2080). Antes de confirmar, consulte o ATP do Centro 2000 / Depósito DEP1: o saldo livre de 70 unidades permite confirmar integralmente as 20 unidades na data analisada. Registre a quantidade solicitada, a confirmação, a data, a planta e o saldo pendente na evidência ATP; depois grave a ordem no canal de revenda 1000/20/01 com Z28D e CIF. Não prometa volumes ou datas além do contrato registrado.',
 
     purchaseOrderDocument: {
       buyerName: 'Sul Distribuidora de Informática Ltda (Joinville/SC)',
@@ -1280,16 +1282,19 @@ export const ScenarioCatalog = [
       paymentInstructions: 'Condição escalonada 28 dias (Z28D)'
     },
 
-    mentorInitialTip: 'Dica do Chefe Wilson: Inicie na MM03 conferindo a aba Estoque Centro/Depósito do material MAT-2080. Na VA01, certifique-se de selecionar o cliente 100240, Canal 20 e o prazo Z28D.',
+    mentorInitialTip: 'Dica do Chefe Wilson: confira MAT-2080 no Centro 2000 / DEP1 e registre a evidência ATP completa: 20 solicitadas, 20 confirmadas, saldo pendente zero e data analisada. Depois selecione o cliente 100240, Canal 20 e Z28D na VA01.',
 
     sapKnowledgeBridge: {
-      tcode: 'MM03 / VA01',
-      tables: 'MARC / MARD / KNVV / VBAK',
-      concept: 'O SAP permite que a Organização de Vendas atenda clientes a partir de centros logísticos descentralizados (Plant 2000), garantindo agilidade no frete interestadual.'
+      deploymentScope: 'S/4HANA com Product Availability / aATP e Manage Sales Orders; MM03 e VA01 são referências GUI/ECC do laboratório.',
+      tcode: 'Manage Product Availability / Manage Sales Orders',
+      tables: 'MARC / MARD / VBEP / KNVV / VBAK',
+      legacyComparison: 'MM03, CO09 e VA01 são referências GUI/ECC ou simplificações; a confirmação moderna depende do escopo de aATP configurado.',
+      concept: 'ATP registra quantidade solicitada, quantidade confirmada, data, planta, depósito e saldo pendente. Neste caso a confirmação é integral no Centro 2000 / DEP1; o simulador não representa aATP produtivo.'
     },
 
     objectives: [
-      { id: 'check_material', text: 'Auditar saldo e centro do material MAT-2080 na MM03', done: false },
+      { id: 'check_material', text: 'Auditar saldo, centro 2000 e depósito DEP1 do MAT-2080 na consulta de disponibilidade', done: false },
+      { id: 'record_atp_evidence', text: 'Registrar 20 solicitadas, 20 confirmadas, saldo zero e data de confirmação', done: false },
       { id: 'access_va01', text: 'Acessar a transação VA01', done: false },
       { id: 'fill_header_sales_area', text: 'Definir Área de Vendas 1000 / 20 / 01 e Tipo OR', done: false },
       { id: 'fill_header_commercial', text: 'Informar Cliente 100240, PO-SUL-2026-12 e Prazo Z28D', done: false },
@@ -1298,6 +1303,16 @@ export const ScenarioCatalog = [
     ],
 
     targetCriteria: {
+      atpContract: {
+        requestedQuantity: 20,
+        confirmedQuantity: 20,
+        remainingQuantity: 0,
+        expectedDecision: 'FULL',
+        confirmationDate: '2026-11-10',
+        plantId: '2000',
+        storageLocation: 'DEP1',
+        shippingPoint: '2000'
+      },
       action: 'SALES_ORDER_SUBMISSION',
       orderType: 'OR',
       salesOrg: '1000',
@@ -1305,18 +1320,26 @@ export const ScenarioCatalog = [
       division: '01',
       customerId: '100240',
       customerPoNumber: 'PO-SUL-2026-12',
+      requiresCustomerAnalysis: true,
+      requiresPoAnalysis: true,
+      requiresMaterialAnalysis: true,
+      requiresPricingEvidence: true,
+      conditionCode: 'PR00',
+      targetMaterialId: 'MAT-2080',
+      targetAmount: 2850.00,
+      targetNetValue: 57000.00,
       paymentTerms: 'Z28D',
       incoterms: 'CIF',
       items: [
-        { materialId: 'MAT-2080', quantity: 20, discountPercent: 0 }
+        { materialId: 'MAT-2080', requestedQuantity: 20, quantity: 20, discountPercent: 0 }
       ]
     },
 
     completionFeedback: {
-      mentorSpeech: 'Ótima análise logística! Você confirmou a disponibilidade regional na MM03 e emitiu o pedido com a parametrização precisa de prazo e canal para a região Sul. +300 XP.',
-      whatHappened: 'Ordem de venda criada com sucesso para atendimento pelo Centro Regional 2000.',
-      why: 'A checagem de suprimentos antes da gravação evita apontamentos de ruptura e atrasos de entrega.',
-      businessImpact: 'A distribuidora parceira teve seu pedido confirmado dentro do prazo planejado pelo S&OP.'
+      mentorSpeech: 'Ótima análise de ATP! Você registrou a confirmação integral de 20 unidades no Centro 2000 / DEP1, com data e saldo pendente reconciliados, e gravou o pedido sem prometer além da disponibilidade. +300 XP.',
+      whatHappened: 'A ordem de venda foi criada com 20 unidades confirmadas no Centro Regional 2000.',
+      why: 'A evidência ATP separa a demanda original da confirmação firme e torna explícitos centro, depósito, data e saldo pendente.',
+      businessImpact: 'A Sul Distribuidora recebe uma confirmação rastreável; novas promessas dependem de uma nova análise de disponibilidade.'
     }
   },
   {

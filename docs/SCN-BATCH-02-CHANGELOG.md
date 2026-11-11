@@ -28,8 +28,9 @@
 
 ### SCN-14 — crédito de cliente grande
 
-- Corrigido o CNPJ e removida a narrativa de aprovação sem evidência.
-- O caso exige decisão documentada e escalonamento quando a alçada não estiver comprovada.
+- Reescrita a missão que ainda executava expedição/PGI como um desafio de decisão documentada de crédito para a UltraLink (Ordem 10000006).
+- Corrigidos cliente, contrato CIF, limite, utilizado e valor líquido do documento mestre.
+- O caso exige `ESCALATE` com parecer e mantém a ordem bloqueada quando a alçada não estiver comprovada.
 
 ### SCN-15 — billing
 
@@ -60,19 +61,21 @@
 
 ### SCN-20 — ATP regional
 
-- Adicionados centro, ponto de expedição, depósito e análises de parceiro/material/pricing.
-- Adicionadas condições PR00 de revenda para MAT-2080 e MAT-4020.
+- Adicionado contrato ATP explícito para 20 unidades: solicitada, confirmada, saldo zero, data, centro 2000, DEP1 e ponto de expedição 2000.
+- Adicionadas análises obrigatórias de BP, PO, material e pricing antes da gravação.
 - O ATP é explicitamente simplificado e não representa aATP produtivo.
 
 ## Endurecimento do motor
 
 - PGI não completa mais picking silenciosamente.
 - Todas as posições precisam estar separadas antes da baixa física.
+- A evidência ATP valida, quando declarados, centro, depósito e ponto de expedição; a interface também suporta confirmação integral (`FULL`).
+- A auditoria executa `applyCreditDecision` e verifica que `HOLD`/`ESCALATE` preservam o bloqueio.
 - A checagem automatizada continua cobrindo o catálogo inteiro.
 
 ## Validação
 
-- `npm run audit:missions` — **50/50 aprovadas**
+- `npm run audit:missions` — **54/54 aprovadas**
 - `npm run build` — **aprovado**
 - `git diff --check` — **aprovado**
-- `npm audit --omit=dev --audit-level=high` — **0 vulnerabilidades**
+- `npm audit --omit=dev --audit-level=high` — **4 vulnerabilidades high em @grpc/grpc-js via Firebase; correção automática exige downgrade breaking para firebase 9.14.0 e não foi aplicada**

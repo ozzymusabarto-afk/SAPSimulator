@@ -88,10 +88,23 @@ export class Va01ViewComponent {
             <input class="erp-input font-mono atp-date" data-help-id="atpConfirmationDate" type="date" value="${evidence.confirmationDate ?? ''}">
           </label>
         </div>
+        ${(contract.plantId || contract.storageLocation || contract.shippingPoint) ? `
+        <div class="form-grid-4" style="margin-top: 10px;">
+          ${contract.plantId ? `<label class="erp-form-group"><span class="erp-form-label">Centro / planta</span>
+            <input class="erp-input font-mono atp-plant" data-help-id="atpPlant" type="text" value="${evidence.plantId ?? ''}" placeholder="ex.: ${contract.plantId}">
+          </label>` : ''}
+          ${contract.storageLocation ? `<label class="erp-form-group"><span class="erp-form-label">Depósito</span>
+            <input class="erp-input font-mono atp-storage" data-help-id="atpStorageLocation" type="text" value="${evidence.storageLocation ?? ''}" placeholder="ex.: ${contract.storageLocation}">
+          </label>` : ''}
+          ${contract.shippingPoint ? `<label class="erp-form-group"><span class="erp-form-label">Ponto de expedição</span>
+            <input class="erp-input font-mono atp-shipping-point" data-help-id="atpShippingPoint" type="text" value="${evidence.shippingPoint ?? ''}" placeholder="ex.: ${contract.shippingPoint}">
+          </label>` : ''}
+        </div>` : ''}
         <div class="form-grid-2" style="margin-top: 10px;">
           <label class="erp-form-group"><span class="erp-form-label">Encaminhamento comercial</span>
             <select class="erp-select atp-decision" data-help-id="atpDecision">
               <option value="">-- Selecione a decisão --</option>
+              <option value="FULL" ${evidence.decision === 'FULL' ? 'selected' : ''}>Confirmar integralmente na data</option>
               <option value="PARTIAL" ${evidence.decision === 'PARTIAL' ? 'selected' : ''}>Confirmar parcialmente e tratar saldo</option>
               <option value="FUTURE" ${evidence.decision === 'FUTURE' ? 'selected' : ''}>Confirmar em data futura</option>
               <option value="REVISED_PO" ${evidence.decision === 'REVISED_PO' ? 'selected' : ''}>Aguardar PO revisada</option>
@@ -104,7 +117,7 @@ export class Va01ViewComponent {
         </div>
         <label class="text-sm" style="display:flex; gap:8px; align-items:center; margin-top:10px;">
           <input class="atp-attempt" type="checkbox" ${evidence.attemptRecorded ? 'checked' : ''}>
-          Registrei a tentativa original acima do saldo disponível antes de ajustar a ordem.
+          Registrei a consulta/tentativa original de disponibilidade antes de ajustar ou confirmar a ordem.
         </label>
       </div>
     `;
@@ -674,6 +687,9 @@ export class Va01ViewComponent {
       '.atp-confirmed': ['confirmedQuantity', value => Number(value) || 0],
       '.atp-remaining': ['remainingQuantity', value => Number(value) || 0],
       '.atp-date': ['confirmationDate', value => value],
+      '.atp-plant': ['plantId', value => value.trim()],
+      '.atp-storage': ['storageLocation', value => value.trim()],
+      '.atp-shipping-point': ['shippingPoint', value => value.trim()],
       '.atp-decision': ['decision', value => value],
       '.atp-note': ['note', value => value]
     };

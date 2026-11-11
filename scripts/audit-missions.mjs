@@ -59,6 +59,9 @@ function createOrderData(scenario) {
       remainingQuantity: target.atpContract.remainingQuantity,
       decision: target.atpContract.expectedDecision,
       confirmationDate: target.atpContract.confirmationDate,
+      plantId: target.atpContract.plantId,
+      storageLocation: target.atpContract.storageLocation,
+      shippingPoint: target.atpContract.shippingPoint,
       note: `Auditoria: confirmação de ${target.atpContract.confirmedQuantity} UN; saldo ${target.atpContract.remainingQuantity} UN encaminhado para tratativa comercial.`
     } : undefined,
     netValue,
@@ -111,20 +114,26 @@ function finishCreditMission(scenario, order) {
   assert.equal(trainee.isScenarioCompleted(scenario.id), false, 'A consulta XD03 concluiu a missão antes da ação VKM1.');
   assert.equal(scenarioEngine.areActiveScenarioObjectivesComplete(), false, 'A análise XD03 concluiu todos os objetivos antes da liberação VKM1.');
 
-  if (target.creditDecision && target.creditDecision !== 'RELEASE') {
-    assert.ok(['HOLD', 'ESCALATE', 'REJECT'].includes(target.creditDecision), 'Decisão de crédito não suportada pelo laboratório.');
+  const decision = target.creditDecision || 'RELEASE';
+  const decisionNote = `Auditoria: decisão ${decision} documentada com exposição, risco, alçada e próximo passo operacional.`;
+  const decisionResult = db.applyCreditDecision(order.docNumber, decision, decisionNote);
+  assert.equal(decisionResult.success, true, decisionResult.error || 'VKM1 não aceitou a decisão documentada.');
+  assert.equal(decisionResult.decision.decision, decision, 'VKM1 não persistiu a decisão contratada.');
+
+  if (decision !== 'RELEASE') {
+    assert.ok(['HOLD', 'ESCALATE', 'REJECT'].includes(decision), 'Decisão de crédito não suportada pelo laboratório.');
     scenarioEngine.completeObjectives(['access_vkm1', 'release_with_notes', 'release_credit_order', 'analyze_credit', 'release_order']);
-    assert.equal(order.overallStatus, 'CREDIT_BLOCKED', 'Uma decisão sem RELEASE não pode desbloquear a ordem.');
+    assert.equal(db.getSalesOrder(order.docNumber).overallStatus, 'CREDIT_BLOCKED', 'Uma decisão sem RELEASE não pode desbloquear a ordem.');
     assert.equal(scenarioEngine.areActiveScenarioObjectivesComplete(), true, 'A decisão documentada deveria concluir os objetivos do chamado.');
     assert.equal(
-      scenarioEngine.completeActiveScenarioIfReady('Decisão documentada de crédito', `Ordem ${order.docNumber} com decisão ${target.creditDecision}`),
+      scenarioEngine.completeActiveScenarioIfReady('Decisão documentada de crédito', `Ordem ${order.docNumber} com decisão ${decision}`),
       true,
       'A decisão documentada deveria homologar a missão.'
     );
     return;
   }
 
-  assert.equal(db.releaseCreditOrder(order.docNumber), true, 'VKM1 não liberou a ordem-alvo.');
+  assert.equal(db.getSalesOrder(order.docNumber).overallStatus, 'OPEN', 'A decisão RELEASE deveria desbloquear a ordem.');
   // Replica os objetivos registrados pelo handler da VKM1 após uma liberação válida.
   scenarioEngine.completeObjectives(['access_vkm1', 'release_with_notes', 'release_credit_order', 'analyze_credit', 'release_order']);
 
@@ -515,6 +524,74 @@ function verifyRedoUsesCurrentAttemptForCompletionCard() {
   scenarioEngine.stopSlaTimer();
 }
 
+function verifyBatch11To20Contracts() {
+  const byId = new Map(ScenarioCatalog.map(scenario => [scenario.id, scenario]));
+  const requiredIds = Array.from({ length: 10 }, (_, index) => `SCN-${String(index + 11).padStart(2, '0')}`);
+  assert.deepEqual(requiredIds.map(id => byId.has(id)), requiredIds.map(() => true), 'O lote SCN-11 a SCN-20 está incompleto.');
+
+  for (const id of ['SCN-11', 'SCN-14', 'SCN-17']) {
+    const scenario = byId.get(id);
+    const target = scenario.targetCriteria;
+    assert.equal(target.action, 'CREDIT_RELEASE', `${id} precisa ser uma missão de decisão de crédito.`);
+    assert.ok(['HOLD', 'ESCALATE', 'REJECT', 'RELEASE'].includes(target.creditDecision), `${id} sem decisão de crédito suportada.`);
+    assert.equal(target.requiresApproval, true, `${id} precisa declarar aprovação/alçada.`);
+    assert.ok(target.expectedCreditLimit > 0 && target.expectedCreditUsed >= 0, `${id} sem contrato de exposição de crédito.`);
+    assert.ok(target.targetNetValue > 0, `${id} sem valor líquido-alvo.`);
+    assert.ok(scenario.objectives.some(objective => objective.id === 'investigate_credit'), `${id} sem objetivo de investigação de crédito.`);
+    assert.ok(scenario.objectives.some(objective => objective.id === 'access_vkm1'), `${id} sem objetivo de fila de crédito.`);
+    assert.ok(scenario.objectives.some(objective => objective.id === 'release_credit_order'), `${id} sem objetivo de decisão documentada.`);
+  }
+
+  const delivery = byId.get('SCN-12').targetCriteria;
+  assert.deepEqual(
+    { action: delivery.action, targetDocNumber: delivery.targetDocNumber, shippingPoint: delivery.shippingPoint },
+    { action: 'CREATE_DELIVERY', targetDocNumber: '10000007', shippingPoint: '1000' },
+    'SCN-12 perdeu o contrato de remessa/ponto de expedição.'
+  );
+
+  const pgi = byId.get('SCN-13').targetCriteria;
+  assert.deepEqual(
+    { action: pgi.action, targetDocNumber: pgi.targetDocNumber, shippingPoint: pgi.shippingPoint, plantId: pgi.plantId, storageLocation: pgi.storageLocation, targetMaterialId: pgi.targetMaterialId, targetQuantity: pgi.targetQuantity },
+    { action: 'POST_GOODS_ISSUE', targetDocNumber: '10000008', shippingPoint: '1000', plantId: '1000', storageLocation: 'DEP2', targetMaterialId: 'MAT-3020', targetQuantity: 8 },
+    'SCN-13 perdeu o contrato de picking/PGI.'
+  );
+
+  for (const id of ['SCN-15', 'SCN-16']) {
+    const target = byId.get(id).targetCriteria;
+    assert.equal(target.action, 'CREATE_INVOICE', `${id} precisa criar faturamento.`);
+    assert.equal(target.billingType, 'F2', `${id} precisa manter o tipo F2 simulado.`);
+  }
+
+  const pricing = byId.get('SCN-19').targetCriteria;
+  assert.equal(pricing.requiresPricingEvidence, true, 'SCN-19 precisa exigir evidência de pricing.');
+  assert.equal(pricing.conditionCode, 'PR00', 'SCN-19 precisa reconciliar a base PR00.');
+  assert.equal(pricing.targetAmount, 890, 'SCN-19 perdeu o preço unitário autorizado.');
+  assert.equal(pricing.items?.[0]?.discountPercent, 8, 'SCN-19 perdeu o desconto RB00 autorizado.');
+  assert.equal(pricing.targetNetValue, 8188, 'SCN-19 perdeu o valor líquido esperado.');
+
+  const atp = byId.get('SCN-20').targetCriteria;
+  assert.equal(atp.action, 'SALES_ORDER_SUBMISSION', 'SCN-20 precisa registrar uma ordem de venda.');
+  assert.deepEqual(
+    atp.atpContract,
+    {
+      requestedQuantity: 20,
+      confirmedQuantity: 20,
+      remainingQuantity: 0,
+      expectedDecision: 'FULL',
+      confirmationDate: '2026-11-10',
+      plantId: '2000',
+      storageLocation: 'DEP1',
+      shippingPoint: '2000'
+    },
+    'SCN-20 precisa declarar o contrato ATP completo do Centro 2000 / DEP1.'
+  );
+  assert.equal(atp.requiresCustomerAnalysis, true, 'SCN-20 deve exigir análise do BP.');
+  assert.equal(atp.requiresPoAnalysis, true, 'SCN-20 deve exigir conferência da PO.');
+  assert.equal(atp.requiresMaterialAnalysis, true, 'SCN-20 deve exigir consulta de disponibilidade.');
+  assert.equal(atp.requiresPricingEvidence, true, 'SCN-20 deve exigir evidência de pricing.');
+  assert.equal(byId.get('SCN-20').objectives.some(objective => objective.id === 'record_atp_evidence'), true, 'SCN-20 sem objetivo explícito de evidência ATP.');
+}
+
 verifyCustomerAnalysisRewardIsIdempotent();
 verifyCustomerLookupNeverCompletesMissionAlone();
 verifyUnrelatedVa02DoesNotCompleteCreditMission();
@@ -522,6 +599,7 @@ verifyUnrelatedVa01DoesNotCompleteInvoiceMission();
 verifyMissingAndWrongPricingAreRejected();
 verifyMm03CanIdentifyMissingPricing();
 verifyRedoUsesCurrentAttemptForCompletionCard();
+verifyBatch11To20Contracts();
 useIsolatedProfile('audit-all-54-missions');
 assert.equal(ScenarioCatalog.length, 54, 'O catálogo precisa conter exatamente 54 missões.');
 assert.equal(new Set(ScenarioCatalog.map(item => item.id)).size, 54, 'Há IDs de missão duplicados.');

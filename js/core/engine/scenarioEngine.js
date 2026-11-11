@@ -434,6 +434,9 @@ class ScenarioEngine {
     if (remaining !== expectedRemaining) errors.push(`calcule o saldo pendente como ${expectedRemaining} unidades`);
     if (evidence.decision !== contract.expectedDecision) errors.push(`selecione a decisão ${contract.expectedDecision}`);
     if (evidence.confirmationDate !== contract.confirmationDate) errors.push(`informe a data de confirmação ${contract.confirmationDate}`);
+    if (contract.plantId && evidence.plantId !== contract.plantId) errors.push(`informe a planta ${contract.plantId}`);
+    if (contract.storageLocation && evidence.storageLocation !== contract.storageLocation) errors.push(`informe o depósito ${contract.storageLocation}`);
+    if (contract.shippingPoint && evidence.shippingPoint !== contract.shippingPoint) errors.push(`informe o ponto de expedição ${contract.shippingPoint}`);
     if (String(evidence.note || '').trim().length < 20) errors.push('registre uma justificativa operacional com pelo menos 20 caracteres');
 
     if (errors.length) {
@@ -457,7 +460,7 @@ class ScenarioEngine {
       recordedAt: new Date().toISOString()
     };
     this.completeObjectives([
-      'check_atp_error', 'create_adjusted_order'
+      'check_atp_error', 'create_adjusted_order', 'record_atp_evidence'
     ]);
     return { isValid: true, atpEvidence: scenario.atpEvidence };
   }
